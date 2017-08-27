@@ -119,7 +119,7 @@ async def iam(ctx, *, name: str):
 
 
 @bot.command()
-async def whois(ctx, member: discord.User):
+async def whois(ctx, member: discord.Member):
     '''
     Retrieves character information for a user
 
@@ -165,7 +165,7 @@ async def roll(ctx, *, expression: str):
 async def roll_add(ctx, expression: str, *, name: str):
     '''
     Adds/updates a new roll for a character
-    
+
     Parameters:
     [expression] dice equation
     [name] name of roll to store
@@ -178,7 +178,7 @@ async def roll_add(ctx, expression: str, *, name: str):
             raise NoCharacterError()
 
         equations.solve(expression, operations, order_of_operations)
-        
+
         try:
             roll = session.query(m.Roll)\
                 .filter_by(name=name, character=character).one()
@@ -215,7 +215,7 @@ async def roll_use(ctx, *, name: str):
                 .filter_by(name=name, character=character).one()
         except NoResultFound:
             raise NoResourceError
-        
+
         result = equations.solve(
             roll.expression, operations, order_of_operations)
         await ctx.send('Rolling: {}'.format(roll.expression))
@@ -387,7 +387,7 @@ async def resource_check(ctx, *, name: str):
                     .filter_by(name=name, character=character).one()
             except NoResultFound:
                 raise NoResourceError
-    
+
             await ctx.send(resource)
         else:
             for resource in character.resources:
