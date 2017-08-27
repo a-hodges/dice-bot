@@ -6,6 +6,7 @@ from sqlalchemy import (
     Column,
     String,
     Integer,
+    BigInteger,
     Boolean,
     Enum,
     ForeignKey,
@@ -101,7 +102,7 @@ class Resource (Base):
 
     def __str__(self):
         ret = '{0.name}: {0.current}/{0.max}'.format(self)
-        if self.recover != Rests.other:
+        if self.recover != Rest.other:
             ret += ' per {} rest'.format(self.recover.name)
         return ret
 

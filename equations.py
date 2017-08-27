@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 
-import random
-
 operations = {
     '+': lambda a, b: a + b,
     '-': lambda a, b: a - b,
@@ -45,10 +43,10 @@ def infix2postfix(
         else:
             raise ValueError('Invalid character found: {} in {}'.format(
                 item, equation))
-    
+
     if len(stack) != 0:
         raise ValueError('Invalid equation: {}'.format(equation))
-    
+
     return output
 
 
@@ -72,10 +70,10 @@ def solve_postfix(
         else:
             raise ValueError('Invalid operand/operator: {} in '.format(
                 item, equation))
-    
+
     if len(stack) != 1:
         raise ValueError('Invalid equation: {}'.format(equation))
-    
+
     return stack[0]
 
 
