@@ -46,7 +46,7 @@ class Character (Base):
         unique=True,
         doc='The name of the character')
     user = Column(
-        Integer,
+        BigInteger,
         unique=True,
         doc='The id of the user of the character')
 
