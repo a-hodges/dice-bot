@@ -46,8 +46,12 @@ def roll_dice(a, b):
 operations = equations.operations.copy()
 operations['d'] = roll_dice
 operations['D'] = roll_dice
-order_of_operations = equations.order_of_operations.copy()
-order_of_operations.insert(0, ['d', 'D'])
+operations['ad'] = lambda a, b: max(roll_dice(a, b), roll_dice(a, b))
+operations['dd'] = lambda a, b: min(roll_dice(a, b), roll_dice(a, b))
+operations['>'] = max
+operations['<'] = min
+order_of_operations = [['d', 'D', 'ad', 'dd'], ['>', '<']]
+order_of_operations.extend(equations.order_of_operations)
 
 
 class BotError (Exception):
@@ -152,6 +156,12 @@ async def roll(ctx, *, expression: str):
 
     Parameters:
     [expression] standard dice notation specifying what to roll
+    
+    *Everything past here may change*
+    
+    There are special operators for advantage and disadvantage rolls:
+    "ad" for advantage, "dd" for disadvantage
+    So, use "1ad20" for advantage or "1dd20" for disadvantage
     '''
     if expression:
         roll = equations.solve(expression, operations, order_of_operations)

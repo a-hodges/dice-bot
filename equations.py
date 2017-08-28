@@ -33,10 +33,12 @@ def infix2postfix(
             stack.pop()
         elif item in operations:
             higher_or_equal_priority = []
-            for line in order_of_operations:
+            ops = iter(order_of_operations)
+            line = next(ops)
+            while item not in line:
                 higher_or_equal_priority.extend(line)
-                if item in line:
-                    break
+                line = next(ops)
+
             while stack[-1] in higher_or_equal_priority:
                 output.append(stack.pop())
             stack.append(item)
@@ -89,6 +91,8 @@ def solve(
                 stack[-1] = stack[-1] * 10 + int(c)
             else:
                 stack.append(int(c))
+        elif stack and not isinstance(stack[-1], int):
+            stack[-1] += c
         else:
             stack.append(c)
 
