@@ -372,7 +372,7 @@ async def resource_check(ctx, *, name: str):
 
     Parameters:
     [name] the name of the resource
-        leave empty to list resources
+        use the value "all" to list resources
     '''
     with sqlalchemy_context(Session) as session:
         try:
@@ -381,7 +381,7 @@ async def resource_check(ctx, *, name: str):
         except NoResultFound:
             raise NoCharacterError
 
-        if name:
+        if name != 'all':
             try:
                 resource = session.query(m.Resource)\
                     .filter_by(name=name, character=character).one()
