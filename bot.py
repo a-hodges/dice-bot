@@ -77,6 +77,24 @@ class NoResourceError (BotError):
     pass
 
 
+def sql_update(session, type, keys, values):
+    '''
+    Updates a sql object
+    '''
+    try:
+        obj = session.query(type)\
+            .filter_by(**keys).one()
+        for value in values:
+            setattr(obj, value, values[value])
+    except NoResultFound:
+        values = values.copy()
+        values.update(keys)
+        obj = type(**values)
+        session.add(obj)
+
+    session.commit()
+
+
 # ----#-   Commands
 
 
@@ -200,21 +218,13 @@ async def roll_add(ctx, expression: str, *, name: str):
                 .filter_by(user=ctx.author.id).one()
         except NoResultFound:
             raise NoCharacterError()
-
-        equations.solve(expression, operations, order_of_operations)
-
-        try:
-            roll = session.query(m.Roll)\
-                .filter_by(name=name, character=character).one()
-            roll.expression = expression
-        except NoResultFound:
-            roll = m.Roll(
-                character=character,
-                name=name,
-                expression=expression)
-            session.add(roll)
-
-        session.commit()
+        
+        sql_update(session, m.Roll, {
+            'character': character,
+            'name': name,
+        }, {
+            'expression': expression,
+        })
 
         await ctx.send('{} now has {}'.format(character.name, roll))
 
@@ -351,22 +361,15 @@ async def resource_add(ctx, max_uses: int, recover: str, *, name: str):
                 .filter_by(user=ctx.author.id).one()
         except NoResultFound:
             raise NoCharacterError()
-
-        try:
-            resource = session.query(m.Resource)\
-                .filter_by(name=name, character=character).one()
-            resource.max = max_uses
-            resource.recover = recover
-        except NoResultFound:
-            resource = m.Resource(
-                character=character,
-                name=name,
-                max=max_uses,
-                current=max_uses,
-                recover=recover)
-            session.add(resource)
-
-        session.commit()
+        
+        sql_update(session, m.Resource, {
+            'character': character,
+            'name': name,
+        }, {
+            'max': max,
+            'current': max,
+            'recover': recover,
+        })
 
         await ctx.send('{} now has {}'.format(character.name, resource))
 
