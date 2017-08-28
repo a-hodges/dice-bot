@@ -62,28 +62,52 @@ async def do_roll(ctx, character, expression, silent=False):
     output = []
 
     # Set up operations
-    def roll_dice(a, b):
+    def roll_dice(a, b, *, silent=False):
         out = 0
         for _ in range(a):
             n = random.randint(1, b)
-            output.append('{}d{}: {}'.format(1, b, n))
+            out += n
+        if not silent:
+            output.append('{}d{}: {}'.format(a, b, out))
+        return out
+
+    def great_weapon_fighting(a, b, *, silent=False):
+        out = 0
+        for _ in range(a):
+            n = roll_dice(1, b, silent=True)
+            if n <= 2:
+                n2 = random.randint(1, b)
+                if not silent:
+                    output.append('1d{0}: {1}, rerolling, 1d{0}: {2}'.format(
+                        1, b, n, n2))
+                n = n2
+            elif not silent:
+                output.append('1d{}: {}'.format(b, n))
             out += n
         return out
 
-    def great_weapon_fighting(a, b):
-        out = 0
-        for _ in range(a):
-            n = roll_dice(1, b)
-            if n <= 2:
-                n = random.randint(1, b)
-                output.append('Using GWF to reroll, {}d{}: {}'.format(1, b, n))
-            out += n
+    def advantage(a, b, *, silent=False):
+        first = roll_dice(a, b, silent=True)
+        second = roll_dice(a, b, silent=True)
+        out = max(first, second)
+        if not silent:
+            output.append('{}ad{}, picking larger of {} and {}: {}'.format(
+                a, b, first, second, out))
+        return out
+
+    def disadvantage(a, b, *, silent=False):
+        first = roll_dice(a, b, silent=True)
+        second = roll_dice(a, b, silent=True)
+        out = min(first, second)
+        if not silent:
+            output.append('{}dd{}, picking smaller of {} and {}: {}'.format(
+                a, b, first, second, out))
         return out
 
     operations = equations.operations.copy()
     operations['d'] = roll_dice
-    operations['ad'] = lambda a, b: max(roll_dice(a, b), roll_dice(a, b))
-    operations['dd'] = lambda a, b: min(roll_dice(a, b), roll_dice(a, b))
+    operations['ad'] = advantage
+    operations['dd'] = disadvantage
     operations['gwf'] = great_weapon_fighting
     operations['>'] = max
     operations['<'] = min
@@ -98,7 +122,7 @@ async def do_roll(ctx, character, expression, silent=False):
     # do roll
     roll = equations.solve(expression, operations, order_of_operations)
     output.append('I rolled {}'.format(roll))
-    
+
     await ctx.send('\n'.join(output))
 
 
