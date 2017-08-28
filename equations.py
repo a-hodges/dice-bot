@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+import math
+
 operations = {
     '+': lambda a, b: a + b,
     '-': lambda a, b: a - b,
@@ -85,12 +87,22 @@ def solve(
         order_of_operations=order_of_operations):
     stack = []
     equation = equation.replace(' ', '')
-    for c in equation:
+    for i, c in enumerate(equation):
         if c.isdigit():
-            if stack and isinstance(stack[-1], int):
-                stack[-1] = stack[-1] * 10 + int(c)
+            if stack and isinstance(stack[-1], (int, float)):
+                stack[-1] = stack[-1] * 10 + int(
+                    math.copysign(int(c), stack[-1]))
+                # poor way to handle the negatives
+                if stack and isinstance(stack[-1], float):
+                    stack[-1] = int(stack[-1])
             else:
                 stack.append(int(c))
+        # poor way to handle the negatives
+        elif c == '-' and (
+                i == 0 or
+                stack[-1] == '(' or
+                stack[-1] in operations):
+            stack.append(-0.0)
         elif stack and not isinstance(stack[-1], int):
             stack[-1] += c
         else:
