@@ -161,7 +161,7 @@ async def roll(ctx, *, expression: str):
         await ctx.send('No equation provided')
 
 
-@roll.command('add', aliases=['update'])
+@roll.command('add', aliases=['set', 'update'])
 async def roll_add(ctx, expression: str, *, name: str):
     '''
     Adds/updates a new roll for a character
@@ -222,9 +222,66 @@ async def roll_use(ctx, *, name: str):
         await ctx.send('I rolled {}'.format(result))
 
 
+@roll.command('check')
+async def roll_check(ctx, *, name: str):
+    '''
+    Checks the status of a roll
+
+    Parameters:
+    [name] the name of the roll
+        use the value "all" to list all rolls
+    '''
+    with sqlalchemy_context(Session) as session:
+        try:
+            character = session.query(m.Character)\
+                .filter_by(user=ctx.author.id).one()
+        except NoResultFound:
+            raise NoCharacterError
+
+        if name != 'all':
+            try:
+                roll = session.query(m.Roll)\
+                    .filter_by(name=name, character=character).one()
+            except NoResultFound:
+                raise NoResourceError
+
+            await ctx.send(roll)
+        else:
+            for roll in character.rolls:
+                await ctx.send(roll)
+
+
+@roll.command('remove')
+async def roll_remove(ctx, *, name: str):
+    '''
+    Deletes a roll from the character
+
+    Parameters:
+    [name] the name of the roll
+    '''
+    with sqlalchemy_context(Session) as session:
+        try:
+            character = session.query(m.Character)\
+                .filter_by(user=ctx.author.id).one()
+        except NoResultFound:
+            raise NoCharacterError
+
+        try:
+            roll = session.query(m.Roll)\
+                .filter_by(name=name, character=character).one()
+        except NoResultFound:
+            raise NoResourceError
+
+        session.remove(roll)
+        session.commit()
+        await ctx.send('{} removed'.format(roll))
+
+
 @roll.error
 @roll_add.error
 @roll_use.error
+@roll_check.error
+@roll_remove.error
 async def roll_error(ctx, error):
     if (isinstance(error, commands.BadArgument) or
             isinstance(error, commands.MissingRequiredArgument) or
