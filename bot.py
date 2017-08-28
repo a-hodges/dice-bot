@@ -459,7 +459,7 @@ async def resource_set(ctx, uses: int_or_max, *, name: str):
             raise NoResourceError
 
         if uses == 'max':
-            resource.current = resource.max_uses
+            resource.current = resource.max
         else:
             resource.current = uses
         session.commit()
