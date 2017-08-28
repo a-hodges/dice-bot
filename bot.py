@@ -375,11 +375,12 @@ async def resource_add(ctx, max_uses: int, recover: str, *, name: str):
 
 
 @resource.command('use')
-async def resource_use(ctx, *, name: str):
+async def resource_use(ctx, number: int, *, name: str):
     '''
     Consumes 1 use of the resource
 
     Parameters:
+    [number] the quantity of the resource to use (can be negative to regain)
     [name] the name of the resource
     '''
     with sqlalchemy_context(Session) as session:
@@ -396,7 +397,7 @@ async def resource_use(ctx, *, name: str):
             raise NoResourceError
 
         if resource.current > 0:
-            resource.current -= 1
+            resource.current -= number
             session.commit()
             await ctx.send('{} used {}, {} remaining'.format(
                 character.name, resource.name, resource.current))
