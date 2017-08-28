@@ -298,8 +298,10 @@ async def roll_check(ctx, *, name: str):
 
             await ctx.send(roll)
         else:
+            text = character.name + "'s rolls:\n"
             for roll in character.rolls:
-                await ctx.send(roll)
+                text += str(roll) + '\n'
+            await ctx.send(text)
 
 
 @roll.command('remove', aliases=['delete'])
@@ -491,8 +493,10 @@ async def resource_check(ctx, *, name: str):
 
             await ctx.send(resource)
         else:
+            text = character.name + "'s resources:\n"
             for resource in character.resources:
-                await ctx.send(resource)
+                text += str(resource) + '\n'
+            await ctx.send(text)
 
 
 @resource.command('remove', aliases=['delete'])
@@ -638,8 +642,10 @@ async def const_check(ctx, *, name: str):
 
             await ctx.send(const)
         else:
-            for const in character.consts:
-                await ctx.send(const)
+            text = character.name + "'s consts:\n"
+            for const in character.constants:
+                text += str(const) + '\n'
+            await ctx.send(text)
 
 
 @const.command('remove', aliases=['delete'])
