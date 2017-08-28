@@ -28,41 +28,7 @@ config = OrderedDict([
 ])
 
 
-@contextmanager
-def sqlalchemy_context(Session, autocommit=False):
-    session = Session(autocommit=autocommit)
-    try:
-        yield session
-    finally:
-        session.close()
-
-
-def roll_dice(a, b):
-    out = 0
-    for _ in range(a):
-        out += random.randint(1, b)
-    return out
-
-
-def great_weapon_fighting(a, b):
-    out = 0
-    for _ in range(a):
-        n = random.randint(1, b)
-        if n <= 2:
-            n = random.randint(1, b)
-        out += n
-    return out
-
-operations = equations.operations.copy()
-operations['d'] = roll_dice
-operations['D'] = roll_dice
-operations['ad'] = lambda a, b: max(roll_dice(a, b), roll_dice(a, b))
-operations['dd'] = lambda a, b: min(roll_dice(a, b), roll_dice(a, b))
-operations['gwf'] = great_weapon_fighting
-operations['>'] = max
-operations['<'] = min
-order_of_operations = [['d', 'D', 'ad', 'dd', 'gwf'], ['>', '<']]
-order_of_operations.extend(equations.order_of_operations)
+# ----#-   Error classes
 
 
 class BotError (Exception):
@@ -75,6 +41,61 @@ class NoCharacterError (BotError):
 
 class NoResourceError (BotError):
     pass
+
+
+# ----#-   Utilities
+
+
+@contextmanager
+def sqlalchemy_context(Session, autocommit=False):
+    session = Session(autocommit=autocommit)
+    try:
+        yield session
+    finally:
+        session.close()
+
+
+async def do_roll(ctx, character, expression, silent=False):
+    '''
+    Does the dice rolling after const replacement
+    '''
+    # Set up operations
+    def roll_dice(a, b):
+        out = 0
+        for _ in range(a):
+            n = random.randint(1, b)
+            ctx.send('{}d{}: {}'.format(1, b, n))
+            out += n
+        return out
+
+    def great_weapon_fighting(a, b):
+        out = 0
+        for _ in range(a):
+            n = roll_dice(1, b)
+            if n <= 2:
+                n = random.randint(1, b)
+                ctx.send('Using GWF to reroll, {}d{}: {}'.format(1, b, n))
+            out += n
+        return out
+
+    operations = equations.operations.copy()
+    operations['d'] = roll_dice
+    operations['ad'] = lambda a, b: max(roll_dice(a, b), roll_dice(a, b))
+    operations['dd'] = lambda a, b: min(roll_dice(a, b), roll_dice(a, b))
+    operations['gwf'] = great_weapon_fighting
+    operations['>'] = max
+    operations['<'] = min
+    order_of_operations = [['d', 'D', 'ad', 'dd', 'gwf'], ['>', '<']]
+    order_of_operations.extend(equations.order_of_operations)
+
+    # replace constants
+    for const in character.constants:
+        expression = expression.replace(const.name, const.value)
+    await ctx.send('Rolling: {}'.format(expression))
+
+    # do roll
+    roll = equations.solve(expression, operations, order_of_operations)
+    await ctx.send('I rolled {}'.format(roll))
 
 
 def sql_update(session, type, keys, values):
@@ -178,17 +199,6 @@ async def whois(ctx, member: discord.Member):
     else:
         # error
         await ctx.send('No one was mentioned')
-
-
-async def do_roll(ctx, character, expression, silent=False):
-    '''
-    Does the dice rolling after const replacement
-    '''
-    for const in character.constants:
-        expression = expression.replace(const.name, const.value)
-    await ctx.send('Rolling: {}'.format(expression))
-    roll = equations.solve(expression, operations, order_of_operations)
-    await ctx.send('I rolled {}'.format(roll))
 
 
 @bot.group(invoke_without_command=True)
