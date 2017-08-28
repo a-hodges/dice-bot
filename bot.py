@@ -261,7 +261,7 @@ async def roll_check(ctx, *, name: str):
                 await ctx.send(roll)
 
 
-@roll.command('remove')
+@roll.command('remove', aliases=['delete'])
 async def roll_remove(ctx, *, name: str):
     '''
     Deletes a roll from the character
@@ -282,7 +282,7 @@ async def roll_remove(ctx, *, name: str):
         except NoResultFound:
             raise NoResourceError
 
-        session.remove(roll)
+        session.delete(roll)
         session.commit()
         await ctx.send('{} removed'.format(roll))
 
@@ -310,7 +310,6 @@ async def roll_error(ctx, error):
             await ctx.send('Error: {}'.format(error))
     else:
         await ctx.send('Error: {}'.format(error))
-    raise error
 
 
 @bot.group(invoke_without_command=True)
@@ -327,10 +326,10 @@ async def resource_add(ctx, max_uses: int, recover: str, *, name: str):
     Adds or changes a character resource
 
     Parameters:
-    [name] the name of the new resource
     [max uses] the maximum number of uses of the resource
     [recover] the rest required to recover the resource,
         can be short|long|other
+    [name] the name of the new resource
     '''
     with sqlalchemy_context(Session) as session:
         try:
@@ -461,7 +460,7 @@ async def resource_check(ctx, *, name: str):
                 await ctx.send(resource)
 
 
-@resource.command('remove')
+@resource.command('remove', aliases=['delete'])
 async def resource_remove(ctx, *, name: str):
     '''
     Deletes a resource from the character
@@ -482,7 +481,7 @@ async def resource_remove(ctx, *, name: str):
         except NoResultFound:
             raise NoResourceError
 
-        session.remove(resource)
+        session.delete(resource)
         session.commit()
         await ctx.send('{} removed'.format(resource))
 
