@@ -79,7 +79,7 @@ async def do_roll(ctx, character, expression, silent=False):
                 n2 = random.randint(1, b)
                 if not silent:
                     output.append('1d{0}: {1}, rerolling, 1d{0}: {2}'.format(
-                        1, b, n, n2))
+                        b, n, n2))
                 n = n2
             elif not silent:
                 output.append('1d{}: {}'.format(b, n))
