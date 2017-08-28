@@ -59,6 +59,10 @@ class Character (Base):
         'Roll',
         order_by='Roll.name',
         back_populates='character')
+    constants = relationship(
+        'Constant',
+        order_by='Constant.name',
+        back_populates='character')
 
 
 class Rest (enum.Enum):
@@ -133,3 +137,31 @@ class Roll (Base):
 
     def __str__(self):
         return '{0.name}: {0.expression}'.format(self)
+
+
+class Constant (Base):
+    '''
+    Character values to store
+    '''
+    __tablename__ = 'constant'
+
+    character_id = Column(
+        Integer,
+        ForeignKey('characters.id'),
+        primary_key=True,
+        doc='Character foreign key')
+    name = Column(
+        String(64),
+        primary_key=True,
+        doc='Constant name')
+    value = Column(
+        String,
+        doc='The value of the constant')
+
+    character = relationship(
+        'Character',
+        foreign_keys=[character_id],
+        back_populates='constants')
+
+    def __str__(self):
+        return '{0.name}: {0.value}'.format(self)

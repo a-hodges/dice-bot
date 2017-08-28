@@ -562,6 +562,95 @@ async def rest(ctx, data: str):
         await ctx.send('Invalid rest type')
 
 
+@bot.group(invoke_without_command=True)
+async def const(ctx, *, expression: str):
+    '''
+    Manage character values
+    '''
+    await ctx.send('Invalid subcommand')
+
+
+@const.command('add', aliases=['set', 'update'])
+async def const_add(ctx, value: str, *, name: str):
+    '''
+    Adds/updates a new const for a character
+
+    Parameters:
+    [value] value to store
+    [name] name of const to store
+    '''
+    with sqlalchemy_context(Session) as session:
+        try:
+            character = session.query(m.Character)\
+                .filter_by(user=ctx.author.id).one()
+        except NoResultFound:
+            raise NoCharacterError()
+        
+        sql_update(session, m.Constant, {
+            'character': character,
+            'name': name,
+        }, {
+            'value': value,
+        })
+
+        await ctx.send('{} now has {}'.format(character.name, const))
+
+
+@const.command('check')
+async def const_check(ctx, *, name: str):
+    '''
+    Checks the status of a const
+
+    Parameters:
+    [name] the name of the const
+        use the value "all" to list all consts
+    '''
+    with sqlalchemy_context(Session) as session:
+        try:
+            character = session.query(m.Character)\
+                .filter_by(user=ctx.author.id).one()
+        except NoResultFound:
+            raise NoCharacterError
+
+        if name != 'all':
+            try:
+                const = session.query(m.Constant)\
+                    .filter_by(name=name, character=character).one()
+            except NoResultFound:
+                raise NoResourceError
+
+            await ctx.send(const)
+        else:
+            for const in character.consts:
+                await ctx.send(const)
+
+
+@const.command('remove', aliases=['delete'])
+async def const_remove(ctx, *, name: str):
+    '''
+    Deletes a const from the character
+
+    Parameters:
+    [name] the name of the const
+    '''
+    with sqlalchemy_context(Session) as session:
+        try:
+            character = session.query(m.Character)\
+                .filter_by(user=ctx.author.id).one()
+        except NoResultFound:
+            raise NoCharacterError
+
+        try:
+            const = session.query(m.Constant)\
+                .filter_by(name=name, character=character).one()
+        except NoResultFound:
+            raise NoResourceError
+
+        session.delete(const)
+        session.commit()
+        await ctx.send('{} removed'.format(const))
+
+
 # ----#-   Application
 
 
