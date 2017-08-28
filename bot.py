@@ -178,10 +178,22 @@ async def whois(ctx, member: discord.Member):
         await ctx.send('No one was mentioned')
 
 
+async def do_roll(ctx, character, expression, silent=False):
+    '''
+    Does the dice rolling after const replacement
+    '''
+    for const in character.constants:
+        expression = expression.replace(const.name, const.value)
+    await ctx.send('Rolling: {}'.format(expression))
+    roll = equations.solve(expression, operations, order_of_operations)
+    await ctx.send('I rolled {}'.format(roll))
+
+
 @bot.group(invoke_without_command=True)
 async def roll(ctx, *, expression: str):
     '''
     Rolls dice
+    Note: consts can be used in rolls and are replaced by the const value
 
     Parameters:
     [expression] standard dice notation specifying what to roll
@@ -196,8 +208,14 @@ async def roll(ctx, *, expression: str):
     which rerolls a 1 or 2, i.e. "2gwf6+5"
     '''
     if expression:
-        roll = equations.solve(expression, operations, order_of_operations)
-        await ctx.send('I rolled {}'.format(roll))
+        with sqlalchemy_context(Session) as session:
+            try:
+                character = session.query(m.Character)\
+                    .filter_by(user=ctx.author.id).one()
+            except NoResultFound:
+                raise NoCharacterError()
+    
+            await do_roll(ctx, character, expression)
     else:
         # error
         await ctx.send('No equation provided')
@@ -250,10 +268,7 @@ async def roll_use(ctx, *, name: str):
         except NoResultFound:
             raise NoResourceError
 
-        result = equations.solve(
-            roll.expression, operations, order_of_operations)
-        await ctx.send('Rolling: {}'.format(roll.expression))
-        await ctx.send('I rolled {}'.format(result))
+        await do_roll(ctx, character, roll.expression)
 
 
 @roll.command('check')
