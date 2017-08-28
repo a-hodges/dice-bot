@@ -94,6 +94,8 @@ def sql_update(session, type, keys, values):
 
     session.commit()
 
+    return obj
+
 
 # ----#-   Commands
 
@@ -197,13 +199,13 @@ async def roll(ctx, *, expression: str):
 
     Parameters:
     [expression] standard dice notation specifying what to roll
-    
+
     *Everything past here may change*
-    
+
     There are special operators for advantage and disadvantage rolls:
     "ad" for advantage, "dd" for disadvantage
     So, use "1ad20" for advantage or "1dd20" for disadvantage
-    
+
     There is also a special 'great weapon fighting' operator
     which rerolls a 1 or 2, i.e. "2gwf6+5"
     '''
@@ -214,7 +216,7 @@ async def roll(ctx, *, expression: str):
                     .filter_by(user=ctx.author.id).one()
             except NoResultFound:
                 raise NoCharacterError()
-    
+
             await do_roll(ctx, character, expression)
     else:
         # error
@@ -236,8 +238,8 @@ async def roll_add(ctx, expression: str, *, name: str):
                 .filter_by(user=ctx.author.id).one()
         except NoResultFound:
             raise NoCharacterError()
-        
-        sql_update(session, m.Roll, {
+
+        roll = sql_update(session, m.Roll, {
             'character': character,
             'name': name,
         }, {
@@ -376,8 +378,8 @@ async def resource_add(ctx, max_uses: int, recover: str, *, name: str):
                 .filter_by(user=ctx.author.id).one()
         except NoResultFound:
             raise NoCharacterError()
-        
-        sql_update(session, m.Resource, {
+
+        resource = sql_update(session, m.Resource, {
             'character': character,
             'name': name,
         }, {
@@ -600,8 +602,8 @@ async def const_add(ctx, value: str, *, name: str):
                 .filter_by(user=ctx.author.id).one()
         except NoResultFound:
             raise NoCharacterError()
-        
-        sql_update(session, m.Constant, {
+
+        const = sql_update(session, m.Constant, {
             'character': character,
             'name': name,
         }, {
