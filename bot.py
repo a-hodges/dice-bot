@@ -43,14 +43,25 @@ def roll_dice(a, b):
         out += random.randint(1, b)
     return out
 
+
+def great_weapon_fighting(a, b):
+    out = 0
+    for _ in range(a):
+        n = random.randint(1, b)
+        if n <= 2:
+            n = random.randint(1, b)
+        out += n
+    return out
+
 operations = equations.operations.copy()
 operations['d'] = roll_dice
 operations['D'] = roll_dice
 operations['ad'] = lambda a, b: max(roll_dice(a, b), roll_dice(a, b))
 operations['dd'] = lambda a, b: min(roll_dice(a, b), roll_dice(a, b))
+operations['gwf'] = great_weapon_fighting
 operations['>'] = max
 operations['<'] = min
-order_of_operations = [['d', 'D', 'ad', 'dd'], ['>', '<']]
+order_of_operations = [['d', 'D', 'ad', 'dd', 'gwf'], ['>', '<']]
 order_of_operations.extend(equations.order_of_operations)
 
 
@@ -162,6 +173,9 @@ async def roll(ctx, *, expression: str):
     There are special operators for advantage and disadvantage rolls:
     "ad" for advantage, "dd" for disadvantage
     So, use "1ad20" for advantage or "1dd20" for disadvantage
+    
+    There is also a special 'great weapon fighting' operator
+    which rerolls a 1 or 2, i.e. "2gwf6+5"
     '''
     if expression:
         roll = equations.solve(expression, operations, order_of_operations)
