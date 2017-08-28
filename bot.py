@@ -59,12 +59,14 @@ async def do_roll(ctx, character, expression, silent=False):
     '''
     Does the dice rolling after const replacement
     '''
+    output = []
+
     # Set up operations
     def roll_dice(a, b):
         out = 0
         for _ in range(a):
             n = random.randint(1, b)
-            ctx.send('{}d{}: {}'.format(1, b, n))
+            output.append('{}d{}: {}'.format(1, b, n))
             out += n
         return out
 
@@ -74,7 +76,7 @@ async def do_roll(ctx, character, expression, silent=False):
             n = roll_dice(1, b)
             if n <= 2:
                 n = random.randint(1, b)
-                ctx.send('Using GWF to reroll, {}d{}: {}'.format(1, b, n))
+                output.append('Using GWF to reroll, {}d{}: {}'.format(1, b, n))
             out += n
         return out
 
@@ -91,11 +93,13 @@ async def do_roll(ctx, character, expression, silent=False):
     # replace constants
     for const in character.constants:
         expression = expression.replace(const.name, const.value)
-    await ctx.send('Rolling: {}'.format(expression))
+    output.append('Rolling: {}'.format(expression))
 
     # do roll
     roll = equations.solve(expression, operations, order_of_operations)
-    await ctx.send('I rolled {}'.format(roll))
+    output.append('I rolled {}'.format(roll))
+    
+    await ctx.send('\n'.join(output))
 
 
 def sql_update(session, type, keys, values):
