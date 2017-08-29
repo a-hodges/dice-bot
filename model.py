@@ -143,7 +143,7 @@ class Constant (Base):
     '''
     Character values to store
     '''
-    __tablename__ = 'constant'
+    __tablename__ = 'constants'
 
     character_id = Column(
         Integer,
@@ -155,7 +155,7 @@ class Constant (Base):
         primary_key=True,
         doc='Constant name')
     value = Column(
-        String,
+        Integer,
         doc='The value of the constant')
 
     character = relationship(

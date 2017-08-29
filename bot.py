@@ -116,7 +116,7 @@ async def do_roll(ctx, character, expression, silent=False):
 
     # replace constants
     for const in character.constants:
-        expression = expression.replace(const.name, const.value)
+        expression = expression.replace(const.name, str(const.value))
     output.append('Rolling: {}'.format(expression))
 
     # do roll
@@ -630,7 +630,7 @@ async def const(ctx, *, expression: str):
 
 
 @const.command('add', aliases=['set', 'update'])
-async def const_add(ctx, value: str, *, name: str):
+async def const_add(ctx, value: int, *, name: str):
     '''
     Adds/updates a new const for a character
 
