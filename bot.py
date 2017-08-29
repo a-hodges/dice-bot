@@ -17,7 +17,11 @@ from sqlalchemy.orm.exc import NoResultFound
 import equations
 import model as m
 
-description = '''D&D manager bot for discord based RPGs'''
+description = '''D&D manager bot for discord based RPGs
+
+Note:
+Any parameters that have spaces in them need to be wrapped in quotes "
+'''
 bot = commands.Bot(
     command_prefix='!',
     description=description,
@@ -262,13 +266,13 @@ async def roll(ctx, *, expression: str):
 
 
 @roll.command('add', aliases=['set', 'update'])
-async def roll_add(ctx, expression: str, *, name: str):
+async def roll_add(ctx, name: str, expression: str):
     '''
     Adds/updates a new roll for a character
 
     Parameters:
-    [expression] dice equation
     [name] name of roll to store
+    [expression] dice equation
     '''
     with sqlalchemy_context(Session) as session:
         try:
@@ -402,15 +406,15 @@ async def resource(ctx):
 
 
 @resource.command('add', aliases=['update'])
-async def resource_add(ctx, max_uses: int, recover: str, *, name: str):
+async def resource_add(ctx, name: str, max_uses: int, recover: str):
     '''
     Adds or changes a character resource
 
     Parameters:
+    [name] the name of the new resource
     [max uses] the maximum number of uses of the resource
     [recover] the rest required to recover the resource,
         can be short|long|other
-    [name] the name of the new resource
     '''
     with sqlalchemy_context(Session) as session:
         try:
@@ -432,13 +436,13 @@ async def resource_add(ctx, max_uses: int, recover: str, *, name: str):
 
 
 @resource.command('use')
-async def resource_use(ctx, number: int, *, name: str):
+async def resource_use(ctx, name: str, number: int):
     '''
     Consumes 1 use of the resource
 
     Parameters:
-    [number] the quantity of the resource to use (can be negative to regain)
     [name] the name of the resource
+    [number] the quantity of the resource to use (can be negative to regain)
     '''
     with sqlalchemy_context(Session) as session:
         try:
@@ -474,14 +478,14 @@ def int_or_max(value: str):
 
 
 @resource.command('set')
-async def resource_set(ctx, uses: int_or_max, *, name: str):
+async def resource_set(ctx, name: str, uses: int_or_max):
     '''
     Sets the remaining uses of a resource
 
     Parameters:
+    [name] the name of the resource
     [uses] can be the number of remaining uses or
         the special value "max" to refill all uses
-    [name] the name of the resource
     '''
     with sqlalchemy_context(Session) as session:
         try:
@@ -651,13 +655,13 @@ async def const(ctx, *, expression: str):
 
 
 @const.command('add', aliases=['set', 'update'])
-async def const_add(ctx, value: int, *, name: str):
+async def const_add(ctx, name: str, value: int):
     '''
     Adds/updates a new const for a character
 
     Parameters:
-    [value] value to store
     [name] name of const to store
+    [value] value to store
     '''
     with sqlalchemy_context(Session) as session:
         try:
