@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 
 import math
+import operator
 
 operations = {
-    '+': lambda a, b: a + b,
-    '-': lambda a, b: a - b,
-    '*': lambda a, b: a * b,
-    '/': lambda a, b: a / b,
-    '^': lambda a, b: a ** b,
+    '+': operator.add,
+    '-': operator.sub,
+    '*': operator.mul,
+    '/': operator.floordiv,
+    '^': operator.pow,
 }
 order_of_operations = [
     ['^'],
@@ -103,7 +104,9 @@ def solve(
                 stack[-1] == '(' or
                 stack[-1] in operations):
             stack.append(-0.0)
-        elif stack and not isinstance(stack[-1], int):
+        elif (stack and
+                not isinstance(stack[-1], int) and
+                not stack[-1] in operations):
             stack[-1] += c
         else:
             stack.append(c)
