@@ -315,7 +315,7 @@ async def roll_use(ctx, *, name: str):
         await do_roll(ctx, character, roll.expression)
 
 
-@roll.command('check')
+@roll.command('check', aliases=['list'])
 async def roll_check(ctx, *, name: str):
     '''
     Checks the status of a roll
@@ -338,12 +338,12 @@ async def roll_check(ctx, *, name: str):
             except NoResultFound:
                 raise NoResourceError
 
-            await ctx.send(roll)
+            await ctx.send('`{}`'.format(roll))
         else:
-            text = character.name + "'s rolls:\n"
+            text = ["{}'s rolls:".format(character.name)]
             for roll in character.rolls:
-                text += str(roll) + '\n'
-            await ctx.send(text)
+                text.append('`{}`'.format(roll))
+            await ctx.send('\n'.join(text))
 
 
 @roll.command('remove', aliases=['delete'])
@@ -510,7 +510,7 @@ async def resource_set(ctx, name: str, uses: int_or_max):
             character.name, resource.current, resource.name))
 
 
-@resource.command('check')
+@resource.command('check', aliases=['list'])
 async def resource_check(ctx, *, name: str):
     '''
     Checks the status of a resource
@@ -533,12 +533,12 @@ async def resource_check(ctx, *, name: str):
             except NoResultFound:
                 raise NoResourceError
 
-            await ctx.send(resource)
+            await ctx.send('`{}`'.format(resource))
         else:
-            text = character.name + "'s resources:\n"
+            text = ["{}'s resources:".format(character.name)]
             for resource in character.resources:
-                text += str(resource) + '\n'
-            await ctx.send(text)
+                text.append('`{}`'.format(resource))
+            await ctx.send('\n'.join(text))
 
 
 @resource.command('remove', aliases=['delete'])
@@ -680,7 +680,7 @@ async def const_add(ctx, name: str, value: int):
         await ctx.send('{} now has {}'.format(character.name, const))
 
 
-@const.command('check')
+@const.command('check', aliases=['list'])
 async def const_check(ctx, *, name: str):
     '''
     Checks the status of a const
@@ -703,12 +703,12 @@ async def const_check(ctx, *, name: str):
             except NoResultFound:
                 raise NoResourceError
 
-            await ctx.send(const)
+            await ctx.send('`{}`'.format(const))
         else:
-            text = character.name + "'s consts:\n"
+            text = ["{}'s consts:\n".format(character.name)]
             for const in character.constants:
-                text += str(const) + '\n'
-            await ctx.send(text)
+                text.append('`{}`'.format(const))
+            await ctx.send('\n'.join(text))
 
 
 @const.command('remove', aliases=['delete'])
