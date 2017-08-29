@@ -588,14 +588,14 @@ async def resource_error(ctx, error):
 
 
 @bot.command()
-async def rest(ctx, data: str):
+async def rest(ctx, rest: str):
     '''
     Take a rest
 
     Parameters:
     [type] should be short|long
     '''
-    if data in ['short', 'long']:
+    if rest in ['short', 'long']:
         # short or long rest
         with sqlalchemy_context(Session) as session:
             try:
@@ -606,7 +606,7 @@ async def rest(ctx, data: str):
 
             if character:
                 for resource in character.resources:
-                    if data == 'long' and resource.recover == m.Rest.long:
+                    if rest == 'long' and resource.recover == m.Rest.long:
                         resource.current = resource.max
                     elif resource.recover == m.Rest.short:
                         resource.current = resource.max
@@ -618,7 +618,28 @@ async def rest(ctx, data: str):
                 await ctx.send('User has no character')
     else:
         # error
-        await ctx.send('Invalid rest type')
+        raise ValueError(rest)
+
+
+@rest.error
+async def rest_error(ctx, error):
+    if (isinstance(error, commands.BadArgument) or
+            isinstance(error, commands.MissingRequiredArgument) or
+            isinstance(error, commands.TooManyArguments)):
+        await ctx.send('Invalid parameters')
+        await ctx.send('See the help text for valid parameters')
+    elif isinstance(error, commands.CommandInvokeError):
+        error = error.original
+        if isinstance(error, NoCharacterError):
+            await ctx.send('User does not have a character')
+        elif isinstance(error, NoResourceError):
+            await ctx.send('Could not find const')
+        elif isinstance(error, ValueError):
+            await ctx.send('Invalid rest type')
+        else:
+            await ctx.send('Error: {}'.format(error))
+    else:
+        await ctx.send('Error: {}'.format(error))
 
 
 @bot.group(invoke_without_command=True)
@@ -710,6 +731,28 @@ async def const_remove(ctx, *, name: str):
         session.delete(const)
         session.commit()
         await ctx.send('{} removed'.format(const))
+
+
+@const.error
+@const_add.error
+@const_check.error
+@const_remove.error
+async def const_error(ctx, error):
+    if (isinstance(error, commands.BadArgument) or
+            isinstance(error, commands.MissingRequiredArgument) or
+            isinstance(error, commands.TooManyArguments)):
+        await ctx.send('Invalid parameters')
+        await ctx.send('See the help text for valid parameters')
+    elif isinstance(error, commands.CommandInvokeError):
+        error = error.original
+        if isinstance(error, NoCharacterError):
+            await ctx.send('User does not have a character')
+        elif isinstance(error, NoResourceError):
+            await ctx.send('Could not find const')
+        else:
+            await ctx.send('Error: {}'.format(error))
+    else:
+        await ctx.send('Error: {}'.format(error))
 
 
 # ----#-   Application
