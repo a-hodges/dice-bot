@@ -65,7 +65,7 @@ class Character (Base):
         back_populates='character')
     initiatives = relationship(
         'Initiative',
-        order_by='Initiative.name',
+        order_by='Initiative.channel',
         back_populates='character')
 
     def __str__(self):
