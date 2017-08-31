@@ -120,7 +120,7 @@ async def do_roll(ctx, character, expression, silent=False):
 
     # replace constants
     for const in character.constants:
-        expression = expression.replace(const.name, str(const.value))
+        expression = expression.replace(const.name, '({})'.format(const.value))
     output.append('Rolling: {}'.format(expression))
 
     # do roll
@@ -221,22 +221,40 @@ async def whois(ctx, member: discord.Member):
     [user] should be a user on this channel
     '''
     with sqlalchemy_context(Session) as session:
-        try:
-            character = get_character(session, member.id)
-            text = '{} is {}'.format(member.mention, character.name)
-            await ctx.send(text)
-        except NoCharacterError:
-            await ctx.send('User has no character')
+        character = get_character(session, member.id)
+        text = '{} is {}'.format(member.mention, character.name)
+        await ctx.send(text)
+
+
+@bot.command()
+async def changename(ctx, *, name: str):
+    '''
+    Changes the character's name
+    '''
+    with sqlalchemy_context(Session) as session:
+        character = get_character(session, ctx.author.id)
+        original_name = character.name
+        character.name = name
+        session.commit()
+        await ctx.send("{} has changed {}'s name to {}".format(
+            ctx.author.mention, original_name, name))
 
 
 @iam.error
 @whois.error
-async def iam_whois_error(ctx, error):
+@changename.error
+async def general_error_handler(ctx, error):
     if (isinstance(error, commands.BadArgument) or
             isinstance(error, commands.MissingRequiredArgument) or
             isinstance(error, commands.TooManyArguments)):
         await ctx.send('Invalid parameters')
         await ctx.send('See the help text for valid parameters')
+    elif isinstance(error, commands.CommandInvokeError):
+        error = error.original
+        if isinstance(error, NoCharacterError):
+            await ctx.send('User does not have a character')
+        else:
+            await ctx.send('Error: {}'.format(error))
     else:
         await ctx.send('Error: {}'.format(error))
 
