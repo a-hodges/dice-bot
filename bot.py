@@ -129,6 +129,20 @@ async def do_roll(ctx, character, expression, silent=False):
 
     await ctx.send('\n'.join(output))
 
+    return roll
+
+
+def get_character(session, userid):
+    '''
+    Gets a character based on their user
+    '''
+    try:
+        character = session.query(m.Character)\
+            .filter_by(user=userid).one()
+    except NoResultFound:
+        raise NoCharacterError()
+    return character
+
 
 def sql_update(session, type, keys, values):
     '''
@@ -178,15 +192,10 @@ async def iam(ctx, *, name: str):
                     ctx.author.mention))
 
             session.commit()
-    elif name:
+    else:
         # associate character
         with sqlalchemy_context(Session) as session:
-            try:
-                character = session.query(m.Character)\
-                    .filter_by(name=name).one()
-            except NoResultFound:
-                character = m.Character(name=name)
-                session.add(character)
+            character = sql_update(session, m.Character, {'name': name}, {})
 
             if character.user is None:
                 character.user = ctx.author.id
@@ -201,9 +210,6 @@ async def iam(ctx, *, name: str):
             else:
                 await ctx.send('Someone else is using {}'.format(
                     character.name))
-    else:
-        # error
-        await ctx.send('No character name given')
 
 
 @bot.command()
@@ -214,23 +220,25 @@ async def whois(ctx, member: discord.Member):
     Parameters:
     [user] should be a user on this channel
     '''
-    if member:
-        # whois
-        with sqlalchemy_context(Session) as session:
-            try:
-                character = session.query(m.Character)\
-                    .filter_by(user=member.id).one()
-            except NoResultFound:
-                character = None
+    with sqlalchemy_context(Session) as session:
+        try:
+            character = get_character(session, member.id)
+            text = '{} is {}'.format(member.mention, character.name)
+            await ctx.send(text)
+        except NoCharacterError:
+            await ctx.send('User has no character')
 
-            if character:
-                text = '{} is {}'.format(member.mention, character.name)
-                await ctx.send(text)
-            else:
-                await ctx.send('User has no character')
+
+@iam.error
+@whois.error
+async def iam_whois_error(ctx, error):
+    if (isinstance(error, commands.BadArgument) or
+            isinstance(error, commands.MissingRequiredArgument) or
+            isinstance(error, commands.TooManyArguments)):
+        await ctx.send('Invalid parameters')
+        await ctx.send('See the help text for valid parameters')
     else:
-        # error
-        await ctx.send('No one was mentioned')
+        await ctx.send('Error: {}'.format(error))
 
 
 @bot.group(invoke_without_command=True)
@@ -275,11 +283,7 @@ async def roll_add(ctx, name: str, expression: str):
     [expression] dice equation
     '''
     with sqlalchemy_context(Session) as session:
-        try:
-            character = session.query(m.Character)\
-                .filter_by(user=ctx.author.id).one()
-        except NoResultFound:
-            raise NoCharacterError()
+        character = get_character(session, ctx.author.id)
 
         roll = sql_update(session, m.Roll, {
             'character': character,
@@ -300,11 +304,7 @@ async def roll_use(ctx, *, name: str):
     [name] name of roll to use
     '''
     with sqlalchemy_context(Session) as session:
-        try:
-            character = session.query(m.Character)\
-                .filter_by(user=ctx.author.id).one()
-        except NoResultFound:
-            raise NoCharacterError
+        character = get_character(session, ctx.author.id)
 
         try:
             roll = session.query(m.Roll)\
@@ -325,11 +325,7 @@ async def roll_check(ctx, *, name: str):
         use the value "all" to list all rolls
     '''
     with sqlalchemy_context(Session) as session:
-        try:
-            character = session.query(m.Character)\
-                .filter_by(user=ctx.author.id).one()
-        except NoResultFound:
-            raise NoCharacterError
+        character = get_character(session, ctx.author.id)
 
         if name != 'all':
             try:
@@ -355,11 +351,7 @@ async def roll_remove(ctx, *, name: str):
     [name] the name of the roll
     '''
     with sqlalchemy_context(Session) as session:
-        try:
-            character = session.query(m.Character)\
-                .filter_by(user=ctx.author.id).one()
-        except NoResultFound:
-            raise NoCharacterError
+        character = get_character(session, ctx.author.id)
 
         try:
             roll = session.query(m.Roll)\
@@ -390,7 +382,11 @@ async def roll_error(ctx, error):
         elif isinstance(error, NoResourceError):
             await ctx.send('Could not find roll')
         elif isinstance(error, ValueError):
-            await ctx.send('Invalid dice expression')
+            if error.args:
+                await ctx.send('Invalid dice expression: {}'.format(
+                    error.args[0]))
+            else:
+                await ctx.send('Invalid dice expression')
         else:
             await ctx.send('Error: {}'.format(error))
     else:
@@ -417,11 +413,7 @@ async def resource_add(ctx, name: str, max_uses: int, recover: str):
         can be short|long|other
     '''
     with sqlalchemy_context(Session) as session:
-        try:
-            character = session.query(m.Character)\
-                .filter_by(user=ctx.author.id).one()
-        except NoResultFound:
-            raise NoCharacterError()
+        character = get_character(session, ctx.author.id)
 
         resource = sql_update(session, m.Resource, {
             'character': character,
@@ -445,11 +437,7 @@ async def resource_use(ctx, name: str, number: int):
     [number] the quantity of the resource to use (can be negative to regain)
     '''
     with sqlalchemy_context(Session) as session:
-        try:
-            character = session.query(m.Character)\
-                .filter_by(user=ctx.author.id).one()
-        except NoResultFound:
-            raise NoCharacterError
+        character = get_character(session, ctx.author.id)
 
         try:
             resource = session.query(m.Resource)\
@@ -488,11 +476,7 @@ async def resource_set(ctx, name: str, uses: int_or_max):
         the special value "max" to refill all uses
     '''
     with sqlalchemy_context(Session) as session:
-        try:
-            character = session.query(m.Character)\
-                .filter_by(user=ctx.author.id).one()
-        except NoResultFound:
-            raise NoCharacterError
+        character = get_character(session, ctx.author.id)
 
         try:
             resource = session.query(m.Resource)\
@@ -520,11 +504,7 @@ async def resource_check(ctx, *, name: str):
         use the value "all" to list resources
     '''
     with sqlalchemy_context(Session) as session:
-        try:
-            character = session.query(m.Character)\
-                .filter_by(user=ctx.author.id).one()
-        except NoResultFound:
-            raise NoCharacterError
+        character = get_character(session, ctx.author.id)
 
         if name != 'all':
             try:
@@ -550,11 +530,7 @@ async def resource_remove(ctx, *, name: str):
     [name] the name of the resource
     '''
     with sqlalchemy_context(Session) as session:
-        try:
-            character = session.query(m.Character)\
-                .filter_by(user=ctx.author.id).one()
-        except NoResultFound:
-            raise NoCharacterError
+        character = get_character(session, ctx.author.id)
 
         try:
             resource = session.query(m.Resource)\
@@ -602,11 +578,7 @@ async def rest(ctx, rest: str):
     if rest in ['short', 'long']:
         # short or long rest
         with sqlalchemy_context(Session) as session:
-            try:
-                character = session.query(m.Character)\
-                    .filter_by(user=ctx.author.id).one()
-            except NoResultFound:
-                character = None
+            character = get_character(session, ctx.author.id)
 
             if character:
                 for resource in character.resources:
@@ -664,11 +636,7 @@ async def const_add(ctx, name: str, value: int):
     [value] value to store
     '''
     with sqlalchemy_context(Session) as session:
-        try:
-            character = session.query(m.Character)\
-                .filter_by(user=ctx.author.id).one()
-        except NoResultFound:
-            raise NoCharacterError()
+        character = get_character(session, ctx.author.id)
 
         const = sql_update(session, m.Constant, {
             'character': character,
@@ -690,11 +658,7 @@ async def const_check(ctx, *, name: str):
         use the value "all" to list all consts
     '''
     with sqlalchemy_context(Session) as session:
-        try:
-            character = session.query(m.Character)\
-                .filter_by(user=ctx.author.id).one()
-        except NoResultFound:
-            raise NoCharacterError
+        character = get_character(session, ctx.author.id)
 
         if name != 'all':
             try:
@@ -720,11 +684,7 @@ async def const_remove(ctx, *, name: str):
     [name] the name of the const
     '''
     with sqlalchemy_context(Session) as session:
-        try:
-            character = session.query(m.Character)\
-                .filter_by(user=ctx.author.id).one()
-        except NoResultFound:
-            raise NoCharacterError
+        character = get_character(session, ctx.author.id)
 
         try:
             const = session.query(m.Constant)\

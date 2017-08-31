@@ -64,6 +64,9 @@ class Character (Base):
         order_by='Constant.name',
         back_populates='character')
 
+    def __str__(self):
+        return self.name
+
 
 class Rest (enum.Enum):
     r"""
@@ -165,3 +168,31 @@ class Constant (Base):
 
     def __str__(self):
         return '{0.name}: {0.value}'.format(self)
+
+
+class Initiative (Base):
+    '''
+    Manages character initiative by channel
+    '''
+    __tablename__ = 'initiative'
+
+    character_id = Column(
+        Integer,
+        ForeignKey('characters.id'),
+        primary_key=True,
+        doc='Character foreign key')
+    channel = Column(
+        String(64),
+        primary_key=True,
+        doc='Channel name')
+    value = Column(
+        Integer,
+        doc='The initiative roll')
+
+    character = relationship(
+        'Character',
+        foreign_keys=[character_id],
+        back_populates='initiatives')
+
+    def __str__(self):
+        return '{0.character.name}: {0.value}'.format(self)
