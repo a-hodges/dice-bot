@@ -63,6 +63,10 @@ class Character (Base):
         'Constant',
         order_by='Constant.name',
         back_populates='character')
+    initiatives = relationship(
+        'Initiative',
+        order_by='Initiative.name',
+        back_populates='character')
 
     def __str__(self):
         return self.name
