@@ -106,7 +106,8 @@ def solve(
             stack.append(-0.0)
         elif (stack and
                 not isinstance(stack[-1], int) and
-                not stack[-1] in operations):
+                not stack[-1] in operations and
+                not stack[-1] in ['(', ')']):
             stack[-1] += c
         else:
             stack.append(c)
