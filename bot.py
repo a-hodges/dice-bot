@@ -230,6 +230,9 @@ async def whois(ctx, member: discord.Member):
 async def changename(ctx, *, name: str):
     '''
     Changes the character's name
+
+    Parameters:
+    [name] the new name
     '''
     with sqlalchemy_context(Session) as session:
         character = get_character(session, ctx.author.id)
@@ -731,6 +734,136 @@ async def const_error(ctx, error):
             await ctx.send('User does not have a character')
         elif isinstance(error, NoResourceError):
             await ctx.send('Could not find const')
+        else:
+            await ctx.send('Error: {}'.format(error))
+    else:
+        await ctx.send('Error: {}'.format(error))
+
+
+@bot.group(invoke_without_command=True)
+async def initiative(ctx):
+    '''
+    Manage initiative by channel
+    '''
+    await ctx.send('Invalid subcommand')
+
+
+@initiative.command('add', aliases=['set', 'update'])
+async def initiative_add(ctx, *, value: int):
+    '''
+    Set initiative
+
+    Parameters:
+    [value] the initiative to store
+    '''
+    with sqlalchemy_context(Session) as session:
+        character = get_character(session, ctx.author.id)
+
+        initiative = sql_update(session, m.Constant, {
+            'character': character,
+            'channel': ctx.message.channel.name,
+        }, {
+            'value': value,
+        })
+
+        await ctx.send('{} has initiative {}'.format(
+            character.name, initiative))
+
+
+@initiative.command('roll')
+async def initiative_roll(ctx, *, expression: str):
+    '''
+    Roll initiative using the notation from the roll command
+
+    Parameters:
+    [expression] either the expression to roll or the name of a stored roll
+    '''
+    with sqlalchemy_context(Session) as session:
+        character = get_character(session, ctx.author.id)
+
+        try:
+            roll = session.query(m.Roll)\
+                .filter_by(name=name, character=character).one()
+            roll = roll.expression
+        except NoResultFound:
+            roll = expression
+
+        value = await do_roll(ctx, character, roll)
+
+        initiative_add(ctx, value=value)
+
+
+@initiative.command('check', aliases=['list'])
+async def initiative_check(ctx):
+    '''
+    Lists all initiatives currently stored in this channel
+    '''
+    with sqlalchemy_context(Session) as session:
+        initiatives = session.query(m.Initiative)\
+            .filter_by(channel=ctx.message.channel.name).all()
+        text = ['Initiatives:']
+        for initiative in initiatives:
+            text.append('`{}`'.format(initiative))
+        await ctx.send('\n'.join(text))
+
+
+@initiative.command('remove', aliases=['delete'])
+async def initiative_remove(ctx):
+    '''
+    Deletes a character's current initiative
+    '''
+    with sqlalchemy_context(Session) as session:
+        character = get_character(session, ctx.author.id)
+
+        try:
+            channel = ctx.message.channel.name
+            initiative = session.query(m.Initiative)\
+                .filter_by(character=character, channel=channel).one()
+        except NoResultFound:
+            raise NoResourceError
+
+        session.delete(initiative)
+        session.commit()
+        await ctx.send('Initiative removed')
+
+
+@initiative.command('endcombat', aliases=['clearall'])
+@commands.has_role('DM')
+async def initiative_endcombat(ctx):
+    '''
+    Removes all initiative entries for the current channel
+    '''
+    with sqlalchemy_context(Session) as session:
+        session.query(m.Initiative)\
+            .filter_by(channel=ctx.message.channel.name).delete(False)
+
+
+@initiative.error
+@initiative_add.error
+@initiative_roll.error
+@initiative_check.error
+@initiative_remove.error
+@initiative_endcombat.error
+async def initiative_error(ctx, error):
+    if (isinstance(error, commands.BadArgument) or
+            isinstance(error, commands.MissingRequiredArgument) or
+            isinstance(error, commands.TooManyArguments)):
+        await ctx.send('Invalid parameters')
+        await ctx.send('See the help text for valid parameters')
+    elif isinstance(error, commands.CheckFailure):
+        await ctx.send('You do not have the authority to use this command')
+    elif isinstance(error, commands.CommandInvokeError):
+        error = error.original
+        if isinstance(error, NoCharacterError):
+            await ctx.send('User does not have a character')
+        elif isinstance(error, NoResourceError):
+            await ctx.send('Could not find initiative')
+        elif isinstance(error, ValueError):
+            if error.args:
+                await ctx.send('Invalid dice expression: {}'.format(
+                    error.args[0]))
+            else:
+                await ctx.send('Invalid dice expression')
         else:
             await ctx.send('Error: {}'.format(error))
     else:
