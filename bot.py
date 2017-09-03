@@ -391,8 +391,8 @@ async def resource_add(ctx, name: str, max_uses: int, recover: str):
             'character': character,
             'name': name,
         }, {
-            'max': max,
-            'current': max,
+            'max': max_uses,
+            'current': max_uses,
             'recover': recover,
         })
 
