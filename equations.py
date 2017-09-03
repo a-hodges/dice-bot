@@ -17,6 +17,10 @@ order_of_operations = [
 ]
 
 
+class EquationError (Exception):
+    pass
+
+
 def infix2postfix(
         equation,
         operations=operations,
@@ -46,11 +50,11 @@ def infix2postfix(
                 output.append(stack.pop())
             stack.append(item)
         else:
-            raise ValueError('Invalid character found: {} in {}'.format(
+            raise EquationError('Invalid character found: {} in {}'.format(
                 item, equation))
 
     if len(stack) != 0:
-        raise ValueError('Invalid equation: {}'.format(equation))
+        raise EquationError('Invalid equation: {}'.format(equation))
 
     return output
 
@@ -66,18 +70,18 @@ def solve_postfix(
             stack.append(item)
         elif item in operations:
             if len(stack) < 2:
-                raise ValueError('Not enough operands for {} in {}'.format(
+                raise EquationError('Not enough operands for {} in {}'.format(
                     item, equation))
             else:
                 b = stack.pop()
                 a = stack.pop()
                 stack.append(operations[item](a, b))
         else:
-            raise ValueError('Invalid operand/operator: {} in '.format(
+            raise EquationError('Invalid operand/operator: {} in '.format(
                 item, equation))
 
     if len(stack) != 1:
-        raise ValueError('Invalid equation: {}'.format(equation))
+        raise EquationError('Invalid equation: {}'.format(equation))
 
     return stack[0]
 

@@ -206,14 +206,13 @@ async def iam(ctx, *, name: str):
                 except IntegrityError:
                     await ctx.send(
                         'You are already using a different character')
-                    raise
             else:
                 await ctx.send('Someone else is using {}'.format(
                     character.name))
 
 
 @bot.command()
-async def whois(ctx, member: discord.Member):
+async def whois(ctx, *, member: discord.Member):
     '''
     Retrieves character information for a user
 
@@ -241,25 +240,6 @@ async def changename(ctx, *, name: str):
         session.commit()
         await ctx.send("{} has changed {}'s name to {}".format(
             ctx.author.mention, original_name, name))
-
-
-@iam.error
-@whois.error
-@changename.error
-async def general_error_handler(ctx, error):
-    if (isinstance(error, commands.BadArgument) or
-            isinstance(error, commands.MissingRequiredArgument) or
-            isinstance(error, commands.TooManyArguments)):
-        await ctx.send('Invalid parameters')
-        await ctx.send('See the help text for valid parameters')
-    elif isinstance(error, commands.CommandInvokeError):
-        error = error.original
-        if isinstance(error, NoCharacterError):
-            await ctx.send('User does not have a character')
-        else:
-            await ctx.send('Error: {}'.format(error))
-    else:
-        await ctx.send('Error: {}'.format(error))
 
 
 @bot.group(invoke_without_command=True)
@@ -383,35 +363,6 @@ async def roll_remove(ctx, *, name: str):
         session.delete(roll)
         session.commit()
         await ctx.send('{} removed'.format(roll))
-
-
-@roll.error
-@roll_add.error
-@roll_use.error
-@roll_check.error
-@roll_remove.error
-async def roll_error(ctx, error):
-    if (isinstance(error, commands.BadArgument) or
-            isinstance(error, commands.MissingRequiredArgument) or
-            isinstance(error, commands.TooManyArguments)):
-        await ctx.send('Invalid parameters')
-        await ctx.send('See the help text for valid parameters')
-    elif isinstance(error, commands.CommandInvokeError):
-        error = error.original
-        if isinstance(error, NoCharacterError):
-            await ctx.send('User does not have a character')
-        elif isinstance(error, NoResourceError):
-            await ctx.send('Could not find roll')
-        elif isinstance(error, ValueError):
-            if error.args:
-                await ctx.send('Invalid dice expression: {}'.format(
-                    error.args[0]))
-            else:
-                await ctx.send('Invalid dice expression')
-        else:
-            await ctx.send('Error: {}'.format(error))
-    else:
-        await ctx.send('Error: {}'.format(error))
 
 
 @bot.group(invoke_without_command=True)
@@ -564,32 +515,8 @@ async def resource_remove(ctx, *, name: str):
         await ctx.send('{} removed'.format(resource))
 
 
-@resource.error
-@resource_add.error
-@resource_use.error
-@resource_set.error
-@resource_check.error
-@resource_remove.error
-async def resource_error(ctx, error):
-    if (isinstance(error, commands.BadArgument) or
-            isinstance(error, commands.MissingRequiredArgument) or
-            isinstance(error, commands.TooManyArguments)):
-        await ctx.send('Invalid parameters')
-        await ctx.send('See the help text for valid parameters')
-    elif isinstance(error, commands.CommandInvokeError):
-        error = error.original
-        if isinstance(error, NoCharacterError):
-            await ctx.send('User does not have a character')
-        elif isinstance(error, NoResourceError):
-            await ctx.send('Could not find resource')
-        else:
-            await ctx.send('Error: {}'.format(error))
-    else:
-        await ctx.send('Error: {}'.format(error))
-
-
 @bot.command()
-async def rest(ctx, rest: str):
+async def rest(ctx, *, rest: str):
     '''
     Take a rest
 
@@ -616,27 +543,6 @@ async def rest(ctx, rest: str):
     else:
         # error
         raise ValueError(rest)
-
-
-@rest.error
-async def rest_error(ctx, error):
-    if (isinstance(error, commands.BadArgument) or
-            isinstance(error, commands.MissingRequiredArgument) or
-            isinstance(error, commands.TooManyArguments)):
-        await ctx.send('Invalid parameters')
-        await ctx.send('See the help text for valid parameters')
-    elif isinstance(error, commands.CommandInvokeError):
-        error = error.original
-        if isinstance(error, NoCharacterError):
-            await ctx.send('User does not have a character')
-        elif isinstance(error, NoResourceError):
-            await ctx.send('Could not find const')
-        elif isinstance(error, ValueError):
-            await ctx.send('Invalid rest type')
-        else:
-            await ctx.send('Error: {}'.format(error))
-    else:
-        await ctx.send('Error: {}'.format(error))
 
 
 @bot.group(invoke_without_command=True)
@@ -716,28 +622,6 @@ async def const_remove(ctx, *, name: str):
         session.delete(const)
         session.commit()
         await ctx.send('{} removed'.format(const))
-
-
-@const.error
-@const_add.error
-@const_check.error
-@const_remove.error
-async def const_error(ctx, error):
-    if (isinstance(error, commands.BadArgument) or
-            isinstance(error, commands.MissingRequiredArgument) or
-            isinstance(error, commands.TooManyArguments)):
-        await ctx.send('Invalid parameters')
-        await ctx.send('See the help text for valid parameters')
-    elif isinstance(error, commands.CommandInvokeError):
-        error = error.original
-        if isinstance(error, NoCharacterError):
-            await ctx.send('User does not have a character')
-        elif isinstance(error, NoResourceError):
-            await ctx.send('Could not find const')
-        else:
-            await ctx.send('Error: {}'.format(error))
-    else:
-        await ctx.send('Error: {}'.format(error))
 
 
 @bot.group(invoke_without_command=True)
@@ -838,38 +722,6 @@ async def initiative_endcombat(ctx):
             .filter_by(channel=ctx.message.channel.name).delete(False)
 
 
-@initiative.error
-@initiative_add.error
-@initiative_roll.error
-@initiative_check.error
-@initiative_remove.error
-@initiative_endcombat.error
-async def initiative_error(ctx, error):
-    if (isinstance(error, commands.BadArgument) or
-            isinstance(error, commands.MissingRequiredArgument) or
-            isinstance(error, commands.TooManyArguments)):
-        await ctx.send('Invalid parameters')
-        await ctx.send('See the help text for valid parameters')
-    elif isinstance(error, commands.CheckFailure):
-        await ctx.send('You do not have the authority to use this command')
-    elif isinstance(error, commands.CommandInvokeError):
-        error = error.original
-        if isinstance(error, NoCharacterError):
-            await ctx.send('User does not have a character')
-        elif isinstance(error, NoResourceError):
-            await ctx.send('Could not find initiative')
-        elif isinstance(error, ValueError):
-            if error.args:
-                await ctx.send('Invalid dice expression: {}'.format(
-                    error.args[0]))
-            else:
-                await ctx.send('Invalid dice expression')
-        else:
-            await ctx.send('Error: {}'.format(error))
-    else:
-        await ctx.send('Error: {}'.format(error))
-
-
 # ----#-   Application
 
 
@@ -882,6 +734,36 @@ async def on_ready():
     print(bot.user.name)
     print(bot.user.id)
     print('------')
+
+
+@bot.event
+async def on_command_error(ctx, error):
+    if (isinstance(error, commands.BadArgument) or
+            isinstance(error, commands.MissingRequiredArgument) or
+            isinstance(error, commands.TooManyArguments)):
+        await ctx.send(
+            'Invalid parameters\nSee the help text for valid parameters')
+    elif isinstance(error, commands.CommandInvokeError):
+        error = error.original
+        if isinstance(error, NoCharacterError):
+            await ctx.send('User does not have a character')
+        elif isinstance(error, NoResourceError):
+            await ctx.send('Could not find requested item')
+        elif isinstance(error, equations.EquationError):
+            if error.args:
+                await ctx.send('Invalid dice expression: {}'.format(
+                    error.args[0]))
+            else:
+                await ctx.send('Invalid dice expression')
+        elif isinstance(error, ValueError):
+            if error.args:
+                await ctx.send('Invalid parameter: {}'.format(error.args[0]))
+            else:
+                await ctx.send('Invalid parameter')
+        else:
+            await ctx.send('Error: {}'.format(error))
+    else:
+        await ctx.send('Error: {}'.format(error))
 
 
 if __name__ == '__main__':
