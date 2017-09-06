@@ -738,32 +738,31 @@ async def on_ready():
 
 @bot.event
 async def on_command_error(ctx, error):
+    if (isinstance(error, commands.CommandInvokeError)):
+        error = error.original
+
     if (isinstance(error, commands.BadArgument) or
             isinstance(error, commands.MissingRequiredArgument) or
             isinstance(error, commands.TooManyArguments)):
         await ctx.send(
             'Invalid parameters\nSee the help text for valid parameters')
-    elif isinstance(error, commands.CommandInvokeError):
-        error = error.original
-        if isinstance(error, NoCharacterError):
-            await ctx.send('User does not have a character')
-        elif isinstance(error, NoResourceError):
-            await ctx.send('Could not find requested item')
-        elif isinstance(error, equations.EquationError):
-            if error.args:
-                await ctx.send('Invalid dice expression: {}'.format(
-                    error.args[0]))
-            else:
-                await ctx.send('Invalid dice expression')
-        elif isinstance(error, ValueError):
-            if error.args:
-                await ctx.send('Invalid parameter: {}'.format(error.args[0]))
-            else:
-                await ctx.send('Invalid parameter')
+    elif isinstance(error, NoCharacterError):
+        await ctx.send('User does not have a character')
+    elif isinstance(error, NoResourceError):
+        await ctx.send('Could not find requested item')
+    elif isinstance(error, equations.EquationError):
+        if error.args:
+            await ctx.send('Invalid dice expression: {}'.format(error.args[0]))
         else:
-            await ctx.send('Error: {}'.format(error))
+            await ctx.send('Invalid dice expression')
+    elif isinstance(error, ValueError):
+        if error.args:
+            await ctx.send('Invalid parameter: {}'.format(error.args[0]))
+        else:
+            await ctx.send('Invalid parameter')
     else:
         await ctx.send('Error: {}'.format(error))
+        raise error
 
 
 if __name__ == '__main__':
