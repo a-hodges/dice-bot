@@ -42,9 +42,12 @@ def infix2postfix(
             higher_or_equal_priority = []
             ops = iter(order_of_operations)
             line = next(ops)
-            while item not in line:
-                higher_or_equal_priority.extend(line)
-                line = next(ops)
+            try:
+                while item not in line:
+                    higher_or_equal_priority.extend(line)
+                    line = next(ops)
+            except StopIteration:
+                raise SyntaxError('Operator and Order of Operations mismatch')
 
             while stack[-1] in higher_or_equal_priority:
                 output.append(stack.pop())
@@ -102,6 +105,8 @@ def solve(
                     stack[-1] = int(stack[-1])
             else:
                 stack.append(int(c))
+        elif c in ['(', ')']:
+            stack.append(c)
         # poor way to handle the negatives
         elif c == '-' and (
                 i == 0 or
