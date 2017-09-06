@@ -350,7 +350,7 @@ async def roll_add(ctx, name: str, expression: str):
             'expression': expression,
         })
 
-        await ctx.send('{} now has {}'.format(character.name, roll))
+        await ctx.send('{} now has `{}`'.format(character.name, roll))
 
 
 @roll.command('check', aliases=['list'])
@@ -433,7 +433,7 @@ async def resource_add(ctx, name: str, max_uses: int, recover: str):
             'recover': recover,
         })
 
-        await ctx.send('{} now has {}'.format(character.name, resource))
+        await ctx.send('{} now has `{}`'.format(character.name, resource))
 
 
 @resource.command('use')
@@ -599,7 +599,7 @@ async def const_add(ctx, name: str, value: int):
             'value': value,
         })
 
-        await ctx.send('{} now has {}'.format(character.name, const))
+        await ctx.send('{} now has `{}`'.format(character.name, const))
 
 
 @const.command('check', aliases=['list'])
@@ -677,7 +677,7 @@ async def initiative_add(ctx, *, value: int):
             'value': value,
         })
 
-        await ctx.send('{} has initiative {}'.format(
+        await ctx.send('{} has initiative `{}`'.format(
             character.name, initiative))
 
 
