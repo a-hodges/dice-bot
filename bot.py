@@ -132,7 +132,7 @@ async def do_roll(ctx, character, expression, adv=0):
     for roll in character.rolls:
         if roll.name in expression:
             expression = expression.replace(
-                roll.name, '({})'.format(roll.expression))
+                roll.name, '({})'.format(roll.expression), 1)
             break
     # replace constants
     for const in character.constants:
