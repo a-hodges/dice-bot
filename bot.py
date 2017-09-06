@@ -319,8 +319,11 @@ async def roll(ctx, *expression: str):
                 adv = 1
             elif adv == 'disadv':
                 adv = -1
-            else:
+            elif adv == '':
                 adv = 0
+            else:
+                raise commands.BadArgument(adv)
+
             await do_roll(ctx, character, expression, adv)
     elif len(expression) < 1:
         raise commands.MissingRequiredArgument()
@@ -758,11 +761,17 @@ async def on_command_error(ctx, error):
     if (isinstance(error, commands.CommandInvokeError)):
         error = error.original
 
-    if (isinstance(error, commands.BadArgument) or
-            isinstance(error, commands.MissingRequiredArgument) or
-            isinstance(error, commands.TooManyArguments)):
+    if isinstance(error, commands.BadArgument):
         await ctx.send(
-            'Invalid parameters\nSee the help text for valid parameters')
+            'Invalid parameter: {}\n'.format(error.message) +
+            'See the help text for valid parameters')
+    elif isinstance(error, commands.MissingRequiredArgument):
+        await ctx.send(
+            'Missing parameter: {}\n'.format(error.param) +
+            'See the help text for valid parameters')
+    elif isinstance(error, commands.TooManyArguments):
+        await ctx.send(
+            'Too many parameters\nSee the help text for valid parameters')
     elif isinstance(error, NoCharacterError):
         await ctx.send('User does not have a character')
     elif isinstance(error, NoResourceError):
