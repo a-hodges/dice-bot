@@ -59,7 +59,7 @@ def sqlalchemy_context(Session, autocommit=False):
         session.close()
 
 
-async def do_roll(ctx, character, expression, silent=False):
+async def do_roll(ctx, character, expression, adv=0):
     '''
     Does the dice rolling after const replacement
     '''
@@ -90,34 +90,50 @@ async def do_roll(ctx, character, expression, silent=False):
             out += n
         return out
 
-    def advantage(a, b, *, silent=False):
-        first = roll_dice(a, b, silent=True)
-        second = roll_dice(a, b, silent=True)
-        out = max(first, second)
-        if not silent:
-            output.append('{}ad{}, picking larger of {} and {}: {}'.format(
-                a, b, first, second, out))
+    def roll_advantage(a, b, *, silent=False):
+        if a == 1 and b == 20:
+            first = roll_dice(a, b, silent=True)
+            second = roll_dice(a, b, silent=True)
+            out = max(first, second)
+            if not silent:
+                output.append('{}d{}, picking larger of {} and {}: {}'.format(
+                    a, b, first, second, out))
+        else:
+            out = roll_dice(a, b, silent=silent)
         return out
 
-    def disadvantage(a, b, *, silent=False):
-        first = roll_dice(a, b, silent=True)
-        second = roll_dice(a, b, silent=True)
-        out = min(first, second)
-        if not silent:
-            output.append('{}dd{}, picking smaller of {} and {}: {}'.format(
-                a, b, first, second, out))
+    def roll_disadvantage(a, b, *, silent=False):
+        if a == 1 and b == 20:
+            first = roll_dice(a, b, silent=True)
+            second = roll_dice(a, b, silent=True)
+            out = min(first, second)
+            if not silent:
+                output.append('{}d{}, picking smaller of {} and {}: {}'.format(
+                    a, b, first, second, out))
+        else:
+            out = roll_dice(a, b, silent=silent)
         return out
 
     operations = equations.operations.copy()
-    operations['d'] = roll_dice
-    operations['ad'] = advantage
-    operations['dd'] = disadvantage
+    if adv == 0:
+        operations['d'] = roll_dice
+    elif adv > 0:
+        operations['d'] = roll_advantage
+    else:
+        operations['d'] = roll_disadvantage
+    operations['D'] = operations['d']
     operations['gwf'] = great_weapon_fighting
     operations['>'] = max
     operations['<'] = min
-    order_of_operations = [['d', 'D', 'ad', 'dd', 'gwf'], ['>', '<']]
+    order_of_operations = [['d', 'D', 'gwf'], ['>', '<']]
     order_of_operations.extend(equations.order_of_operations)
 
+    # replace only 1 roll
+    for roll in character.rolls:
+        if roll.name in expression:
+            expression = expression.replace(
+                roll.name, '({})'.format(roll.expression))
+            break
     # replace constants
     for const in character.constants:
         expression = expression.replace(const.name, '({})'.format(const.value))
@@ -265,24 +281,26 @@ async def changename(ctx, *, name: str):
 
 
 @bot.group(invoke_without_command=True)
-async def roll(ctx, *, expression: str):
+async def roll(ctx, *expression: str):
     '''
     Rolls dice
     Note: consts can be used in rolls and are replaced by the const value
 
     Parameters:
     [expression] standard dice notation specifying what to roll
+        the expression may include up to 1 saved roll
+    [adv] (optional) if present should be adv|disadv to indicate that any
+        1d20 should be rolled with advantage or disadvantage respectively
+
+    For finer control over advantage/disadvantage the > operator
+    picks the larger operand and the < operator picks the smaller
 
     *Everything past here may change*
 
-    There are special operators for advantage and disadvantage rolls:
-    "ad" for advantage, "dd" for disadvantage
-    So, use "1ad20" for advantage or "1dd20" for disadvantage
-
-    There is also a special 'great weapon fighting' operator
+    There is a special 'great weapon fighting' operator
     which rerolls a 1 or 2, i.e. "2gwf6+5"
     '''
-    if expression:
+    if 0 < len(expression) <= 2:
         with sqlalchemy_context(Session) as session:
             try:
                 character = session.query(m.Character)\
@@ -290,10 +308,24 @@ async def roll(ctx, *, expression: str):
             except NoResultFound:
                 raise NoCharacterError()
 
-            await do_roll(ctx, character, expression)
+            if len(expression) == 2:
+                adv = expression[1]
+                expression = expression[0]
+            else:
+                adv = ''
+                expression = expression[0]
+
+            if adv == 'adv':
+                adv = 1
+            elif adv == 'disadv':
+                adv = -1
+            else:
+                adv = 0
+            await do_roll(ctx, character, expression, adv)
+    elif len(expression) < 1:
+        raise commands.MissingRequiredArgument()
     else:
-        # error
-        await ctx.send('No equation provided')
+        raise commands.TooManyArguments()
 
 
 @roll.command('add', aliases=['set', 'update'])
@@ -316,26 +348,6 @@ async def roll_add(ctx, name: str, expression: str):
         })
 
         await ctx.send('{} now has {}'.format(character.name, roll))
-
-
-@roll.command('use')
-async def roll_use(ctx, *, name: str):
-    '''
-    Rolls a stored dice expression
-
-    Parameters:
-    [name] name of roll to use
-    '''
-    with sqlalchemy_context(Session) as session:
-        character = get_character(session, ctx.author.id)
-
-        try:
-            roll = session.query(m.Roll)\
-                .filter_by(name=name, character=character).one()
-        except NoResultFound:
-            raise NoResourceError
-
-        await do_roll(ctx, character, roll.expression)
 
 
 @roll.command('check', aliases=['list'])
@@ -676,13 +688,6 @@ async def initiative_roll(ctx, *, expression: str):
     '''
     with sqlalchemy_context(Session) as session:
         character = get_character(session, ctx.author.id)
-
-        try:
-            roll = session.query(m.Roll)\
-                .filter_by(name=name, character=character).one()
-            roll = roll.expression
-        except NoResultFound:
-            roll = expression
 
         value = await do_roll(ctx, character, roll)
 
