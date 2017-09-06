@@ -164,6 +164,19 @@ def sql_update(session, type, keys, values):
     return obj
 
 
+# ----#-   Converters
+
+
+def int_or_max(value: str):
+    if value == 'max':
+        return value
+    else:
+        try:
+            return int(value)
+        except ValueError:
+            raise commands.BadArgument(value)
+
+
 # ----#-   Commands
 
 
@@ -195,7 +208,13 @@ async def iam(ctx, *, name: str):
     else:
         # associate character
         with sqlalchemy_context(Session) as session:
-            character = sql_update(session, m.Character, {'name': name}, {})
+            try:
+                character = session.query(m.Character)\
+                    .filter_by(name=name).one()
+            except NoResultFound:
+                character = m.Character(name=name)
+                session.add(character)
+                await ctx.send('Creating character: {}'.format(name))
 
             if character.user is None:
                 character.user = ctx.author.id
@@ -234,12 +253,15 @@ async def changename(ctx, *, name: str):
     [name] the new name
     '''
     with sqlalchemy_context(Session) as session:
-        character = get_character(session, ctx.author.id)
-        original_name = character.name
-        character.name = name
-        session.commit()
-        await ctx.send("{} has changed {}'s name to {}".format(
-            ctx.author.mention, original_name, name))
+        try:
+            character = get_character(session, ctx.author.id)
+            original_name = character.name
+            character.name = name
+            session.commit()
+            await ctx.send("{} has changed {}'s name to {}".format(
+                ctx.author.mention, original_name, name))
+        except IntegrityError:
+            await ctx.send('There is already a character with that name')
 
 
 @bot.group(invoke_without_command=True)
@@ -425,16 +447,6 @@ async def resource_use(ctx, name: str, number: int):
         else:
             await ctx.send('{} cannot use {}'.format(
                 character.name, resource.name))
-
-
-def int_or_max(value: str):
-    if value == 'max':
-        return value
-    else:
-        try:
-            return int(value)
-        except ValueError:
-            raise commands.BadArgument(value)
 
 
 @resource.command('set')
