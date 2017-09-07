@@ -10,8 +10,8 @@ from contextlib import contextmanager
 import discord
 from discord.ext import commands
 from sqlalchemy import create_engine
-from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import NoResultFound
 
 import equations
@@ -300,35 +300,28 @@ async def roll(ctx, *expression: str):
     There is a special 'great weapon fighting' operator
     which rerolls a 1 or 2, i.e. "2gwf6+5"
     '''
-    if 0 < len(expression) <= 2:
-        with sqlalchemy_context(Session) as session:
-            try:
-                character = session.query(m.Character)\
-                    .filter_by(user=ctx.author.id).one()
-            except NoResultFound:
-                raise NoCharacterError()
+    if not expression:
+        raise commands.MissingRequiredArgument('expression')
 
-            if len(expression) == 2:
-                adv = expression[1]
-                expression = expression[0]
-            else:
-                adv = ''
-                expression = expression[0]
-
-            if adv == 'adv':
-                adv = 1
-            elif adv == 'disadv':
-                adv = -1
-            elif adv == '':
-                adv = 0
-            else:
-                raise commands.BadArgument(adv)
-
-            await do_roll(ctx, character, expression, adv)
-    elif len(expression) < 1:
-        raise commands.MissingRequiredArgument()
+    if expression[-1] == 'disadv':
+        adv = -1
+        expression.pop()
+    elif expression[-1] == 'adv':
+        adv = 1
+        expression.pop()
     else:
-        raise commands.TooManyArguments()
+        adv = 0
+
+    expression = ' '.join(expression)
+
+    with sqlalchemy_context(Session) as session:
+        try:
+            character = session.query(m.Character)\
+                .filter_by(user=ctx.author.id).one()
+        except NoResultFound:
+            raise NoCharacterError()
+
+        await do_roll(ctx, character, expression, adv)
 
 
 @roll.command('add', aliases=['set', 'update'])
