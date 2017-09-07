@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
-import math
 import operator
+import re
 
 operations = {
     '+': operator.add,
@@ -21,45 +21,45 @@ class EquationError (Exception):
     pass
 
 
-def equation2list(
-        equation,
-        operations=operations,
-        order_of_operations=order_of_operations):
-    stack = []
-    equation = equation.replace(' ', '')
-    for i, c in enumerate(equation):
-        if c.isdigit():
-            if stack and isinstance(stack[-1], (int, float)):
-                stack[-1] = stack[-1] * 10 + int(
-                    math.copysign(int(c), stack[-1]))
-                # poor way to handle the negatives
-                if stack and isinstance(stack[-1], float):
-                    stack[-1] = int(stack[-1])
-            else:
-                stack.append(int(c))
-        elif c in ['(', ')']:
-            stack.append(c)
-        # poor way to handle the negatives
-        elif c == '-' and (
-                i == 0 or
-                stack[-1] == '(' or
-                stack[-1] in operations):
-            stack.append(-0.0)
-        elif (stack and
-                not isinstance(stack[-1], int) and
-                not stack[-1] in ['(', ')']):
-            stack[-1] += c
-        else:
-            stack.append(c)
-    return stack
+def parse_number(num):
+    '''
+    Converts a string to an int if possible,
+    otherwise float if possible,
+    otherwise returns the original string
+    '''
+    try:
+        return int(num)
+    except ValueError:
+        try:
+            return float(num)
+        except ValueError:
+            return num
+
+
+def tokenize(equation):
+    '''
+    Tokenizes an infix equation to create a list
+    '''
+    # things to split by
+    text = r'[a-zA-Z]+'
+    num = r'(?<!\d)-?\d*\.?\d+'
+    parens = r'[()]'
+    #
+    stack = re.split('({}|{}|{})'.format(text, num, parens), equation)
+    stack = filter(None, stack)
+    stack = map(parse_number, stack)
+    return list(stack)
 
 
 def infix2postfix(
         equation,
         operations=operations,
         order_of_operations=order_of_operations):
-    equation.append(')')
-    stack = ['(']
+    '''
+    Converts a tokenized infix equation to postfix
+    '''
+    equation = list(equation)
+    stack = []
     output = []
 
     for item in equation:
@@ -68,6 +68,8 @@ def infix2postfix(
         elif item == '(':
             stack.append(item)
         elif item == ')':
+            if '(' not in stack:
+                raise EquationError('Invalid equation: {}'.format(equation))
             while stack[-1] != '(':
                 output.append(stack.pop())
             stack.pop()
@@ -82,15 +84,18 @@ def infix2postfix(
             except StopIteration:
                 raise SyntaxError('Operator and Order of Operations mismatch')
 
-            while stack[-1] in higher_or_equal_priority:
+            while stack and stack[-1] in higher_or_equal_priority:
                 output.append(stack.pop())
             stack.append(item)
         else:
             raise EquationError('Invalid character found: {} in {}'.format(
                 item, equation))
 
-    if len(stack) != 0:
+    if '(' in stack:
         raise EquationError('Invalid equation: {}'.format(equation))
+
+    while stack:
+        output.append(stack.pop())
 
     return output
 
@@ -99,6 +104,10 @@ def solve_postfix(
         equation,
         operations=operations,
         order_of_operations=order_of_operations):
+    '''
+    Solves a tokenized postfix equation
+    '''
+    equation = list(equation)
     stack = []
 
     for item in equation:
@@ -129,7 +138,7 @@ def solve(
     '''
     Runs equation2list, infix2postfix, and solve_postfix in order
     '''
-    equation = equation2list(equation, operations, order_of_operations)
+    equation = tokenize(equation)
     postfix = infix2postfix(equation, operations, order_of_operations)
     value = solve_postfix(postfix, operations, order_of_operations)
     return value
