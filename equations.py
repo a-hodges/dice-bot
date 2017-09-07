@@ -138,6 +138,7 @@ def solve(
     '''
     Runs equation2list, infix2postfix, and solve_postfix in order
     '''
+    equation = re.sub('\s', '', equation) # remove whitespace
     equation = tokenize(equation)
     postfix = infix2postfix(equation, operations, order_of_operations)
     value = solve_postfix(postfix, operations, order_of_operations)
