@@ -305,10 +305,10 @@ async def roll(ctx, *expression: str):
 
     if expression[-1] == 'disadv':
         adv = -1
-        expression.pop()
+        expression = expression[:-1]
     elif expression[-1] == 'adv':
         adv = 1
-        expression.pop()
+        expression = expression[:-1]
     else:
         adv = 0
 
