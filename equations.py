@@ -42,7 +42,7 @@ def tokenize(equation):
     '''
     # things to split by
     text = r'[a-zA-Z]+'
-    num = r'(?<!\d)-?\d*\.?\d+'
+    num = r'(?<![)\d])-?\d*\.?\d+'
     parens = r'[()]'
     #
     stack = re.split('({}|{}|{})'.format(text, num, parens), equation)
@@ -138,7 +138,7 @@ def solve(
     '''
     Runs equation2list, infix2postfix, and solve_postfix in order
     '''
-    equation = re.sub('\s', '', equation) # remove whitespace
+    equation = re.sub('\s', '', equation)  # remove whitespace
     equation = tokenize(equation)
     postfix = infix2postfix(equation, operations, order_of_operations)
     value = solve_postfix(postfix, operations, order_of_operations)
