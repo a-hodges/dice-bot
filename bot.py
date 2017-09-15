@@ -123,11 +123,13 @@ async def do_roll(ctx, session, character, expression, adv=0):
     else:
         operations['d'] = roll_disadvantage
     operations['D'] = operations['d']
-    operations['gwf'] = great_weapon_fighting
+    operations['g'] = great_weapon_fighting
+    operations['G'] = operations['g']
     operations['>'] = max
     operations['<'] = min
-    order_of_operations = [['d', 'D', 'gwf'], ['>', '<']]
+    order_of_operations = [['d', 'D', 'g', 'G']]
     order_of_operations.extend(equations.order_of_operations)
+    order_of_operations.append(['>', '<'])
 
     # replace only 1 roll
     rolls = session.query(m.Roll)\
@@ -306,7 +308,7 @@ async def roll(ctx, *expression: str):
     *Everything past here may change*
 
     There is a special 'great weapon fighting' operator
-    which rerolls a 1 or 2, i.e. "2gwf6+5"
+    which rerolls a 1 or 2, i.e. "2g6+5"
     '''
     if not expression:
         raise commands.MissingRequiredArgument('expression')
