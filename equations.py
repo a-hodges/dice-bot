@@ -145,4 +145,4 @@ def solve(
     return value
 
 if __name__ == '__main__':
-    print(solve(input()))
+    print(solve(input('Eq: ')))

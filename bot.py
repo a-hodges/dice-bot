@@ -11,6 +11,7 @@ import discord
 from discord.ext import commands
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import NoResultFound
 
@@ -59,7 +60,7 @@ def sqlalchemy_context(Session, autocommit=False):
         session.close()
 
 
-async def do_roll(ctx, character, expression, adv=0):
+async def do_roll(ctx, session, character, expression, adv=0):
     '''
     Does the dice rolling after const replacement
     '''
@@ -129,13 +130,20 @@ async def do_roll(ctx, character, expression, adv=0):
     order_of_operations.extend(equations.order_of_operations)
 
     # replace only 1 roll
-    for roll in character.rolls:
+    rolls = session.query(m.Roll)\
+        .filter_by(character=character)\
+        .order_by(func.char_length(m.Roll.name).desc())
+    for roll in rolls:
         if roll.name in expression:
             expression = expression.replace(
                 roll.name, '({})'.format(roll.expression), 1)
             break
+
     # replace constants
-    for const in character.constants:
+    consts = session.query(m.Constant)\
+        .filter_by(character=character)\
+        .order_by(func.char_length(m.Constant.name).desc())
+    for const in consts:
         expression = expression.replace(const.name, '({})'.format(const.value))
     output.append('Rolling: {}'.format(expression))
 
@@ -321,7 +329,7 @@ async def roll(ctx, *expression: str):
         except NoResultFound:
             raise NoCharacterError()
 
-        await do_roll(ctx, character, expression, adv)
+        await do_roll(ctx, session, character, expression, adv)
 
 
 @roll.command('add', aliases=['set', 'update'])
@@ -685,7 +693,7 @@ async def initiative_roll(ctx, *, expression: str):
     with sqlalchemy_context(Session) as session:
         character = get_character(session, ctx.author.id)
 
-        value = await do_roll(ctx, character, roll)
+        value = await do_roll(ctx, session, character, roll)
 
         initiative_add(ctx, value=value)
 
