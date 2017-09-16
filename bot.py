@@ -5,7 +5,7 @@ import asyncio
 import logging
 import random
 from collections import OrderedDict
-from contextlib import contextmanager
+from contextlib import closing
 
 import discord
 from discord.ext import commands
@@ -49,15 +49,6 @@ class NoResourceError (BotError):
 
 
 # ----#-   Utilities
-
-
-@contextmanager
-def sqlalchemy_context(Session, autocommit=False):
-    session = Session(autocommit=autocommit)
-    try:
-        yield session
-    finally:
-        session.close()
 
 
 async def do_roll(ctx, session, character, expression, adv=0):
@@ -219,7 +210,7 @@ async def iam(ctx, *, name: str):
     '''
     if name.lower() == 'done':
         # remove character association
-        with sqlalchemy_context(Session) as session:
+        with closing(Session()) as session:
             try:
                 character = session.query(m.Character)\
                     .filter_by(user=ctx.author.id).one()
@@ -233,7 +224,7 @@ async def iam(ctx, *, name: str):
             session.commit()
     else:
         # associate character
-        with sqlalchemy_context(Session) as session:
+        with closing(Session()) as session:
             try:
                 character = session.query(m.Character)\
                     .filter_by(name=name).one()
@@ -264,7 +255,7 @@ async def whois(ctx, *, member: discord.Member):
     Parameters:
     [user] should be a user on this channel
     '''
-    with sqlalchemy_context(Session) as session:
+    with closing(Session()) as session:
         character = get_character(session, member.id)
         text = '{} is {}'.format(member.mention, character.name)
         await ctx.send(text)
@@ -278,7 +269,7 @@ async def changename(ctx, *, name: str):
     Parameters:
     [name] the new name
     '''
-    with sqlalchemy_context(Session) as session:
+    with closing(Session()) as session:
         try:
             character = get_character(session, ctx.author.id)
             original_name = character.name
@@ -324,7 +315,7 @@ async def roll(ctx, *expression: str):
 
     expression = ' '.join(expression)
 
-    with sqlalchemy_context(Session) as session:
+    with closing(Session()) as session:
         try:
             character = session.query(m.Character)\
                 .filter_by(user=ctx.author.id).one()
@@ -343,7 +334,7 @@ async def roll_add(ctx, name: str, expression: str):
     [name] name of roll to store
     [expression] dice equation
     '''
-    with sqlalchemy_context(Session) as session:
+    with closing(Session()) as session:
         character = get_character(session, ctx.author.id)
 
         roll = sql_update(session, m.Roll, {
@@ -365,7 +356,7 @@ async def roll_check(ctx, *, name: str):
     [name] the name of the roll
         use the value "all" to list all rolls
     '''
-    with sqlalchemy_context(Session) as session:
+    with closing(Session()) as session:
         character = get_character(session, ctx.author.id)
 
         if name != 'all':
@@ -391,7 +382,7 @@ async def roll_remove(ctx, *, name: str):
     Parameters:
     [name] the name of the roll
     '''
-    with sqlalchemy_context(Session) as session:
+    with closing(Session()) as session:
         character = get_character(session, ctx.author.id)
 
         try:
@@ -424,7 +415,7 @@ async def resource_add(ctx, name: str, max_uses: int, recover: str):
     [recover] the rest required to recover the resource,
         can be short|long|other
     '''
-    with sqlalchemy_context(Session) as session:
+    with closing(Session()) as session:
         character = get_character(session, ctx.author.id)
 
         resource = sql_update(session, m.Resource, {
@@ -448,7 +439,7 @@ async def resource_use(ctx, name: str, number: int):
     [name] the name of the resource
     [number] the quantity of the resource to use (can be negative to regain)
     '''
-    with sqlalchemy_context(Session) as session:
+    with closing(Session()) as session:
         character = get_character(session, ctx.author.id)
 
         try:
@@ -477,7 +468,7 @@ async def resource_set(ctx, name: str, uses: int_or_max):
     [uses] can be the number of remaining uses or
         the special value "max" to refill all uses
     '''
-    with sqlalchemy_context(Session) as session:
+    with closing(Session()) as session:
         character = get_character(session, ctx.author.id)
 
         try:
@@ -505,7 +496,7 @@ async def resource_check(ctx, *, name: str):
     [name] the name of the resource
         use the value "all" to list resources
     '''
-    with sqlalchemy_context(Session) as session:
+    with closing(Session()) as session:
         character = get_character(session, ctx.author.id)
 
         if name != 'all':
@@ -531,7 +522,7 @@ async def resource_remove(ctx, *, name: str):
     Parameters:
     [name] the name of the resource
     '''
-    with sqlalchemy_context(Session) as session:
+    with closing(Session()) as session:
         character = get_character(session, ctx.author.id)
 
         try:
@@ -555,7 +546,7 @@ async def rest(ctx, *, rest: str):
     '''
     if rest in ['short', 'long']:
         # short or long rest
-        with sqlalchemy_context(Session) as session:
+        with closing(Session()) as session:
             character = get_character(session, ctx.author.id)
 
             if character:
@@ -592,7 +583,7 @@ async def const_add(ctx, name: str, value: int):
     [name] name of const to store
     [value] value to store
     '''
-    with sqlalchemy_context(Session) as session:
+    with closing(Session()) as session:
         character = get_character(session, ctx.author.id)
 
         const = sql_update(session, m.Constant, {
@@ -614,7 +605,7 @@ async def const_check(ctx, *, name: str):
     [name] the name of the const
         use the value "all" to list all consts
     '''
-    with sqlalchemy_context(Session) as session:
+    with closing(Session()) as session:
         character = get_character(session, ctx.author.id)
 
         if name != 'all':
@@ -640,7 +631,7 @@ async def const_remove(ctx, *, name: str):
     Parameters:
     [name] the name of the const
     '''
-    with sqlalchemy_context(Session) as session:
+    with closing(Session()) as session:
         character = get_character(session, ctx.author.id)
 
         try:
@@ -670,7 +661,7 @@ async def initiative_add(ctx, *, value: int):
     Parameters:
     [value] the initiative to store
     '''
-    with sqlalchemy_context(Session) as session:
+    with closing(Session()) as session:
         character = get_character(session, ctx.author.id)
 
         initiative = sql_update(session, m.Constant, {
@@ -692,7 +683,7 @@ async def initiative_roll(ctx, *, expression: str):
     Parameters:
     [expression] either the expression to roll or the name of a stored roll
     '''
-    with sqlalchemy_context(Session) as session:
+    with closing(Session()) as session:
         character = get_character(session, ctx.author.id)
 
         value = await do_roll(ctx, session, character, roll)
@@ -705,7 +696,7 @@ async def initiative_check(ctx):
     '''
     Lists all initiatives currently stored in this channel
     '''
-    with sqlalchemy_context(Session) as session:
+    with closing(Session()) as session:
         initiatives = session.query(m.Initiative)\
             .filter_by(channel=ctx.message.channel.name).all()
         text = ['Initiatives:']
@@ -719,7 +710,7 @@ async def initiative_remove(ctx):
     '''
     Deletes a character's current initiative
     '''
-    with sqlalchemy_context(Session) as session:
+    with closing(Session()) as session:
         character = get_character(session, ctx.author.id)
 
         try:
@@ -740,7 +731,7 @@ async def initiative_endcombat(ctx):
     '''
     Removes all initiative entries for the current channel
     '''
-    with sqlalchemy_context(Session) as session:
+    with closing(Session()) as session:
         session.query(m.Initiative)\
             .filter_by(channel=ctx.message.channel.name).delete(False)
 
@@ -810,7 +801,7 @@ if __name__ == '__main__':
     engine = create_engine(args.database)
     m.Base.metadata.create_all(engine)
     Session = sessionmaker(bind=engine)
-    with sqlalchemy_context(Session) as session:
+    with closing(Session()) as session:
         for name in config:
             try:
                 key = session.query(m.Config).filter_by(name=name).one()
