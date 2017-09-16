@@ -451,13 +451,13 @@ async def resource_use(ctx, name: str, number: int):
         except NoResultFound:
             raise NoResourceError
 
-        if resource.current > 0:
+        if resource.current - number >= 0:
             resource.current -= number
             session.commit()
             await ctx.send('{} used {}, {} remaining'.format(
                 character.name, resource.name, resource.current))
         else:
-            await ctx.send('{} cannot use {}'.format(
+            await ctx.send('{} does not have enough {} to use'.format(
                 character.name, resource.name))
 
 
