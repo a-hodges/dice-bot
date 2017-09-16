@@ -415,6 +415,9 @@ async def resource_add(ctx, name: str, max_uses: int, recover: str):
     [recover] the rest required to recover the resource,
         can be short|long|other
     '''
+    if recover not in ['short', 'long', 'other']:
+        raise commands.BadArgument('recover')
+
     with closing(Session()) as session:
         character = get_character(session, ctx.author.id)
 
