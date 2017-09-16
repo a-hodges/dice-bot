@@ -393,7 +393,7 @@ async def roll_remove(ctx, *, name: str):
 
         session.delete(roll)
         session.commit()
-        await ctx.send('{} removed'.format(roll))
+        await ctx.send('`{}` removed'.format(roll))
 
 
 @bot.group(invoke_without_command=True)
@@ -533,7 +533,7 @@ async def resource_remove(ctx, *, name: str):
 
         session.delete(resource)
         session.commit()
-        await ctx.send('{} removed'.format(resource))
+        await ctx.send('`{}` removed'.format(resource))
 
 
 @bot.command()
@@ -642,7 +642,7 @@ async def const_remove(ctx, *, name: str):
 
         session.delete(const)
         session.commit()
-        await ctx.send('{} removed'.format(const))
+        await ctx.send('`{}` removed'.format(const))
 
 
 @bot.group(invoke_without_command=True)
