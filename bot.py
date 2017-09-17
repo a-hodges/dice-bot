@@ -674,7 +674,7 @@ async def initiative_add(ctx, *, value: int):
             'value': value,
         })
 
-        await ctx.send('{} has initiative `{}`'.format(
+        await ctx.send('Initiative `{}` added'.format(
             character.name, initiative))
 
 
@@ -698,7 +698,7 @@ async def initiative_roll(ctx, *, expression: str):
             'value': value,
         })
 
-        await ctx.send('{} has initiative `{}`'.format(
+        await ctx.send('Initiative `{}` added'.format(
             character.name, initiative))
 
 
