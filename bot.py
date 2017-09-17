@@ -691,7 +691,15 @@ async def initiative_roll(ctx, *, expression: str):
 
         value = await do_roll(ctx, session, character, expression)
 
-        initiative_add(ctx, value=value)
+        initiative = sql_update(session, m.Initiative, {
+            'character': character,
+            'channel': ctx.message.channel.name,
+        }, {
+            'value': value,
+        })
+
+        await ctx.send('{} has initiative `{}`'.format(
+            character.name, initiative))
 
 
 @initiative.command('check', aliases=['list'])
