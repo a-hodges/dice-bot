@@ -768,7 +768,7 @@ async def on_command_error(ctx, error):
 
     if isinstance(error, commands.BadArgument):
         await ctx.send(
-            'Invalid parameter: {}\n'.format(error.message) +
+            '{}\n'.format(error) +
             'See the help text for valid parameters')
     elif isinstance(error, commands.MissingRequiredArgument):
         await ctx.send(
