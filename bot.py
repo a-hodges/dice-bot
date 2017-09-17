@@ -667,7 +667,7 @@ async def initiative_add(ctx, *, value: int):
     with closing(Session()) as session:
         character = get_character(session, ctx.author.id)
 
-        initiative = sql_update(session, m.Constant, {
+        initiative = sql_update(session, m.Initiative, {
             'character': character,
             'channel': ctx.message.channel.name,
         }, {
