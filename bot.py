@@ -434,13 +434,13 @@ async def resource_add(ctx, name: str, max_uses: int, recover: str):
 
 
 @resource.command('use')
-async def resource_use(ctx, name: str, number: int):
+async def resource_use(ctx, number: int, *, name: str):
     '''
     Consumes 1 use of the resource
 
     Parameters:
-    [name] the name of the resource
     [number] the quantity of the resource to use (can be negative to regain)
+    [name] the name of the resource
     '''
     with closing(Session()) as session:
         character = get_character(session, ctx.author.id)
@@ -454,8 +454,8 @@ async def resource_use(ctx, name: str, number: int):
         if resource.current - number >= 0:
             resource.current -= number
             session.commit()
-            await ctx.send('{} used {}, {} remaining'.format(
-                character.name, resource.name, resource.current))
+            await ctx.send('{} used {} {}, {} remaining'.format(
+                character.name, number, resource.name, resource.current))
         else:
             await ctx.send('{} does not have enough {} to use'.format(
                 character.name, resource.name))
@@ -486,8 +486,8 @@ async def resource_set(ctx, name: str, uses: int_or_max):
             resource.current = uses
         session.commit()
 
-        await ctx.send('{} now has {} uses of {}'.format(
-            character.name, resource.current, resource.name))
+        await ctx.send('{} now has {}/{} uses of {}'.format(
+            character.name, resource.current, resource.max, resource.name))
 
 
 @resource.command('check', aliases=['list'])
