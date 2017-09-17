@@ -4,6 +4,7 @@ import argparse
 import asyncio
 import logging
 import random
+import re
 from collections import OrderedDict
 from contextlib import closing
 
@@ -55,6 +56,7 @@ async def do_roll(ctx, session, character, expression, adv=0):
     '''
     Does the dice rolling after const replacement
     '''
+    original_expression = expression
     output = []
 
     # Set up operations
@@ -139,6 +141,15 @@ async def do_roll(ctx, session, character, expression, adv=0):
     for const in consts:
         expression = expression.replace(const.name, '({})'.format(const.value))
     output.append('Rolling: {}'.format(expression))
+
+    # validate
+    for token in re.findall(r'[a-zA-Z]+', expression):
+        if token not in operations:
+            search = r'[a-zA-Z]*' + re.escape(token) + r'[a-zA-Z]*'
+            search = re.findall(search, original_expression)
+            if search:
+                token = search[0]
+            raise equations.EquationError('Could not find `{}`'.format(token))
 
     # do roll
     roll = equations.solve(expression, operations, order_of_operations)
