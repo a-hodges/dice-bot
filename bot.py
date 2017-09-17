@@ -689,7 +689,7 @@ async def initiative_roll(ctx, *, expression: str):
     with closing(Session()) as session:
         character = get_character(session, ctx.author.id)
 
-        value = await do_roll(ctx, session, character, roll)
+        value = await do_roll(ctx, session, character, expression)
 
         initiative_add(ctx, value=value)
 
