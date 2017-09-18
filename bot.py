@@ -227,7 +227,7 @@ async def iam(ctx, *, name: str):
                     .filter_by(user=ctx.author.id).one()
                 character.user = None
                 await ctx.send('{} is no longer playing as {}'.format(
-                    ctx.author.mention, character.name))
+                    ctx.author.mention, str(character)))
             except NoResultFound:
                 await ctx.send('{} does not have a character to remove'.format(
                     ctx.author.mention))
@@ -249,13 +249,13 @@ async def iam(ctx, *, name: str):
                 try:
                     session.commit()
                     await ctx.send('{} is {}'.format(
-                        ctx.author.mention, character.name))
+                        ctx.author.mention, str(character)))
                 except IntegrityError:
                     await ctx.send(
                         'You are already using a different character')
             else:
                 await ctx.send('Someone else is using {}'.format(
-                    character.name))
+                    str(character)))
 
 
 @bot.command()
@@ -268,8 +268,7 @@ async def whois(ctx, *, member: discord.Member):
     '''
     with closing(Session()) as session:
         character = get_character(session, member.id)
-        text = '{} is {}'.format(member.mention, character.name)
-        await ctx.send(text)
+        await ctx.send('{} is {}'.format(member.mention, str(character)))
 
 
 @bot.command()
@@ -355,7 +354,7 @@ async def roll_add(ctx, name: str, expression: str):
             'expression': expression,
         })
 
-        await ctx.send('{} now has `{}`'.format(character.name, roll))
+        await ctx.send('{} now has {}'.format(str(character), str(roll)))
 
 
 @roll.command('check', aliases=['list'])
@@ -377,11 +376,11 @@ async def roll_check(ctx, *, name: str):
             except NoResultFound:
                 raise NoResourceError
 
-            await ctx.send('`{}`'.format(roll))
+            await ctx.send(str(roll))
         else:
-            text = ["{}'s rolls:".format(character.name)]
+            text = ["{}'s rolls:".format(str(character))]
             for roll in character.rolls:
-                text.append('`{}`'.format(roll))
+                text.append(str(roll))
             await ctx.send('\n'.join(text))
 
 
@@ -404,7 +403,7 @@ async def roll_remove(ctx, *, name: str):
 
         session.delete(roll)
         session.commit()
-        await ctx.send('`{}` removed'.format(roll))
+        await ctx.send('{} removed'.format(str(roll)))
 
 
 @bot.group(invoke_without_command=True)
@@ -441,7 +440,7 @@ async def resource_add(ctx, name: str, max_uses: int, recover: str):
             'recover': recover,
         })
 
-        await ctx.send('{} now has `{}`'.format(character.name, resource))
+        await ctx.send('{} now has {}'.format(str(character), str(resource)))
 
 
 @resource.command('use')
@@ -465,11 +464,12 @@ async def resource_use(ctx, number: int, *, name: str):
         if resource.current - number >= 0:
             resource.current -= number
             session.commit()
-            await ctx.send('{} used {} {}, {} remaining'.format(
-                character.name, number, resource.name, resource.current))
+            await ctx.send('{} used {} {}, {}/{} remaining'.format(
+                str(character), number, resource.name,
+                resource.current, resource.max))
         else:
-            await ctx.send('{} does not have enough {} to use'.format(
-                character.name, resource.name))
+            await ctx.send('{} does not have enough to use: {}'.format(
+                str(character), str(resource)))
 
 
 @resource.command('set')
@@ -498,7 +498,7 @@ async def resource_set(ctx, name: str, uses: int_or_max):
         session.commit()
 
         await ctx.send('{} now has {}/{} uses of {}'.format(
-            character.name, resource.current, resource.max, resource.name))
+            str(character), resource.current, resource.max, resource.name))
 
 
 @resource.command('check', aliases=['list'])
@@ -520,11 +520,11 @@ async def resource_check(ctx, *, name: str):
             except NoResultFound:
                 raise NoResourceError
 
-            await ctx.send('`{}`'.format(resource))
+            await ctx.send(str(resource))
         else:
-            text = ["{}'s resources:".format(character.name)]
+            text = ["{}'s resources:".format(character)]
             for resource in character.resources:
-                text.append('`{}`'.format(resource))
+                text.append(str(resource))
             await ctx.send('\n'.join(text))
 
 
@@ -547,7 +547,7 @@ async def resource_remove(ctx, *, name: str):
 
         session.delete(resource)
         session.commit()
-        await ctx.send('`{}` removed'.format(resource))
+        await ctx.send('{} removed'.format(str(resource)))
 
 
 @bot.command()
@@ -558,26 +558,26 @@ async def rest(ctx, *, rest: str):
     Parameters:
     [type] should be short|long
     '''
-    if rest in ['short', 'long']:
-        # short or long rest
-        with closing(Session()) as session:
-            character = get_character(session, ctx.author.id)
+    if rest not in ['short', 'long']:
+        raise commands.BadArgument('rest')
+    # short or long rest
+    with closing(Session()) as session:
+        character = get_character(session, ctx.author.id)
 
-            if character:
-                for resource in character.resources:
-                    if rest == 'long' and resource.recover == m.Rest.long:
-                        resource.current = resource.max
-                    elif resource.recover == m.Rest.short:
-                        resource.current = resource.max
+        if character:
+            for resource in character.resources:
+                if resource.recover == m.Rest.long and rest == 'long':
+                    resource.current = resource.max
+                elif resource.recover == m.Rest.short:
+                    resource.current = resource.max
 
-                session.commit()
+            session.commit()
 
-                await ctx.send('{} has rested'.format(character.name))
-            else:
-                await ctx.send('User has no character')
-    else:
-        # error
-        raise ValueError(rest)
+            await ctx.send(
+                '{} has taken a {} rest, resources recovered'.format(
+                    rest, str(character)))
+        else:
+            await ctx.send('User has no character')
 
 
 @bot.group(invoke_without_command=True)
@@ -607,7 +607,7 @@ async def const_add(ctx, name: str, value: int):
             'value': value,
         })
 
-        await ctx.send('{} now has `{}`'.format(character.name, const))
+        await ctx.send('{} now has {}'.format(str(character), str(const)))
 
 
 @const.command('check', aliases=['list'])
@@ -629,11 +629,11 @@ async def const_check(ctx, *, name: str):
             except NoResultFound:
                 raise NoResourceError
 
-            await ctx.send('`{}`'.format(const))
+            await ctx.send(str(const))
         else:
-            text = ["{}'s consts:\n".format(character.name)]
+            text = ["{}'s consts:\n".format(character)]
             for const in character.constants:
-                text.append('`{}`'.format(const))
+                text.append(str(const))
             await ctx.send('\n'.join(text))
 
 
@@ -656,7 +656,7 @@ async def const_remove(ctx, *, name: str):
 
         session.delete(const)
         session.commit()
-        await ctx.send('`{}` removed'.format(const))
+        await ctx.send('{} removed'.format(str(const)))
 
 
 @bot.group(invoke_without_command=True)
@@ -685,8 +685,7 @@ async def initiative_add(ctx, *, value: int):
             'value': value,
         })
 
-        await ctx.send('Initiative `{}` added'.format(
-            character.name, initiative))
+        await ctx.send('Initiative {} added'.format(str(initiative)))
 
 
 @initiative.command('roll')
@@ -709,8 +708,7 @@ async def initiative_roll(ctx, *, expression: str):
             'value': value,
         })
 
-        await ctx.send('Initiative `{}` added'.format(
-            character.name, initiative))
+        await ctx.send('Initiative {} added'.format(str(initiative)))
 
 
 @initiative.command('check', aliases=['list'])
@@ -723,7 +721,7 @@ async def initiative_check(ctx):
             .filter_by(channel=ctx.message.channel.name).all()
         text = ['Initiatives:']
         for initiative in initiatives:
-            text.append('`{}`'.format(initiative))
+            text.append(str(initiative))
         await ctx.send('\n'.join(text))
 
 
