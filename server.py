@@ -37,8 +37,10 @@ def create_app(args):
         # defaults will autopopulate the database when first initialized
         # when run subsequently, they will be populated from the database
         # only populated on startup, changes not applied until restart
+        url = ('https://discordapp.com/oauth2/authorize' +
+               '?client_id=%s&scope=bot&permissions=0')
         config = {
-            'INVITE_URL': 'https://discordapp.com/oauth2/authorize?client_id=%s&scope=bot&permissions=0',
+            'INVITE_URL': url,
             'CLIENT_ID': '',
         }
         # get Config values from database
@@ -50,8 +52,6 @@ def create_app(args):
                 key = m.Config(name=name, value=config[name])
                 db.session.add(key)
                 db.session.commit()
-
-        app.config.update(config)
 
 
 @app.route("/")
@@ -83,9 +83,14 @@ def hello():
         </a>
     </body>
     </html>
-    '''.format(
+    '''
+
+    url = m.Config.query.filter_by(name='INVITE_URL').one().value
+    id = m.Config.query.filter_by(name='CLIENT_ID').one().value
+
+    html = html.format(
         favicon=url_for('favicon'),
-        link=app.config['INVITE_URL'] % app.config['CLIENT_ID'],
+        link=url % id,
     )
     return html
 
@@ -131,7 +136,7 @@ if __name__ == '__main__':
 
     if args.reload:
         app.config['TEMPLATES_AUTO_RELOAD'] = True
-    
+
     create_app(args)
 
     app.run(
