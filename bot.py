@@ -680,7 +680,7 @@ async def initiative_add(ctx, *, value: int):
 
         initiative = sql_update(session, m.Initiative, {
             'character': character,
-            'channel': ctx.message.channel.name,
+            'channel': ctx.message.channel.id,
         }, {
             'value': value,
         })
@@ -703,7 +703,7 @@ async def initiative_roll(ctx, *, expression: str):
 
         initiative = sql_update(session, m.Initiative, {
             'character': character,
-            'channel': ctx.message.channel.name,
+            'channel': ctx.message.channel.id,
         }, {
             'value': value,
         })
@@ -718,7 +718,7 @@ async def initiative_check(ctx):
     '''
     with closing(Session()) as session:
         initiatives = session.query(m.Initiative)\
-            .filter_by(channel=ctx.message.channel.name).all()
+            .filter_by(channel=ctx.message.channel.id).all()
         text = ['Initiatives:']
         for initiative in initiatives:
             text.append(str(initiative))
@@ -734,7 +734,7 @@ async def initiative_remove(ctx):
         character = get_character(session, ctx.author.id)
 
         try:
-            channel = ctx.message.channel.name
+            channel = ctx.message.channel.id
             initiative = session.query(m.Initiative)\
                 .filter_by(character=character, channel=channel).one()
         except NoResultFound:
@@ -753,7 +753,7 @@ async def initiative_endcombat(ctx):
     '''
     with closing(Session()) as session:
         session.query(m.Initiative)\
-            .filter_by(channel=ctx.message.channel.name).delete(False)
+            .filter_by(channel=ctx.message.channel.id).delete(False)
 
 
 # ----#-   Application

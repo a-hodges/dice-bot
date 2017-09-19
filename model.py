@@ -187,9 +187,9 @@ class Initiative (Base):
         primary_key=True,
         doc='Character foreign key')
     channel = Column(
-        String(64),
+        BigInteger,
         primary_key=True,
-        doc='Channel name')
+        doc='Channel id')
     value = Column(
         Integer,
         doc='The initiative roll')
