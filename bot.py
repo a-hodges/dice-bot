@@ -215,7 +215,7 @@ def int_or_max(value: str):
 
 class CharacterCog (Cog):
     @commands.command()
-    async def iam(ctx, *, name: str):
+    async def iam(self, ctx, *, name: str):
         '''
         Associates user with a character
         It is highly encouraged to change your nickname to match the character
@@ -266,7 +266,7 @@ class CharacterCog (Cog):
 
 
     @commands.command()
-    async def whois(ctx, *, member: discord.Member):
+    async def whois(self, ctx, *, member: discord.Member):
         '''
         Retrieves character information for a user
 
@@ -279,7 +279,7 @@ class CharacterCog (Cog):
 
 
     @commands.command()
-    async def changename(ctx, *, name: str):
+    async def changename(self, ctx, *, name: str):
         '''
         Changes the character's name
 
@@ -300,7 +300,7 @@ class CharacterCog (Cog):
 
 class RollCog (Cog):
     @commands.group(invoke_without_command=True)
-    async def roll(ctx, *expression: str):
+    async def roll(self, ctx, *expression: str):
         '''
         Rolls dice
         Note: consts can be used in rolls and are replaced by the const value
@@ -344,7 +344,7 @@ class RollCog (Cog):
 
 
     @roll.command('add', aliases=['set', 'update'])
-    async def roll_add(ctx, name: str, expression: str):
+    async def roll_add(self, ctx, name: str, expression: str):
         '''
         Adds/updates a new roll for a character
 
@@ -366,7 +366,7 @@ class RollCog (Cog):
 
 
     @roll.command('check', aliases=['list'])
-    async def roll_check(ctx, *, name: str):
+    async def roll_check(self, ctx, *, name: str):
         '''
         Checks the status of a roll
 
@@ -393,7 +393,7 @@ class RollCog (Cog):
 
 
     @roll.command('remove', aliases=['delete'])
-    async def roll_remove(ctx, *, name: str):
+    async def roll_remove(self, ctx, *, name: str):
         '''
         Deletes a roll from the character
 
@@ -416,7 +416,7 @@ class RollCog (Cog):
 
 class ResourceCog (Cog):
     @commands.group(invoke_without_command=True)
-    async def resource(ctx):
+    async def resource(self, ctx):
         '''
         Manages character resources
         '''
@@ -424,7 +424,7 @@ class ResourceCog (Cog):
 
 
     @resource.command('add', aliases=['update'])
-    async def resource_add(ctx, name: str, max_uses: int, recover: str):
+    async def resource_add(self, ctx, name: str, max_uses: int, recover: str):
         '''
         Adds or changes a character resource
 
@@ -453,7 +453,7 @@ class ResourceCog (Cog):
 
 
     @resource.command('use')
-    async def resource_use(ctx, number: int, *, name: str):
+    async def resource_use(self, ctx, number: int, *, name: str):
         '''
         Consumes 1 use of the resource
 
@@ -482,7 +482,7 @@ class ResourceCog (Cog):
 
 
     @resource.command('set')
-    async def resource_set(ctx, name: str, uses: int_or_max):
+    async def resource_set(self, ctx, name: str, uses: int_or_max):
         '''
         Sets the remaining uses of a resource
 
@@ -511,7 +511,7 @@ class ResourceCog (Cog):
 
 
     @resource.command('check', aliases=['list'])
-    async def resource_check(ctx, *, name: str):
+    async def resource_check(self, ctx, *, name: str):
         '''
         Checks the status of a resource
 
@@ -538,7 +538,7 @@ class ResourceCog (Cog):
 
 
     @resource.command('remove', aliases=['delete'])
-    async def resource_remove(ctx, *, name: str):
+    async def resource_remove(self, ctx, *, name: str):
         '''
         Deletes a resource from the character
 
@@ -591,7 +591,7 @@ async def rest(ctx, *, rest: str):
 
 class ConstCog (Cog):
     @commands.group(invoke_without_command=True)
-    async def const(ctx, *, expression: str):
+    async def const(self, ctx, *, expression: str):
         '''
         Manage character values
         '''
@@ -599,7 +599,7 @@ class ConstCog (Cog):
 
 
     @const.command('add', aliases=['set', 'update'])
-    async def const_add(ctx, name: str, value: int):
+    async def const_add(self, ctx, name: str, value: int):
         '''
         Adds/updates a new const for a character
 
@@ -621,7 +621,7 @@ class ConstCog (Cog):
 
 
     @const.command('check', aliases=['list'])
-    async def const_check(ctx, *, name: str):
+    async def const_check(self, ctx, *, name: str):
         '''
         Checks the status of a const
 
@@ -648,7 +648,7 @@ class ConstCog (Cog):
 
 
     @const.command('remove', aliases=['delete'])
-    async def const_remove(ctx, *, name: str):
+    async def const_remove(self, ctx, *, name: str):
         '''
         Deletes a const from the character
 
@@ -671,7 +671,7 @@ class ConstCog (Cog):
 
 class InitiativeCog (Cog):
     @commands.group(invoke_without_command=True)
-    async def initiative(ctx):
+    async def initiative(self, ctx):
         '''
         Manage initiative by channel
         '''
@@ -679,7 +679,7 @@ class InitiativeCog (Cog):
 
 
     @initiative.command('add', aliases=['set', 'update'])
-    async def initiative_add(ctx, *, value: int):
+    async def initiative_add(self, ctx, *, value: int):
         '''
         Set initiative
 
@@ -700,7 +700,7 @@ class InitiativeCog (Cog):
 
 
     @initiative.command('roll')
-    async def initiative_roll(ctx, *, expression: str):
+    async def initiative_roll(self, ctx, *, expression: str):
         '''
         Roll initiative using the notation from the roll command
 
@@ -723,7 +723,7 @@ class InitiativeCog (Cog):
 
 
     @initiative.command('check', aliases=['list'])
-    async def initiative_check(ctx):
+    async def initiative_check(self, ctx):
         '''
         Lists all initiatives currently stored in this channel
         '''
@@ -737,7 +737,7 @@ class InitiativeCog (Cog):
 
 
     @initiative.command('remove', aliases=['delete'])
-    async def initiative_remove(ctx):
+    async def initiative_remove(self, ctx):
         '''
         Deletes a character's current initiative
         '''
@@ -758,7 +758,7 @@ class InitiativeCog (Cog):
 
     @initiative.command('endcombat', aliases=['removeall', 'deleteall'])
     @commands.has_role('DM')
-    async def initiative_endcombat(ctx):
+    async def initiative_endcombat(self, ctx):
         '''
         Removes all initiative entries for the current channel
         '''

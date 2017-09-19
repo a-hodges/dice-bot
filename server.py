@@ -37,10 +37,7 @@ def create_app(args):
         # defaults will autopopulate the database when first initialized
         # when run subsequently, they will be populated from the database
         # only populated on startup, changes not applied until restart
-        url = ('https://discordapp.com/oauth2/authorize' +
-               '?client_id=%s&scope=bot&permissions=0')
         config = {
-            'INVITE_URL': url,
             'CLIENT_ID': '',
         }
         # get Config values from database
@@ -85,7 +82,8 @@ def hello():
     </html>
     '''
 
-    url = m.Config.query.filter_by(name='INVITE_URL').one().value
+    url = ('https://discordapp.com/oauth2/authorize' +
+           '?client_id=%s&scope=bot&permissions=0')
     id = m.Config.query.filter_by(name='CLIENT_ID').one().value
 
     html = html.format(
