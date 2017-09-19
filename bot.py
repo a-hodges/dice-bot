@@ -746,7 +746,7 @@ async def initiative_remove(ctx):
         await ctx.send('Initiative removed')
 
 
-@initiative.command('endcombat', aliases=['clearall'])
+@initiative.command('endcombat', aliases=['removeall', 'deleteall'])
 @commands.has_role('DM')
 async def initiative_endcombat(ctx):
     '''
