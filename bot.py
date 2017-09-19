@@ -160,13 +160,13 @@ async def do_roll(ctx, session, character, expression, adv=0):
     return roll
 
 
-def get_character(session, userid):
+def get_character(session, userid, server):
     '''
     Gets a character based on their user
     '''
     try:
         character = session.query(m.Character)\
-            .filter_by(user=userid).one()
+            .filter_by(user=userid, server=server).one()
     except NoResultFound:
         raise NoCharacterError()
     return character
@@ -219,12 +219,13 @@ async def iam(ctx, *, name: str):
     [name] is he name of the character to associate
         to remove character association use !iam done
     '''
+    server = ctx.guild.id
     if name.lower() == 'done':
         # remove character association
         with closing(Session()) as session:
             try:
                 character = session.query(m.Character)\
-                    .filter_by(user=ctx.author.id).one()
+                    .filter_by(user=ctx.author.id, server=server).one()
                 character.user = None
                 await ctx.send('{} is no longer playing as {}'.format(
                     ctx.author.mention, str(character)))
@@ -238,9 +239,9 @@ async def iam(ctx, *, name: str):
         with closing(Session()) as session:
             try:
                 character = session.query(m.Character)\
-                    .filter_by(name=name).one()
+                    .filter_by(name=name, server=server).one()
             except NoResultFound:
-                character = m.Character(name=name)
+                character = m.Character(name=name, server=server)
                 session.add(character)
                 await ctx.send('Creating character: {}'.format(name))
 
@@ -267,7 +268,7 @@ async def whois(ctx, *, member: discord.Member):
     [user] should be a user on this channel
     '''
     with closing(Session()) as session:
-        character = get_character(session, member.id)
+        character = get_character(session, member.id, ctx.guild.id)
         await ctx.send('{} is {}'.format(member.mention, str(character)))
 
 
@@ -281,7 +282,7 @@ async def changename(ctx, *, name: str):
     '''
     with closing(Session()) as session:
         try:
-            character = get_character(session, ctx.author.id)
+            character = get_character(session, ctx.author.id, ctx.guild.id)
             original_name = character.name
             character.name = name
             session.commit()
@@ -328,7 +329,7 @@ async def roll(ctx, *expression: str):
     with closing(Session()) as session:
         try:
             character = session.query(m.Character)\
-                .filter_by(user=ctx.author.id).one()
+                .filter_by(user=ctx.author.id, server=ctx.guild.id).one()
         except NoResultFound:
             raise NoCharacterError()
 
@@ -345,7 +346,7 @@ async def roll_add(ctx, name: str, expression: str):
     [expression] dice equation
     '''
     with closing(Session()) as session:
-        character = get_character(session, ctx.author.id)
+        character = get_character(session, ctx.author.id, ctx.guild.id)
 
         roll = sql_update(session, m.Roll, {
             'character': character,
@@ -367,7 +368,7 @@ async def roll_check(ctx, *, name: str):
         use the value "all" to list all rolls
     '''
     with closing(Session()) as session:
-        character = get_character(session, ctx.author.id)
+        character = get_character(session, ctx.author.id, ctx.guild.id)
 
         if name != 'all':
             try:
@@ -393,7 +394,7 @@ async def roll_remove(ctx, *, name: str):
     [name] the name of the roll
     '''
     with closing(Session()) as session:
-        character = get_character(session, ctx.author.id)
+        character = get_character(session, ctx.author.id, ctx.guild.id)
 
         try:
             roll = session.query(m.Roll)\
@@ -429,7 +430,7 @@ async def resource_add(ctx, name: str, max_uses: int, recover: str):
         raise commands.BadArgument('recover')
 
     with closing(Session()) as session:
-        character = get_character(session, ctx.author.id)
+        character = get_character(session, ctx.author.id, ctx.guild.id)
 
         resource = sql_update(session, m.Resource, {
             'character': character,
@@ -453,7 +454,7 @@ async def resource_use(ctx, number: int, *, name: str):
     [name] the name of the resource
     '''
     with closing(Session()) as session:
-        character = get_character(session, ctx.author.id)
+        character = get_character(session, ctx.author.id, ctx.guild.id)
 
         try:
             resource = session.query(m.Resource)\
@@ -483,7 +484,7 @@ async def resource_set(ctx, name: str, uses: int_or_max):
         the special value "max" to refill all uses
     '''
     with closing(Session()) as session:
-        character = get_character(session, ctx.author.id)
+        character = get_character(session, ctx.author.id, ctx.guild.id)
 
         try:
             resource = session.query(m.Resource)\
@@ -511,7 +512,7 @@ async def resource_check(ctx, *, name: str):
         use the value "all" to list resources
     '''
     with closing(Session()) as session:
-        character = get_character(session, ctx.author.id)
+        character = get_character(session, ctx.author.id, ctx.guild.id)
 
         if name != 'all':
             try:
@@ -537,7 +538,7 @@ async def resource_remove(ctx, *, name: str):
     [name] the name of the resource
     '''
     with closing(Session()) as session:
-        character = get_character(session, ctx.author.id)
+        character = get_character(session, ctx.author.id, ctx.guild.id)
 
         try:
             resource = session.query(m.Resource)\
@@ -562,7 +563,7 @@ async def rest(ctx, *, rest: str):
         raise commands.BadArgument('rest')
     # short or long rest
     with closing(Session()) as session:
-        character = get_character(session, ctx.author.id)
+        character = get_character(session, ctx.author.id, ctx.guild.id)
 
         if character:
             for resource in character.resources:
@@ -598,7 +599,7 @@ async def const_add(ctx, name: str, value: int):
     [value] value to store
     '''
     with closing(Session()) as session:
-        character = get_character(session, ctx.author.id)
+        character = get_character(session, ctx.author.id, ctx.guild.id)
 
         const = sql_update(session, m.Constant, {
             'character': character,
@@ -620,7 +621,7 @@ async def const_check(ctx, *, name: str):
         use the value "all" to list all consts
     '''
     with closing(Session()) as session:
-        character = get_character(session, ctx.author.id)
+        character = get_character(session, ctx.author.id, ctx.guild.id)
 
         if name != 'all':
             try:
@@ -646,7 +647,7 @@ async def const_remove(ctx, *, name: str):
     [name] the name of the const
     '''
     with closing(Session()) as session:
-        character = get_character(session, ctx.author.id)
+        character = get_character(session, ctx.author.id, ctx.guild.id)
 
         try:
             const = session.query(m.Constant)\
@@ -676,7 +677,7 @@ async def initiative_add(ctx, *, value: int):
     [value] the initiative to store
     '''
     with closing(Session()) as session:
-        character = get_character(session, ctx.author.id)
+        character = get_character(session, ctx.author.id, ctx.guild.id)
 
         initiative = sql_update(session, m.Initiative, {
             'character': character,
@@ -697,7 +698,7 @@ async def initiative_roll(ctx, *, expression: str):
     [expression] either the expression to roll or the name of a stored roll
     '''
     with closing(Session()) as session:
-        character = get_character(session, ctx.author.id)
+        character = get_character(session, ctx.author.id, ctx.guild.id)
 
         value = await do_roll(ctx, session, character, expression)
 
@@ -731,7 +732,7 @@ async def initiative_remove(ctx):
     Deletes a character's current initiative
     '''
     with closing(Session()) as session:
-        character = get_character(session, ctx.author.id)
+        character = get_character(session, ctx.author.id, ctx.guild.id)
 
         try:
             channel = ctx.message.channel.id

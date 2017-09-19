@@ -7,11 +7,11 @@ from sqlalchemy import (
     String,
     Integer,
     BigInteger,
-    Boolean,
     Enum,
     ForeignKey,
 )
 from sqlalchemy.orm import relationship
+from sqlalchemy.schema import Index, UniqueConstraint
 from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
@@ -44,12 +44,18 @@ class Character (Base):
         doc='An autonumber id')
     name = Column(
         String(64),
-        unique=True,
         doc='The name of the character')
+    server = Column(
+        Integer,
+        doc='The server the character is on')
     user = Column(
         BigInteger,
-        unique=True,
         doc='The id of the user of the character')
+
+    __table_args__ = (
+        UniqueConstraint(name, server),
+        Index('_character_index', server, user, unique=True),
+    )
 
     resources = relationship(
         'Resource',
@@ -201,3 +207,28 @@ class Initiative (Base):
 
     def __str__(self):
         return '`{0.character.name}: {0.value}`'.format(self)
+
+if __name__ == '__main__':
+    from operator import attrgetter
+
+    for table in sorted(Base.metadata.tables.values(), key=attrgetter('name')):
+        print(table.name)
+        for column in table.columns:
+            col = '{}: {}'.format(column.name, column.type)
+
+            if column.primary_key and column.foreign_keys:
+                col += ' PK & FK'
+            elif column.primary_key:
+                col += ' PK'
+            elif column.foreign_keys:
+                col += ' FK'
+
+            if not column.nullable:
+                col += ' NOT NULL'
+
+            doc = column.doc
+            if isinstance(column.type, Enum):
+                doc += ': ' + ', '.join(
+                    column.type.python_type.__members__.keys())
+            print('\t{}\n\t\t{}'.format(col, doc))
+        print()
