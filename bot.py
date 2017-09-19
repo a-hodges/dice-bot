@@ -45,7 +45,7 @@ class NoCharacterError (BotError):
     pass
 
 
-class NoResourceError (BotError):
+class ItemNotFoundError (BotError):
     pass
 
 
@@ -382,7 +382,7 @@ class RollCog (Cog):
                     roll = session.query(m.Roll)\
                         .filter_by(name=name, character=character).one()
                 except NoResultFound:
-                    raise NoResourceError
+                    raise ItemNotFoundError
 
                 await ctx.send(str(roll))
             else:
@@ -407,7 +407,7 @@ class RollCog (Cog):
                 roll = session.query(m.Roll)\
                     .filter_by(name=name, character=character).one()
             except NoResultFound:
-                raise NoResourceError
+                raise ItemNotFoundError
 
             session.delete(roll)
             session.commit()
@@ -468,7 +468,7 @@ class ResourceCog (Cog):
                 resource = session.query(m.Resource)\
                     .filter_by(name=name, character=character).one()
             except NoResultFound:
-                raise NoResourceError
+                raise ItemNotFoundError
 
             if resource.current - number >= 0:
                 resource.current -= number
@@ -498,7 +498,7 @@ class ResourceCog (Cog):
                 resource = session.query(m.Resource)\
                     .filter_by(name=name, character=character).one()
             except NoResultFound:
-                raise NoResourceError
+                raise ItemNotFoundError
 
             if uses == 'max':
                 resource.current = resource.max
@@ -527,7 +527,7 @@ class ResourceCog (Cog):
                     resource = session.query(m.Resource)\
                         .filter_by(name=name, character=character).one()
                 except NoResultFound:
-                    raise NoResourceError
+                    raise ItemNotFoundError
 
                 await ctx.send(str(resource))
             else:
@@ -552,7 +552,7 @@ class ResourceCog (Cog):
                 resource = session.query(m.Resource)\
                     .filter_by(name=name, character=character).one()
             except NoResultFound:
-                raise NoResourceError
+                raise ItemNotFoundError
 
             session.delete(resource)
             session.commit()
@@ -637,7 +637,7 @@ class ConstCog (Cog):
                     const = session.query(m.Constant)\
                         .filter_by(name=name, character=character).one()
                 except NoResultFound:
-                    raise NoResourceError
+                    raise ItemNotFoundError
 
                 await ctx.send(str(const))
             else:
@@ -662,7 +662,7 @@ class ConstCog (Cog):
                 const = session.query(m.Constant)\
                     .filter_by(name=name, character=character).one()
             except NoResultFound:
-                raise NoResourceError
+                raise ItemNotFoundError
 
             session.delete(const)
             session.commit()
@@ -749,7 +749,7 @@ class InitiativeCog (Cog):
                 initiative = session.query(m.Initiative)\
                     .filter_by(character=character, channel=channel).one()
             except NoResultFound:
-                raise NoResourceError
+                raise ItemNotFoundError
 
             session.delete(initiative)
             session.commit()
@@ -803,7 +803,7 @@ async def on_command_error(ctx, error):
             'Too many parameters\nSee the help text for valid parameters')
     elif isinstance(error, NoCharacterError):
         await ctx.send('User does not have a character')
-    elif isinstance(error, NoResourceError):
+    elif isinstance(error, ItemNotFoundError):
         await ctx.send('Could not find requested item')
     elif isinstance(error, equations.EquationError):
         if error.args:
