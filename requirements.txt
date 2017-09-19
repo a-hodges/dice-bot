@@ -10,6 +10,9 @@ git+git://github.com/Rapptz/discord.py.git@rewrite#egg=elasticutils
 aiohttp>=2.0.0,<2.3.0
 websockets>=3.1,<4.0
 
-# Heroku stuff
-flask >= 0.12.2
+# Heroku database
 psycopg2 >= 2.7.3
+
+# Web server stuff
+flask >= 0.12.2
+flask_sqlalchemy >= 2.2
