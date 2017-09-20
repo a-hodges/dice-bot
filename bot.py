@@ -453,7 +453,8 @@ class ResourceCog (Cog):
         Consumes 1 use of the resource
 
         Parameters:
-        [number] the quantity of the resource to use (can be negative to regain)
+        [number] the quantity of the resource to use
+            can be negative to regain, but cannot go above max
         [name] the name of the resource
         '''
         with closing(Session()) as session:
@@ -467,6 +468,8 @@ class ResourceCog (Cog):
 
             if resource.current - number >= 0:
                 resource.current -= number
+                if resource.current > resource.max:
+                    resource.current = resource.max
                 session.commit()
                 await ctx.send('{} used {} {}, {}/{} remaining'.format(
                     str(character), number, resource.name,
