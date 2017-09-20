@@ -129,23 +129,23 @@ async def do_roll(ctx, session, character, expression, adv=0):
     order_of_operations.extend(equations.order_of_operations)
     order_of_operations.append(['>', '<'])
 
-    # replace only 1 roll
-    rolls = session.query(m.Roll)\
-        .filter_by(character=character)\
-        .order_by(func.char_length(m.Roll.name).desc())
-    for roll in rolls:
-        if roll.name in expression:
-            expression = expression.replace(
-                roll.name, '({})'.format(roll.expression), 1)
-            break
+    if character:
+        # replace only 1 roll
+        rolls = session.query(m.Roll)\
+            .filter_by(character=character)\
+            .order_by(func.char_length(m.Roll.name).desc())
+        for roll in rolls:
+            if roll.name in expression:
+                expression = expression.replace(
+                    roll.name, '({})'.format(roll.expression), 1)
+                break
 
-    # replace constants
-    consts = session.query(m.Constant)\
-        .filter_by(character=character)\
-        .order_by(func.char_length(m.Constant.name).desc())
-    for const in consts:
-        expression = expression.replace(const.name, '({})'.format(const.value))
-    output.append('Rolling: {}'.format(expression))
+        # replace constants
+        consts = session.query(m.Constant)\
+            .filter_by(character=character)\
+            .order_by(func.char_length(m.Constant.name).desc())
+        for const in consts:
+            expression = expression.replace(const.name, '({})'.format(const.value))
 
     # validate
     for token in re.findall(r'[a-zA-Z]+', expression):
@@ -157,6 +157,7 @@ async def do_roll(ctx, session, character, expression, adv=0):
             raise equations.EquationError('Could not find `{}`'.format(token))
 
     # do roll
+    output.append('Rolling: {}'.format(expression))
     roll = equations.solve(expression, operations, order_of_operations)
     output.append('I rolled {}'.format(roll))
 
@@ -337,7 +338,7 @@ class RollCog (Cog):
                 character = session.query(m.Character)\
                     .filter_by(user=ctx.author.id, server=ctx.guild.id).one()
             except NoResultFound:
-                raise NoCharacterError()
+                character = None
 
             await do_roll(ctx, session, character, expression, adv)
 
