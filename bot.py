@@ -236,8 +236,9 @@ class CharacterCog (Cog):
                     await ctx.send('{} is no longer playing as {}'.format(
                         ctx.author.mention, str(character)))
                 except NoResultFound:
-                    await ctx.send('{} does not have a character to remove'.format(
-                        ctx.author.mention))
+                    await ctx.send(
+                        '{} does not have a character to remove'.format(
+                            ctx.author.mention))
 
                 session.commit()
         else:
@@ -264,7 +265,6 @@ class CharacterCog (Cog):
                     await ctx.send('Someone else is using {}'.format(
                         str(character)))
 
-
     @commands.command()
     async def whois(self, ctx, *, member: discord.Member):
         '''
@@ -276,7 +276,6 @@ class CharacterCog (Cog):
         with closing(Session()) as session:
             character = get_character(session, member.id, ctx.guild.id)
             await ctx.send('{} is {}'.format(member.mention, str(character)))
-
 
     @commands.command()
     async def changename(self, ctx, *, name: str):
@@ -299,8 +298,8 @@ class CharacterCog (Cog):
 
 
 class RollCog (Cog):
-    @commands.group(invoke_without_command=True)
-    async def roll(self, ctx, *expression: str):
+    @commands.group('roll', invoke_without_command=True)
+    async def group(self, ctx, *expression: str):
         '''
         Rolls dice
         Note: consts can be used in rolls and are replaced by the const value
@@ -342,9 +341,8 @@ class RollCog (Cog):
 
             await do_roll(ctx, session, character, expression, adv)
 
-
-    @roll.command('add', aliases=['set', 'update'])
-    async def roll_add(self, ctx, name: str, expression: str):
+    @group.command('add', aliases=['set', 'update'])
+    async def add(self, ctx, name: str, expression: str):
         '''
         Adds/updates a new roll for a character
 
@@ -364,9 +362,8 @@ class RollCog (Cog):
 
             await ctx.send('{} now has {}'.format(str(character), str(roll)))
 
-
-    @roll.command('check', aliases=['list'])
-    async def roll_check(self, ctx, *, name: str):
+    @group.command('check', aliases=['list'])
+    async def check(self, ctx, *, name: str):
         '''
         Checks the status of a roll
 
@@ -391,9 +388,8 @@ class RollCog (Cog):
                     text.append(str(roll))
                 await ctx.send('\n'.join(text))
 
-
-    @roll.command('remove', aliases=['delete'])
-    async def roll_remove(self, ctx, *, name: str):
+    @group.command('remove', aliases=['delete'])
+    async def remove(self, ctx, *, name: str):
         '''
         Deletes a roll from the character
 
@@ -415,16 +411,15 @@ class RollCog (Cog):
 
 
 class ResourceCog (Cog):
-    @commands.group(invoke_without_command=True)
-    async def resource(self, ctx):
+    @commands.group('resource', invoke_without_command=True)
+    async def group(self, ctx):
         '''
         Manages character resources
         '''
         await ctx.send('Invalid subcommand')
 
-
-    @resource.command('add', aliases=['update'])
-    async def resource_add(self, ctx, name: str, max_uses: int, recover: str):
+    @group.command('add', aliases=['update'])
+    async def add(self, ctx, name: str, max_uses: int, recover: str):
         '''
         Adds or changes a character resource
 
@@ -449,11 +444,11 @@ class ResourceCog (Cog):
                 'recover': recover,
             })
 
-            await ctx.send('{} now has {}'.format(str(character), str(resource)))
+            await ctx.send('{} now has {}'.format(
+                str(character), str(resource)))
 
-
-    @resource.command('use')
-    async def resource_use(self, ctx, number: int, *, name: str):
+    @group.command('use')
+    async def use(self, ctx, number: int, *, name: str):
         '''
         Consumes 1 use of the resource
 
@@ -480,9 +475,8 @@ class ResourceCog (Cog):
                 await ctx.send('{} does not have enough to use: {}'.format(
                     str(character), str(resource)))
 
-
-    @resource.command('set')
-    async def resource_set(self, ctx, name: str, uses: int_or_max):
+    @group.command('set')
+    async def set(self, ctx, name: str, uses: int_or_max):
         '''
         Sets the remaining uses of a resource
 
@@ -509,9 +503,8 @@ class ResourceCog (Cog):
             await ctx.send('{} now has {}/{} uses of {}'.format(
                 str(character), resource.current, resource.max, resource.name))
 
-
-    @resource.command('check', aliases=['list'])
-    async def resource_check(self, ctx, *, name: str):
+    @group.command('check', aliases=['list'])
+    async def check(self, ctx, *, name: str):
         '''
         Checks the status of a resource
 
@@ -536,9 +529,8 @@ class ResourceCog (Cog):
                     text.append(str(resource))
                 await ctx.send('\n'.join(text))
 
-
-    @resource.command('remove', aliases=['delete'])
-    async def resource_remove(self, ctx, *, name: str):
+    @group.command('remove', aliases=['delete'])
+    async def remove(self, ctx, *, name: str):
         '''
         Deletes a resource from the character
 
@@ -557,6 +549,180 @@ class ResourceCog (Cog):
             session.delete(resource)
             session.commit()
             await ctx.send('{} removed'.format(str(resource)))
+
+
+class ConstCog (Cog):
+    @commands.group('const', invoke_without_command=True)
+    async def group(self, ctx, *, expression: str):
+        '''
+        Manage character values
+        '''
+        await ctx.send('Invalid subcommand')
+
+    @group.command('add', aliases=['set', 'update'])
+    async def add(self, ctx, name: str, value: int):
+        '''
+        Adds/updates a new const for a character
+
+        Parameters:
+        [name] name of const to store
+        [value] value to store
+        '''
+        with closing(Session()) as session:
+            character = get_character(session, ctx.author.id, ctx.guild.id)
+
+            const = sql_update(session, m.Constant, {
+                'character': character,
+                'name': name,
+            }, {
+                'value': value,
+            })
+
+            await ctx.send('{} now has {}'.format(str(character), str(const)))
+
+    @group.command('check', aliases=['list'])
+    async def check(self, ctx, *, name: str):
+        '''
+        Checks the status of a const
+
+        Parameters:
+        [name] the name of the const
+            use the value "all" to list all consts
+        '''
+        with closing(Session()) as session:
+            character = get_character(session, ctx.author.id, ctx.guild.id)
+
+            if name != 'all':
+                try:
+                    const = session.query(m.Constant)\
+                        .filter_by(name=name, character=character).one()
+                except NoResultFound:
+                    raise ItemNotFoundError
+
+                await ctx.send(str(const))
+            else:
+                text = ["{}'s consts:\n".format(character)]
+                for const in character.constants:
+                    text.append(str(const))
+                await ctx.send('\n'.join(text))
+
+    @group.command('remove', aliases=['delete'])
+    async def remove(self, ctx, *, name: str):
+        '''
+        Deletes a const from the character
+
+        Parameters:
+        [name] the name of the const
+        '''
+        with closing(Session()) as session:
+            character = get_character(session, ctx.author.id, ctx.guild.id)
+
+            try:
+                const = session.query(m.Constant)\
+                    .filter_by(name=name, character=character).one()
+            except NoResultFound:
+                raise ItemNotFoundError
+
+            session.delete(const)
+            session.commit()
+            await ctx.send('{} removed'.format(str(const)))
+
+
+class InitiativeCog (Cog):
+    @commands.group('initiative', invoke_without_command=True)
+    async def group(self, ctx):
+        '''
+        Manage initiative by channel
+        '''
+        await ctx.send('Invalid subcommand')
+
+    @group.command('add', aliases=['set', 'update'])
+    async def add(self, ctx, *, value: int):
+        '''
+        Set initiative
+
+        Parameters:
+        [value] the initiative to store
+        '''
+        with closing(Session()) as session:
+            character = get_character(session, ctx.author.id, ctx.guild.id)
+
+            initiative = sql_update(session, m.Initiative, {
+                'character': character,
+                'channel': ctx.message.channel.id,
+            }, {
+                'value': value,
+            })
+
+            await ctx.send('Initiative {} added'.format(str(initiative)))
+
+    @group.command('roll')
+    async def roll(self, ctx, *, expression: str):
+        '''
+        Roll initiative using the notation from the roll command
+
+        Parameters:
+        [expression] either the expression to roll or the name of a stored roll
+        '''
+        with closing(Session()) as session:
+            character = get_character(session, ctx.author.id, ctx.guild.id)
+
+            value = await do_roll(ctx, session, character, expression)
+
+            initiative = sql_update(session, m.Initiative, {
+                'character': character,
+                'channel': ctx.message.channel.id,
+            }, {
+                'value': value,
+            })
+
+            await ctx.send('Initiative {} added'.format(str(initiative)))
+
+    @group.command('check', aliases=['list'])
+    async def check(self, ctx):
+        '''
+        Lists all initiatives currently stored in this channel
+        '''
+        with closing(Session()) as session:
+            initiatives = session.query(m.Initiative)\
+                .filter_by(channel=ctx.message.channel.id).all()
+            text = ['Initiatives:']
+            for initiative in initiatives:
+                text.append(str(initiative))
+            await ctx.send('\n'.join(text))
+
+    @group.command('remove', aliases=['delete'])
+    async def remove(self, ctx):
+        '''
+        Deletes a character's current initiative
+        '''
+        with closing(Session()) as session:
+            character = get_character(session, ctx.author.id, ctx.guild.id)
+
+            try:
+                channel = ctx.message.channel.id
+                initiative = session.query(m.Initiative)\
+                    .filter_by(character=character, channel=channel).one()
+            except NoResultFound:
+                raise ItemNotFoundError
+
+            session.delete(initiative)
+            session.commit()
+            await ctx.send('Initiative removed')
+
+    @group.command('endcombat', aliases=['removeall', 'deleteall'])
+    @commands.has_role('DM')
+    async def endcombat(self, ctx):
+        '''
+        Removes all initiative entries for the current channel
+        '''
+        with closing(Session()) as session:
+            session.query(m.Initiative)\
+                .filter_by(channel=ctx.message.channel.id).delete(False)
+
+
+for cog in [CharacterCog, RollCog, ResourceCog, ConstCog, InitiativeCog]:
+    bot.add_cog(cog(bot))
 
 
 @bot.command()
@@ -587,188 +753,6 @@ async def rest(ctx, *, rest: str):
                     rest, str(character)))
         else:
             await ctx.send('User has no character')
-
-
-class ConstCog (Cog):
-    @commands.group(invoke_without_command=True)
-    async def const(self, ctx, *, expression: str):
-        '''
-        Manage character values
-        '''
-        await ctx.send('Invalid subcommand')
-
-
-    @const.command('add', aliases=['set', 'update'])
-    async def const_add(self, ctx, name: str, value: int):
-        '''
-        Adds/updates a new const for a character
-
-        Parameters:
-        [name] name of const to store
-        [value] value to store
-        '''
-        with closing(Session()) as session:
-            character = get_character(session, ctx.author.id, ctx.guild.id)
-
-            const = sql_update(session, m.Constant, {
-                'character': character,
-                'name': name,
-            }, {
-                'value': value,
-            })
-
-            await ctx.send('{} now has {}'.format(str(character), str(const)))
-
-
-    @const.command('check', aliases=['list'])
-    async def const_check(self, ctx, *, name: str):
-        '''
-        Checks the status of a const
-
-        Parameters:
-        [name] the name of the const
-            use the value "all" to list all consts
-        '''
-        with closing(Session()) as session:
-            character = get_character(session, ctx.author.id, ctx.guild.id)
-
-            if name != 'all':
-                try:
-                    const = session.query(m.Constant)\
-                        .filter_by(name=name, character=character).one()
-                except NoResultFound:
-                    raise ItemNotFoundError
-
-                await ctx.send(str(const))
-            else:
-                text = ["{}'s consts:\n".format(character)]
-                for const in character.constants:
-                    text.append(str(const))
-                await ctx.send('\n'.join(text))
-
-
-    @const.command('remove', aliases=['delete'])
-    async def const_remove(self, ctx, *, name: str):
-        '''
-        Deletes a const from the character
-
-        Parameters:
-        [name] the name of the const
-        '''
-        with closing(Session()) as session:
-            character = get_character(session, ctx.author.id, ctx.guild.id)
-
-            try:
-                const = session.query(m.Constant)\
-                    .filter_by(name=name, character=character).one()
-            except NoResultFound:
-                raise ItemNotFoundError
-
-            session.delete(const)
-            session.commit()
-            await ctx.send('{} removed'.format(str(const)))
-
-
-class InitiativeCog (Cog):
-    @commands.group(invoke_without_command=True)
-    async def initiative(self, ctx):
-        '''
-        Manage initiative by channel
-        '''
-        await ctx.send('Invalid subcommand')
-
-
-    @initiative.command('add', aliases=['set', 'update'])
-    async def initiative_add(self, ctx, *, value: int):
-        '''
-        Set initiative
-
-        Parameters:
-        [value] the initiative to store
-        '''
-        with closing(Session()) as session:
-            character = get_character(session, ctx.author.id, ctx.guild.id)
-
-            initiative = sql_update(session, m.Initiative, {
-                'character': character,
-                'channel': ctx.message.channel.id,
-            }, {
-                'value': value,
-            })
-
-            await ctx.send('Initiative {} added'.format(str(initiative)))
-
-
-    @initiative.command('roll')
-    async def initiative_roll(self, ctx, *, expression: str):
-        '''
-        Roll initiative using the notation from the roll command
-
-        Parameters:
-        [expression] either the expression to roll or the name of a stored roll
-        '''
-        with closing(Session()) as session:
-            character = get_character(session, ctx.author.id, ctx.guild.id)
-
-            value = await do_roll(ctx, session, character, expression)
-
-            initiative = sql_update(session, m.Initiative, {
-                'character': character,
-                'channel': ctx.message.channel.id,
-            }, {
-                'value': value,
-            })
-
-            await ctx.send('Initiative {} added'.format(str(initiative)))
-
-
-    @initiative.command('check', aliases=['list'])
-    async def initiative_check(self, ctx):
-        '''
-        Lists all initiatives currently stored in this channel
-        '''
-        with closing(Session()) as session:
-            initiatives = session.query(m.Initiative)\
-                .filter_by(channel=ctx.message.channel.id).all()
-            text = ['Initiatives:']
-            for initiative in initiatives:
-                text.append(str(initiative))
-            await ctx.send('\n'.join(text))
-
-
-    @initiative.command('remove', aliases=['delete'])
-    async def initiative_remove(self, ctx):
-        '''
-        Deletes a character's current initiative
-        '''
-        with closing(Session()) as session:
-            character = get_character(session, ctx.author.id, ctx.guild.id)
-
-            try:
-                channel = ctx.message.channel.id
-                initiative = session.query(m.Initiative)\
-                    .filter_by(character=character, channel=channel).one()
-            except NoResultFound:
-                raise ItemNotFoundError
-
-            session.delete(initiative)
-            session.commit()
-            await ctx.send('Initiative removed')
-
-
-    @initiative.command('endcombat', aliases=['removeall', 'deleteall'])
-    @commands.has_role('DM')
-    async def initiative_endcombat(self, ctx):
-        '''
-        Removes all initiative entries for the current channel
-        '''
-        with closing(Session()) as session:
-            session.query(m.Initiative)\
-                .filter_by(channel=ctx.message.channel.id).delete(False)
-
-
-for cog in [CharacterCog, RollCog, ResourceCog, ConstCog, InitiativeCog]:
-    bot.add_cog(cog(bot))
 
 
 # ----#-   Application
