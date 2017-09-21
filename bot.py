@@ -803,19 +803,7 @@ async def on_command_error(ctx, error):
         raise error
 
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(
-        description='Discord D&D bot')
-    parser.add_argument(
-        '-d, --database', dest='database', default='sqlite:///:memory:',
-        help='The database url to be accessed')
-    parser.add_argument(
-        '-i, --initialize', dest='initialize', action='store_true',
-        help='Allows for initialization of config values')
-    args = parser.parse_args()
-
-    logging.basicConfig(level=logging.INFO)
-
+def main(args):
     bot.config = OrderedDict([
         ('token', None),
     ])
@@ -842,3 +830,18 @@ if __name__ == '__main__':
                     session.commit()
 
     bot.run(bot.config['token'])
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(
+        description='Discord D&D bot')
+    parser.add_argument(
+        '-d, --database', dest='database', default='sqlite:///:memory:',
+        help='The database url to be accessed')
+    parser.add_argument(
+        '-i, --initialize', dest='initialize', action='store_true',
+        help='Allows for initialization of config values')
+    args = parser.parse_args()
+
+    logging.basicConfig(level=logging.INFO)
+    main(args)
