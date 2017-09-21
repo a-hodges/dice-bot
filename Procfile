@@ -1,2 +1,2 @@
 web: python server.py -d "$DATABASE_URL" -p $PORT
-worker: python bot.py -d "$DATABASE_URL"
+worker: python bot.py "$DATABASE_URL"
