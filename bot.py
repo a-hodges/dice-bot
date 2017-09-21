@@ -10,9 +10,8 @@ from contextlib import closing
 
 import discord
 from discord.ext import commands
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, func
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import NoResultFound
 
@@ -28,10 +27,6 @@ bot = commands.Bot(
     command_prefix='!',
     description=description,
     loop=asyncio.new_event_loop())
-
-config = OrderedDict([
-    ('token', None),
-])
 
 
 # ----#-   Classes
@@ -145,7 +140,8 @@ async def do_roll(ctx, session, character, expression, adv=0):
             .filter_by(character=character)\
             .order_by(func.char_length(m.Constant.name).desc())
         for const in consts:
-            expression = expression.replace(const.name, '({})'.format(const.value))
+            expression = expression.replace(
+                const.name, '({})'.format(const.value))
 
     # validate
     for token in re.findall(r'[a-zA-Z]+', expression):
@@ -229,7 +225,7 @@ class CharacterCog (Cog):
         server = ctx.guild.id
         if name.lower() == 'done':
             # remove character association
-            with closing(Session()) as session:
+            with closing(self.bot.Session()) as session:
                 try:
                     character = session.query(m.Character)\
                         .filter_by(user=ctx.author.id, server=server).one()
@@ -244,7 +240,7 @@ class CharacterCog (Cog):
                 session.commit()
         else:
             # associate character
-            with closing(Session()) as session:
+            with closing(self.bot.Session()) as session:
                 try:
                     character = session.query(m.Character)\
                         .filter_by(name=name, server=server).one()
@@ -274,7 +270,7 @@ class CharacterCog (Cog):
         Parameters:
         [user] should be a user on this channel
         '''
-        with closing(Session()) as session:
+        with closing(self.bot.Session()) as session:
             character = get_character(session, member.id, ctx.guild.id)
             await ctx.send('{} is {}'.format(member.mention, str(character)))
 
@@ -286,7 +282,7 @@ class CharacterCog (Cog):
         Parameters:
         [name] the new name
         '''
-        with closing(Session()) as session:
+        with closing(self.bot.Session()) as session:
             try:
                 character = get_character(session, ctx.author.id, ctx.guild.id)
                 original_name = character.name
@@ -296,6 +292,35 @@ class CharacterCog (Cog):
                     ctx.author.mention, original_name, name))
             except IntegrityError:
                 await ctx.send('There is already a character with that name')
+
+    @commands.command()
+    async def rest(self, ctx, *, rest: str):
+        '''
+        Take a rest
+
+        Parameters:
+        [type] should be short|long
+        '''
+        if rest not in ['short', 'long']:
+            raise commands.BadArgument('rest')
+        # short or long rest
+        with closing(self.bot.Session()) as session:
+            character = get_character(session, ctx.author.id, ctx.guild.id)
+
+            if character:
+                for resource in character.resources:
+                    if resource.recover == m.Rest.long and rest == 'long':
+                        resource.current = resource.max
+                    elif resource.recover == m.Rest.short:
+                        resource.current = resource.max
+
+                session.commit()
+
+                await ctx.send(
+                    '{} has taken a {} rest, resources recovered'.format(
+                        rest, str(character)))
+            else:
+                await ctx.send('User has no character')
 
 
 class RollCog (Cog):
@@ -333,7 +358,7 @@ class RollCog (Cog):
 
         expression = ' '.join(expression)
 
-        with closing(Session()) as session:
+        with closing(self.bot.Session()) as session:
             try:
                 character = session.query(m.Character)\
                     .filter_by(user=ctx.author.id, server=ctx.guild.id).one()
@@ -351,7 +376,7 @@ class RollCog (Cog):
         [name] name of roll to store
         [expression] dice equation
         '''
-        with closing(Session()) as session:
+        with closing(self.bot.Session()) as session:
             character = get_character(session, ctx.author.id, ctx.guild.id)
 
             roll = sql_update(session, m.Roll, {
@@ -372,7 +397,7 @@ class RollCog (Cog):
         [name] the name of the roll
             use the value "all" to list all rolls
         '''
-        with closing(Session()) as session:
+        with closing(self.bot.Session()) as session:
             character = get_character(session, ctx.author.id, ctx.guild.id)
 
             if name != 'all':
@@ -397,7 +422,7 @@ class RollCog (Cog):
         Parameters:
         [name] the name of the roll
         '''
-        with closing(Session()) as session:
+        with closing(self.bot.Session()) as session:
             character = get_character(session, ctx.author.id, ctx.guild.id)
 
             try:
@@ -433,7 +458,7 @@ class ResourceCog (Cog):
         if recover not in ['short', 'long', 'other']:
             raise commands.BadArgument('recover')
 
-        with closing(Session()) as session:
+        with closing(self.bot.Session()) as session:
             character = get_character(session, ctx.author.id, ctx.guild.id)
 
             resource = sql_update(session, m.Resource, {
@@ -458,7 +483,7 @@ class ResourceCog (Cog):
             can be negative to regain, but cannot go above max
         [name] the name of the resource
         '''
-        with closing(Session()) as session:
+        with closing(self.bot.Session()) as session:
             character = get_character(session, ctx.author.id, ctx.guild.id)
 
             try:
@@ -489,7 +514,7 @@ class ResourceCog (Cog):
         [uses] can be the number of remaining uses or
             the special value "max" to refill all uses
         '''
-        with closing(Session()) as session:
+        with closing(self.bot.Session()) as session:
             character = get_character(session, ctx.author.id, ctx.guild.id)
 
             try:
@@ -516,7 +541,7 @@ class ResourceCog (Cog):
         [name] the name of the resource
             use the value "all" to list resources
         '''
-        with closing(Session()) as session:
+        with closing(self.bot.Session()) as session:
             character = get_character(session, ctx.author.id, ctx.guild.id)
 
             if name != 'all':
@@ -541,7 +566,7 @@ class ResourceCog (Cog):
         Parameters:
         [name] the name of the resource
         '''
-        with closing(Session()) as session:
+        with closing(self.bot.Session()) as session:
             character = get_character(session, ctx.author.id, ctx.guild.id)
 
             try:
@@ -572,7 +597,7 @@ class ConstCog (Cog):
         [name] name of const to store
         [value] value to store
         '''
-        with closing(Session()) as session:
+        with closing(self.bot.Session()) as session:
             character = get_character(session, ctx.author.id, ctx.guild.id)
 
             const = sql_update(session, m.Constant, {
@@ -593,7 +618,7 @@ class ConstCog (Cog):
         [name] the name of the const
             use the value "all" to list all consts
         '''
-        with closing(Session()) as session:
+        with closing(self.bot.Session()) as session:
             character = get_character(session, ctx.author.id, ctx.guild.id)
 
             if name != 'all':
@@ -618,7 +643,7 @@ class ConstCog (Cog):
         Parameters:
         [name] the name of the const
         '''
-        with closing(Session()) as session:
+        with closing(self.bot.Session()) as session:
             character = get_character(session, ctx.author.id, ctx.guild.id)
 
             try:
@@ -648,7 +673,7 @@ class InitiativeCog (Cog):
         Parameters:
         [value] the initiative to store
         '''
-        with closing(Session()) as session:
+        with closing(self.bot.Session()) as session:
             character = get_character(session, ctx.author.id, ctx.guild.id)
 
             initiative = sql_update(session, m.Initiative, {
@@ -668,7 +693,7 @@ class InitiativeCog (Cog):
         Parameters:
         [expression] either the expression to roll or the name of a stored roll
         '''
-        with closing(Session()) as session:
+        with closing(self.bot.Session()) as session:
             character = get_character(session, ctx.author.id, ctx.guild.id)
 
             value = await do_roll(ctx, session, character, expression)
@@ -687,7 +712,7 @@ class InitiativeCog (Cog):
         '''
         Lists all initiatives currently stored in this channel
         '''
-        with closing(Session()) as session:
+        with closing(self.bot.Session()) as session:
             initiatives = session.query(m.Initiative)\
                 .filter_by(channel=ctx.message.channel.id).all()
             text = ['Initiatives:']
@@ -700,7 +725,7 @@ class InitiativeCog (Cog):
         '''
         Deletes a character's current initiative
         '''
-        with closing(Session()) as session:
+        with closing(self.bot.Session()) as session:
             character = get_character(session, ctx.author.id, ctx.guild.id)
 
             try:
@@ -720,43 +745,13 @@ class InitiativeCog (Cog):
         '''
         Removes all initiative entries for the current channel
         '''
-        with closing(Session()) as session:
+        with closing(self.bot.Session()) as session:
             session.query(m.Initiative)\
                 .filter_by(channel=ctx.message.channel.id).delete(False)
 
 
 for cog in [CharacterCog, RollCog, ResourceCog, ConstCog, InitiativeCog]:
     bot.add_cog(cog(bot))
-
-
-@bot.command()
-async def rest(ctx, *, rest: str):
-    '''
-    Take a rest
-
-    Parameters:
-    [type] should be short|long
-    '''
-    if rest not in ['short', 'long']:
-        raise commands.BadArgument('rest')
-    # short or long rest
-    with closing(Session()) as session:
-        character = get_character(session, ctx.author.id, ctx.guild.id)
-
-        if character:
-            for resource in character.resources:
-                if resource.recover == m.Rest.long and rest == 'long':
-                    resource.current = resource.max
-                elif resource.recover == m.Rest.short:
-                    resource.current = resource.max
-
-            session.commit()
-
-            await ctx.send(
-                '{} has taken a {} rest, resources recovered'.format(
-                    rest, str(character)))
-        else:
-            await ctx.send('User has no character')
 
 
 # ----#-   Application
@@ -821,16 +816,20 @@ if __name__ == '__main__':
 
     logging.basicConfig(level=logging.INFO)
 
+    bot.config = OrderedDict([
+        ('token', None),
+    ])
+
     engine = create_engine(args.database)
     m.Base.metadata.create_all(engine)
-    Session = sessionmaker(bind=engine)
-    with closing(Session()) as session:
-        for name in config:
+    bot.Session = sessionmaker(bind=engine)
+    with closing(bot.Session()) as session:
+        for name in bot.config:
             try:
                 key = session.query(m.Config).filter_by(name=name).one()
-                config[name] = key.value
+                bot.config[name] = key.value
             except NoResultFound:
-                key = m.Config(name=name, value=config[name])
+                key = m.Config(name=name, value=bot.config[name])
                 session.add(key)
                 session.commit()
 
@@ -839,7 +838,7 @@ if __name__ == '__main__':
                     name, repr(key.value)))
                 if arg:
                     key.value = arg
-                    config[name] = arg
+                    bot.config[name] = arg
                     session.commit()
 
-    bot.run(config['token'])
+    bot.run(bot.config['token'])
