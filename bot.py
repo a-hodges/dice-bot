@@ -318,7 +318,7 @@ class CharacterCog (Cog):
 
                 await ctx.send(
                     '{} has taken a {} rest, resources recovered'.format(
-                        rest, str(character)))
+                        str(character), rest))
             else:
                 await ctx.send('User has no character')
 
