@@ -381,7 +381,7 @@ class RollCog (Cog):
 
         await do_roll(ctx, ctx.session, character, expression, adv)
 
-    @group.command('add', aliases=['set', 'update'])
+    @group.command(aliases=['set', 'update'])
     async def add(self, ctx, name: str, expression: str):
         '''
         Adds/updates a new roll for a character
@@ -401,7 +401,7 @@ class RollCog (Cog):
 
         await ctx.send('{} now has {}'.format(str(character), str(roll)))
 
-    @group.command('check')
+    @group.command()
     async def check(self, ctx, *, name: str):
         '''
         Checks the status of a roll
@@ -417,7 +417,7 @@ class RollCog (Cog):
             raise ItemNotFoundError
         await ctx.send(str(roll))
 
-    @group.command('list')
+    @group.command()
     async def list(self, ctx):
         '''
         Lists all rolls for the user
@@ -428,7 +428,7 @@ class RollCog (Cog):
             text.append(str(roll))
         await ctx.send('\n'.join(text))
 
-    @group.command('remove', aliases=['delete'])
+    @group.command(aliases=['delete'])
     async def remove(self, ctx, *, name: str):
         '''
         Deletes a roll from the character
@@ -457,7 +457,7 @@ class ResourceCog (Cog):
         '''
         await ctx.send('Invalid subcommand')
 
-    @group.command('add', aliases=['update'])
+    @group.command(aliases=['update'])
     async def add(self, ctx, name: str, max_uses: int, recover: str):
         '''
         Adds or changes a character resource
@@ -485,7 +485,7 @@ class ResourceCog (Cog):
         await ctx.send('{} now has {}'.format(
             str(character), str(resource)))
 
-    @group.command('use')
+    @group.command()
     async def use(self, ctx, number: int, *, name: str):
         '''
         Consumes 1 use of the resource
@@ -515,7 +515,7 @@ class ResourceCog (Cog):
             await ctx.send('{} does not have enough to use: {}'.format(
                 str(character), str(resource)))
 
-    @group.command('set')
+    @group.command()
     async def set(self, ctx, name: str, uses: int_or_max):
         '''
         Sets the remaining uses of a resource
@@ -542,7 +542,7 @@ class ResourceCog (Cog):
         await ctx.send('{} now has {}/{} uses of {}'.format(
             str(character), resource.current, resource.max, resource.name))
 
-    @group.command('check')
+    @group.command()
     async def check(self, ctx, *, name: str):
         '''
         Checks the status of a resource
@@ -558,7 +558,7 @@ class ResourceCog (Cog):
             raise ItemNotFoundError
         await ctx.send(str(resource))
 
-    @group.command('list')
+    @group.command()
     async def list(self, ctx):
         '''
         Lists all resources for the user
@@ -569,7 +569,7 @@ class ResourceCog (Cog):
             text.append(str(resource))
         await ctx.send('\n'.join(text))
 
-    @group.command('remove', aliases=['delete'])
+    @group.command(aliases=['delete'])
     async def remove(self, ctx, *, name: str):
         '''
         Deletes a resource from the character
@@ -598,7 +598,7 @@ class ConstCog (Cog):
         '''
         await ctx.send('Invalid subcommand')
 
-    @group.command('add', aliases=['set', 'update'])
+    @group.command(aliases=['set', 'update'])
     async def add(self, ctx, name: str, value: int):
         '''
         Adds/updates a new const for a character
@@ -618,7 +618,7 @@ class ConstCog (Cog):
 
         await ctx.send('{} now has {}'.format(str(character), str(const)))
 
-    @group.command('check')
+    @group.command()
     async def check(self, ctx, *, name: str):
         '''
         Checks the status of a const
@@ -634,7 +634,7 @@ class ConstCog (Cog):
             raise ItemNotFoundError
         await ctx.send(str(const))
 
-    @group.command('list')
+    @group.command()
     async def list(self, ctx):
         '''
         Lists all consts for the user
@@ -645,7 +645,7 @@ class ConstCog (Cog):
             text.append(str(const))
         await ctx.send('\n'.join(text))
 
-    @group.command('remove', aliases=['delete'])
+    @group.command(aliases=['delete'])
     async def remove(self, ctx, *, name: str):
         '''
         Deletes a const from the character
@@ -674,7 +674,7 @@ class InitiativeCog (Cog):
         '''
         await ctx.send('Invalid subcommand')
 
-    @group.command('add', aliases=['set', 'update'])
+    @group.command(aliases=['set', 'update'])
     async def add(self, ctx, *, value: int):
         '''
         Set initiative
@@ -693,7 +693,7 @@ class InitiativeCog (Cog):
 
         await ctx.send('Initiative {} added'.format(str(initiative)))
 
-    @group.command('roll')
+    @group.command()
     async def roll(self, ctx, *, expression: str):
         '''
         Roll initiative using the notation from the roll command
@@ -714,7 +714,7 @@ class InitiativeCog (Cog):
 
         await ctx.send('Initiative {} added'.format(str(initiative)))
 
-    @group.command('check')
+    @group.command()
     async def check(self, ctx):
         '''
         Checks the user's initiative for this channel
@@ -727,7 +727,7 @@ class InitiativeCog (Cog):
         except NoResultFound:
             await ctx.send('No initiative for {}'.format(str(character)))
 
-    @group.command('list')
+    @group.command()
     async def list(self, ctx):
         '''
         Lists all initiatives currently stored in this channel
@@ -739,7 +739,7 @@ class InitiativeCog (Cog):
             text.append(str(initiative))
         await ctx.send('\n'.join(text))
 
-    @group.command('remove', aliases=['delete'])
+    @group.command(aliases=['delete'])
     async def remove(self, ctx):
         '''
         Deletes a character's current initiative
@@ -757,7 +757,7 @@ class InitiativeCog (Cog):
         ctx.session.commit()
         await ctx.send('Initiative removed')
 
-    @group.command('endcombat', aliases=['removeall', 'deleteall'])
+    @group.command(aliases=['removeall', 'deleteall'])
     @commands.has_role('DM')
     async def endcombat(self, ctx):
         '''
