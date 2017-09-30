@@ -678,7 +678,7 @@ class InitiativeCog (Cog):
 
             initiative = sql_update(session, m.Initiative, {
                 'character': character,
-                'channel': ctx.message.channel.id,
+                'channel': ctx.channel.id,
             }, {
                 'value': value,
             })
@@ -700,7 +700,7 @@ class InitiativeCog (Cog):
 
             initiative = sql_update(session, m.Initiative, {
                 'character': character,
-                'channel': ctx.message.channel.id,
+                'channel': ctx.channel.id,
             }, {
                 'value': value,
             })
@@ -714,7 +714,7 @@ class InitiativeCog (Cog):
         '''
         with closing(self.bot.Session()) as session:
             initiatives = session.query(m.Initiative)\
-                .filter_by(channel=ctx.message.channel.id).all()
+                .filter_by(channel=ctx.channel.id).all()
             text = ['Initiatives:']
             for initiative in initiatives:
                 text.append(str(initiative))
@@ -729,7 +729,7 @@ class InitiativeCog (Cog):
             character = get_character(session, ctx.author.id, ctx.guild.id)
 
             try:
-                channel = ctx.message.channel.id
+                channel = ctx.channel.id
                 initiative = session.query(m.Initiative)\
                     .filter_by(character=character, channel=channel).one()
             except NoResultFound:
@@ -747,7 +747,7 @@ class InitiativeCog (Cog):
         '''
         with closing(self.bot.Session()) as session:
             session.query(m.Initiative)\
-                .filter_by(channel=ctx.message.channel.id).delete(False)
+                .filter_by(channel=ctx.channel.id).delete(False)
 
 
 for cog in [CharacterCog, RollCog, ResourceCog, ConstCog, InitiativeCog]:
