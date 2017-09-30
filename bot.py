@@ -340,7 +340,7 @@ class CharacterCog (Cog):
 
 class RollCog (Cog):
     @commands.group('roll', invoke_without_command=True)
-    async def group(self, ctx, *expression: str):
+    async def group(self, ctx, *, expression: str):
         '''
         Rolls dice
         Note: consts can be used in rolls and are replaced by the const value
@@ -362,16 +362,16 @@ class RollCog (Cog):
         if not expression:
             raise commands.MissingRequiredArgument('expression')
 
-        if expression[-1] == 'disadv':
+        if expression.endswith(' disadv'):
             adv = -1
-            expression = expression[:-1]
-        elif expression[-1] == 'adv':
+            expression = expression[:-7]
+        elif expression.endswith(' adv'):
             adv = 1
-            expression = expression[:-1]
+            expression = expression[:-4]
         else:
             adv = 0
 
-        expression = ' '.join(expression)
+        expression = expression.strip()
 
         try:
             character = ctx.session.query(m.Character)\
