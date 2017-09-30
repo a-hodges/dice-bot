@@ -207,6 +207,26 @@ def int_or_max(value: str):
             raise commands.BadArgument(value)
 
 
+# ----#-   Hooks
+
+
+@bot.before_invoke
+async def before_any_command(ctx):
+    '''
+    Set up database connection
+    '''
+    ctx.session = bot.Session()
+
+
+@bot.after_invoke
+async def after_any_command(ctx):
+    '''
+    Tear down database connection
+    '''
+    ctx.session.close()
+    ctx.session = None
+
+
 # ----#-   Commands
 
 
@@ -225,42 +245,40 @@ class CharacterCog (Cog):
         server = ctx.guild.id
         if name.lower() == 'done':
             # remove character association
-            with closing(self.bot.Session()) as session:
-                try:
-                    character = session.query(m.Character)\
-                        .filter_by(user=ctx.author.id, server=server).one()
-                    character.user = None
-                    await ctx.send('{} is no longer playing as {}'.format(
-                        ctx.author.mention, str(character)))
-                except NoResultFound:
-                    await ctx.send(
-                        '{} does not have a character to remove'.format(
-                            ctx.author.mention))
+            try:
+                character = ctx.session.query(m.Character)\
+                    .filter_by(user=ctx.author.id, server=server).one()
+                character.user = None
+                await ctx.send('{} is no longer playing as {}'.format(
+                    ctx.author.mention, str(character)))
+            except NoResultFound:
+                await ctx.send(
+                    '{} does not have a character to remove'.format(
+                        ctx.author.mention))
 
-                session.commit()
+            ctx.session.commit()
         else:
             # associate character
-            with closing(self.bot.Session()) as session:
-                try:
-                    character = session.query(m.Character)\
-                        .filter_by(name=name, server=server).one()
-                except NoResultFound:
-                    character = m.Character(name=name, server=server)
-                    session.add(character)
-                    await ctx.send('Creating character: {}'.format(name))
+            try:
+                character = ctx.session.query(m.Character)\
+                    .filter_by(name=name, server=server).one()
+            except NoResultFound:
+                character = m.Character(name=name, server=server)
+                ctx.session.add(character)
+                await ctx.send('Creating character: {}'.format(name))
 
-                if character.user is None:
-                    character.user = ctx.author.id
-                    try:
-                        session.commit()
-                        await ctx.send('{} is {}'.format(
-                            ctx.author.mention, str(character)))
-                    except IntegrityError:
-                        await ctx.send(
-                            'You are already using a different character')
-                else:
-                    await ctx.send('Someone else is using {}'.format(
-                        str(character)))
+            if character.user is None:
+                character.user = ctx.author.id
+                try:
+                    ctx.session.commit()
+                    await ctx.send('{} is {}'.format(
+                        ctx.author.mention, str(character)))
+                except IntegrityError:
+                    await ctx.send(
+                        'You are already using a different character')
+            else:
+                await ctx.send('Someone else is using {}'.format(
+                    str(character)))
 
     @commands.command()
     async def whois(self, ctx, *, member: discord.Member):
@@ -270,9 +288,8 @@ class CharacterCog (Cog):
         Parameters:
         [user] should be a user on this channel
         '''
-        with closing(self.bot.Session()) as session:
-            character = get_character(session, member.id, ctx.guild.id)
-            await ctx.send('{} is {}'.format(member.mention, str(character)))
+        character = get_character(ctx.session, member.id, ctx.guild.id)
+        await ctx.send('{} is {}'.format(member.mention, str(character)))
 
     @commands.command()
     async def changename(self, ctx, *, name: str):
@@ -282,16 +299,15 @@ class CharacterCog (Cog):
         Parameters:
         [name] the new name
         '''
-        with closing(self.bot.Session()) as session:
-            try:
-                character = get_character(session, ctx.author.id, ctx.guild.id)
-                original_name = character.name
-                character.name = name
-                session.commit()
-                await ctx.send("{} has changed {}'s name to {}".format(
-                    ctx.author.mention, original_name, name))
-            except IntegrityError:
-                await ctx.send('There is already a character with that name')
+        try:
+            character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
+            original_name = character.name
+            character.name = name
+            ctx.session.commit()
+            await ctx.send("{} has changed {}'s name to {}".format(
+                ctx.author.mention, original_name, name))
+        except IntegrityError:
+            await ctx.send('There is already a character with that name')
 
     @commands.command()
     async def rest(self, ctx, *, rest: str):
@@ -304,23 +320,22 @@ class CharacterCog (Cog):
         if rest not in ['short', 'long']:
             raise commands.BadArgument('rest')
         # short or long rest
-        with closing(self.bot.Session()) as session:
-            character = get_character(session, ctx.author.id, ctx.guild.id)
+        character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
 
-            if character:
-                for resource in character.resources:
-                    if resource.recover == m.Rest.long and rest == 'long':
-                        resource.current = resource.max
-                    elif resource.recover == m.Rest.short:
-                        resource.current = resource.max
+        if character:
+            for resource in character.resources:
+                if resource.recover == m.Rest.long and rest == 'long':
+                    resource.current = resource.max
+                elif resource.recover == m.Rest.short:
+                    resource.current = resource.max
 
-                session.commit()
+            ctx.session.commit()
 
-                await ctx.send(
-                    '{} has taken a {} rest, resources recovered'.format(
-                        str(character), rest))
-            else:
-                await ctx.send('User has no character')
+            await ctx.send(
+                '{} has taken a {} rest, resources recovered'.format(
+                    str(character), rest))
+        else:
+            await ctx.send('User has no character')
 
 
 class RollCog (Cog):
@@ -358,14 +373,13 @@ class RollCog (Cog):
 
         expression = ' '.join(expression)
 
-        with closing(self.bot.Session()) as session:
-            try:
-                character = session.query(m.Character)\
-                    .filter_by(user=ctx.author.id, server=ctx.guild.id).one()
-            except NoResultFound:
-                character = None
+        try:
+            character = ctx.session.query(m.Character)\
+                .filter_by(user=ctx.author.id, server=ctx.guild.id).one()
+        except NoResultFound:
+            character = None
 
-            await do_roll(ctx, session, character, expression, adv)
+        await do_roll(ctx, ctx.session, character, expression, adv)
 
     @group.command('add', aliases=['set', 'update'])
     async def add(self, ctx, name: str, expression: str):
@@ -376,17 +390,16 @@ class RollCog (Cog):
         [name] name of roll to store
         [expression] dice equation
         '''
-        with closing(self.bot.Session()) as session:
-            character = get_character(session, ctx.author.id, ctx.guild.id)
+        character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
 
-            roll = sql_update(session, m.Roll, {
-                'character': character,
-                'name': name,
-            }, {
-                'expression': expression,
-            })
+        roll = sql_update(ctx.session, m.Roll, {
+            'character': character,
+            'name': name,
+        }, {
+            'expression': expression,
+        })
 
-            await ctx.send('{} now has {}'.format(str(character), str(roll)))
+        await ctx.send('{} now has {}'.format(str(character), str(roll)))
 
     @group.command('check', aliases=['list'])
     async def check(self, ctx, *, name: str):
@@ -397,22 +410,21 @@ class RollCog (Cog):
         [name] the name of the roll
             use the value "all" to list all rolls
         '''
-        with closing(self.bot.Session()) as session:
-            character = get_character(session, ctx.author.id, ctx.guild.id)
+        character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
 
-            if name != 'all':
-                try:
-                    roll = session.query(m.Roll)\
-                        .filter_by(name=name, character=character).one()
-                except NoResultFound:
-                    raise ItemNotFoundError
+        if name != 'all':
+            try:
+                roll = ctx.session.query(m.Roll)\
+                    .filter_by(name=name, character=character).one()
+            except NoResultFound:
+                raise ItemNotFoundError
 
-                await ctx.send(str(roll))
-            else:
-                text = ["{}'s rolls:".format(str(character))]
-                for roll in character.rolls:
-                    text.append(str(roll))
-                await ctx.send('\n'.join(text))
+            await ctx.send(str(roll))
+        else:
+            text = ["{}'s rolls:".format(str(character))]
+            for roll in character.rolls:
+                text.append(str(roll))
+            await ctx.send('\n'.join(text))
 
     @group.command('remove', aliases=['delete'])
     async def remove(self, ctx, *, name: str):
@@ -422,18 +434,17 @@ class RollCog (Cog):
         Parameters:
         [name] the name of the roll
         '''
-        with closing(self.bot.Session()) as session:
-            character = get_character(session, ctx.author.id, ctx.guild.id)
+        character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
 
-            try:
-                roll = session.query(m.Roll)\
-                    .filter_by(name=name, character=character).one()
-            except NoResultFound:
-                raise ItemNotFoundError
+        try:
+            roll = ctx.session.query(m.Roll)\
+                .filter_by(name=name, character=character).one()
+        except NoResultFound:
+            raise ItemNotFoundError
 
-            session.delete(roll)
-            session.commit()
-            await ctx.send('{} removed'.format(str(roll)))
+        ctx.session.delete(roll)
+        ctx.session.commit()
+        await ctx.send('{} removed'.format(str(roll)))
 
 
 class ResourceCog (Cog):
@@ -458,20 +469,19 @@ class ResourceCog (Cog):
         if recover not in ['short', 'long', 'other']:
             raise commands.BadArgument('recover')
 
-        with closing(self.bot.Session()) as session:
-            character = get_character(session, ctx.author.id, ctx.guild.id)
+        character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
 
-            resource = sql_update(session, m.Resource, {
-                'character': character,
-                'name': name,
-            }, {
-                'max': max_uses,
-                'current': max_uses,
-                'recover': recover,
-            })
+        resource = sql_update(ctx.session, m.Resource, {
+            'character': character,
+            'name': name,
+        }, {
+            'max': max_uses,
+            'current': max_uses,
+            'recover': recover,
+        })
 
-            await ctx.send('{} now has {}'.format(
-                str(character), str(resource)))
+        await ctx.send('{} now has {}'.format(
+            str(character), str(resource)))
 
     @group.command('use')
     async def use(self, ctx, number: int, *, name: str):
@@ -483,26 +493,25 @@ class ResourceCog (Cog):
             can be negative to regain, but cannot go above max
         [name] the name of the resource
         '''
-        with closing(self.bot.Session()) as session:
-            character = get_character(session, ctx.author.id, ctx.guild.id)
+        character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
 
-            try:
-                resource = session.query(m.Resource)\
-                    .filter_by(name=name, character=character).one()
-            except NoResultFound:
-                raise ItemNotFoundError
+        try:
+            resource = ctx.session.query(m.Resource)\
+                .filter_by(name=name, character=character).one()
+        except NoResultFound:
+            raise ItemNotFoundError
 
-            if resource.current - number >= 0:
-                resource.current -= number
-                if resource.current > resource.max:
-                    resource.current = resource.max
-                session.commit()
-                await ctx.send('{} used {} {}, {}/{} remaining'.format(
-                    str(character), number, resource.name,
-                    resource.current, resource.max))
-            else:
-                await ctx.send('{} does not have enough to use: {}'.format(
-                    str(character), str(resource)))
+        if resource.current - number >= 0:
+            resource.current -= number
+            if resource.current > resource.max:
+                resource.current = resource.max
+            ctx.session.commit()
+            await ctx.send('{} used {} {}, {}/{} remaining'.format(
+                str(character), number, resource.name,
+                resource.current, resource.max))
+        else:
+            await ctx.send('{} does not have enough to use: {}'.format(
+                str(character), str(resource)))
 
     @group.command('set')
     async def set(self, ctx, name: str, uses: int_or_max):
@@ -514,23 +523,22 @@ class ResourceCog (Cog):
         [uses] can be the number of remaining uses or
             the special value "max" to refill all uses
         '''
-        with closing(self.bot.Session()) as session:
-            character = get_character(session, ctx.author.id, ctx.guild.id)
+        character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
 
-            try:
-                resource = session.query(m.Resource)\
-                    .filter_by(name=name, character=character).one()
-            except NoResultFound:
-                raise ItemNotFoundError
+        try:
+            resource = ctx.session.query(m.Resource)\
+                .filter_by(name=name, character=character).one()
+        except NoResultFound:
+            raise ItemNotFoundError
 
-            if uses == 'max':
-                resource.current = resource.max
-            else:
-                resource.current = uses
-            session.commit()
+        if uses == 'max':
+            resource.current = resource.max
+        else:
+            resource.current = uses
+        ctx.session.commit()
 
-            await ctx.send('{} now has {}/{} uses of {}'.format(
-                str(character), resource.current, resource.max, resource.name))
+        await ctx.send('{} now has {}/{} uses of {}'.format(
+            str(character), resource.current, resource.max, resource.name))
 
     @group.command('check', aliases=['list'])
     async def check(self, ctx, *, name: str):
@@ -541,22 +549,21 @@ class ResourceCog (Cog):
         [name] the name of the resource
             use the value "all" to list resources
         '''
-        with closing(self.bot.Session()) as session:
-            character = get_character(session, ctx.author.id, ctx.guild.id)
+        character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
 
-            if name != 'all':
-                try:
-                    resource = session.query(m.Resource)\
-                        .filter_by(name=name, character=character).one()
-                except NoResultFound:
-                    raise ItemNotFoundError
+        if name != 'all':
+            try:
+                resource = ctx.session.query(m.Resource)\
+                    .filter_by(name=name, character=character).one()
+            except NoResultFound:
+                raise ItemNotFoundError
 
-                await ctx.send(str(resource))
-            else:
-                text = ["{}'s resources:".format(character)]
-                for resource in character.resources:
-                    text.append(str(resource))
-                await ctx.send('\n'.join(text))
+            await ctx.send(str(resource))
+        else:
+            text = ["{}'s resources:".format(character)]
+            for resource in character.resources:
+                text.append(str(resource))
+            await ctx.send('\n'.join(text))
 
     @group.command('remove', aliases=['delete'])
     async def remove(self, ctx, *, name: str):
@@ -566,18 +573,17 @@ class ResourceCog (Cog):
         Parameters:
         [name] the name of the resource
         '''
-        with closing(self.bot.Session()) as session:
-            character = get_character(session, ctx.author.id, ctx.guild.id)
+        character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
 
-            try:
-                resource = session.query(m.Resource)\
-                    .filter_by(name=name, character=character).one()
-            except NoResultFound:
-                raise ItemNotFoundError
+        try:
+            resource = ctx.session.query(m.Resource)\
+                .filter_by(name=name, character=character).one()
+        except NoResultFound:
+            raise ItemNotFoundError
 
-            session.delete(resource)
-            session.commit()
-            await ctx.send('{} removed'.format(str(resource)))
+        ctx.session.delete(resource)
+        ctx.session.commit()
+        await ctx.send('{} removed'.format(str(resource)))
 
 
 class ConstCog (Cog):
@@ -597,17 +603,16 @@ class ConstCog (Cog):
         [name] name of const to store
         [value] value to store
         '''
-        with closing(self.bot.Session()) as session:
-            character = get_character(session, ctx.author.id, ctx.guild.id)
+        character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
 
-            const = sql_update(session, m.Constant, {
-                'character': character,
-                'name': name,
-            }, {
-                'value': value,
-            })
+        const = sql_update(ctx.session, m.Constant, {
+            'character': character,
+            'name': name,
+        }, {
+            'value': value,
+        })
 
-            await ctx.send('{} now has {}'.format(str(character), str(const)))
+        await ctx.send('{} now has {}'.format(str(character), str(const)))
 
     @group.command('check', aliases=['list'])
     async def check(self, ctx, *, name: str):
@@ -618,22 +623,21 @@ class ConstCog (Cog):
         [name] the name of the const
             use the value "all" to list all consts
         '''
-        with closing(self.bot.Session()) as session:
-            character = get_character(session, ctx.author.id, ctx.guild.id)
+        character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
 
-            if name != 'all':
-                try:
-                    const = session.query(m.Constant)\
-                        .filter_by(name=name, character=character).one()
-                except NoResultFound:
-                    raise ItemNotFoundError
+        if name != 'all':
+            try:
+                const = ctx.session.query(m.Constant)\
+                    .filter_by(name=name, character=character).one()
+            except NoResultFound:
+                raise ItemNotFoundError
 
-                await ctx.send(str(const))
-            else:
-                text = ["{}'s consts:\n".format(character)]
-                for const in character.constants:
-                    text.append(str(const))
-                await ctx.send('\n'.join(text))
+            await ctx.send(str(const))
+        else:
+            text = ["{}'s consts:\n".format(character)]
+            for const in character.constants:
+                text.append(str(const))
+            await ctx.send('\n'.join(text))
 
     @group.command('remove', aliases=['delete'])
     async def remove(self, ctx, *, name: str):
@@ -643,18 +647,17 @@ class ConstCog (Cog):
         Parameters:
         [name] the name of the const
         '''
-        with closing(self.bot.Session()) as session:
-            character = get_character(session, ctx.author.id, ctx.guild.id)
+        character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
 
-            try:
-                const = session.query(m.Constant)\
-                    .filter_by(name=name, character=character).one()
-            except NoResultFound:
-                raise ItemNotFoundError
+        try:
+            const = ctx.session.query(m.Constant)\
+                .filter_by(name=name, character=character).one()
+        except NoResultFound:
+            raise ItemNotFoundError
 
-            session.delete(const)
-            session.commit()
-            await ctx.send('{} removed'.format(str(const)))
+        ctx.session.delete(const)
+        ctx.session.commit()
+        await ctx.send('{} removed'.format(str(const)))
 
 
 class InitiativeCog (Cog):
@@ -673,17 +676,16 @@ class InitiativeCog (Cog):
         Parameters:
         [value] the initiative to store
         '''
-        with closing(self.bot.Session()) as session:
-            character = get_character(session, ctx.author.id, ctx.guild.id)
+        character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
 
-            initiative = sql_update(session, m.Initiative, {
-                'character': character,
-                'channel': ctx.channel.id,
-            }, {
-                'value': value,
-            })
+        initiative = sql_update(ctx.session, m.Initiative, {
+            'character': character,
+            'channel': ctx.channel.id,
+        }, {
+            'value': value,
+        })
 
-            await ctx.send('Initiative {} added'.format(str(initiative)))
+        await ctx.send('Initiative {} added'.format(str(initiative)))
 
     @group.command('roll')
     async def roll(self, ctx, *, expression: str):
@@ -693,51 +695,48 @@ class InitiativeCog (Cog):
         Parameters:
         [expression] either the expression to roll or the name of a stored roll
         '''
-        with closing(self.bot.Session()) as session:
-            character = get_character(session, ctx.author.id, ctx.guild.id)
+        character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
 
-            value = await do_roll(ctx, session, character, expression)
+        value = await do_roll(ctx, ctx.session, character, expression)
 
-            initiative = sql_update(session, m.Initiative, {
-                'character': character,
-                'channel': ctx.channel.id,
-            }, {
-                'value': value,
-            })
+        initiative = sql_update(ctx.session, m.Initiative, {
+            'character': character,
+            'channel': ctx.channel.id,
+        }, {
+            'value': value,
+        })
 
-            await ctx.send('Initiative {} added'.format(str(initiative)))
+        await ctx.send('Initiative {} added'.format(str(initiative)))
 
     @group.command('check', aliases=['list'])
     async def check(self, ctx):
         '''
         Lists all initiatives currently stored in this channel
         '''
-        with closing(self.bot.Session()) as session:
-            initiatives = session.query(m.Initiative)\
-                .filter_by(channel=ctx.channel.id).all()
-            text = ['Initiatives:']
-            for initiative in initiatives:
-                text.append(str(initiative))
-            await ctx.send('\n'.join(text))
+        initiatives = ctx.session.query(m.Initiative)\
+            .filter_by(channel=ctx.channel.id).all()
+        text = ['Initiatives:']
+        for initiative in initiatives:
+            text.append(str(initiative))
+        await ctx.send('\n'.join(text))
 
     @group.command('remove', aliases=['delete'])
     async def remove(self, ctx):
         '''
         Deletes a character's current initiative
         '''
-        with closing(self.bot.Session()) as session:
-            character = get_character(session, ctx.author.id, ctx.guild.id)
+        character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
 
-            try:
-                channel = ctx.channel.id
-                initiative = session.query(m.Initiative)\
-                    .filter_by(character=character, channel=channel).one()
-            except NoResultFound:
-                raise ItemNotFoundError
+        try:
+            channel = ctx.channel.id
+            initiative = ctx.session.query(m.Initiative)\
+                .filter_by(character=character, channel=channel).one()
+        except NoResultFound:
+            raise ItemNotFoundError
 
-            session.delete(initiative)
-            session.commit()
-            await ctx.send('Initiative removed')
+        ctx.session.delete(initiative)
+        ctx.session.commit()
+        await ctx.send('Initiative removed')
 
     @group.command('endcombat', aliases=['removeall', 'deleteall'])
     @commands.has_role('DM')
@@ -745,9 +744,8 @@ class InitiativeCog (Cog):
         '''
         Removes all initiative entries for the current channel
         '''
-        with closing(self.bot.Session()) as session:
-            session.query(m.Initiative)\
-                .filter_by(channel=ctx.channel.id).delete(False)
+        ctx.session.query(m.Initiative)\
+            .filter_by(channel=ctx.channel.id).delete(False)
 
 
 for cog in [CharacterCog, RollCog, ResourceCog, ConstCog, InitiativeCog]:
