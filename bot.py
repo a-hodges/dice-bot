@@ -401,30 +401,32 @@ class RollCog (Cog):
 
         await ctx.send('{} now has {}'.format(str(character), str(roll)))
 
-    @group.command('check', aliases=['list'])
+    @group.command('check')
     async def check(self, ctx, *, name: str):
         '''
         Checks the status of a roll
 
         Parameters:
         [name] the name of the roll
-            use the value "all" to list all rolls
         '''
         character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
+        try:
+            roll = ctx.session.query(m.Roll)\
+                .filter_by(name=name, character=character).one()
+        except NoResultFound:
+            raise ItemNotFoundError
+        await ctx.send(str(roll))
 
-        if name != 'all':
-            try:
-                roll = ctx.session.query(m.Roll)\
-                    .filter_by(name=name, character=character).one()
-            except NoResultFound:
-                raise ItemNotFoundError
-
-            await ctx.send(str(roll))
-        else:
-            text = ["{}'s rolls:".format(str(character))]
-            for roll in character.rolls:
-                text.append(str(roll))
-            await ctx.send('\n'.join(text))
+    @group.command('list')
+    async def list(self, ctx):
+        '''
+        Lists all rolls for the user
+        '''
+        character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
+        text = ["{}'s rolls:".format(str(character))]
+        for roll in character.rolls:
+            text.append(str(roll))
+        await ctx.send('\n'.join(text))
 
     @group.command('remove', aliases=['delete'])
     async def remove(self, ctx, *, name: str):
@@ -540,30 +542,32 @@ class ResourceCog (Cog):
         await ctx.send('{} now has {}/{} uses of {}'.format(
             str(character), resource.current, resource.max, resource.name))
 
-    @group.command('check', aliases=['list'])
+    @group.command('check')
     async def check(self, ctx, *, name: str):
         '''
         Checks the status of a resource
 
         Parameters:
         [name] the name of the resource
-            use the value "all" to list resources
         '''
         character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
+        try:
+            resource = ctx.session.query(m.Resource)\
+                .filter_by(name=name, character=character).one()
+        except NoResultFound:
+            raise ItemNotFoundError
+        await ctx.send(str(resource))
 
-        if name != 'all':
-            try:
-                resource = ctx.session.query(m.Resource)\
-                    .filter_by(name=name, character=character).one()
-            except NoResultFound:
-                raise ItemNotFoundError
-
-            await ctx.send(str(resource))
-        else:
-            text = ["{}'s resources:".format(character)]
-            for resource in character.resources:
-                text.append(str(resource))
-            await ctx.send('\n'.join(text))
+    @group.command('list')
+    async def list(self, ctx):
+        '''
+        Lists all resources for the user
+        '''
+        character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
+        text = ["{}'s resources:".format(character)]
+        for resource in character.resources:
+            text.append(str(resource))
+        await ctx.send('\n'.join(text))
 
     @group.command('remove', aliases=['delete'])
     async def remove(self, ctx, *, name: str):
@@ -614,30 +618,32 @@ class ConstCog (Cog):
 
         await ctx.send('{} now has {}'.format(str(character), str(const)))
 
-    @group.command('check', aliases=['list'])
+    @group.command('check')
     async def check(self, ctx, *, name: str):
         '''
         Checks the status of a const
 
         Parameters:
         [name] the name of the const
-            use the value "all" to list all consts
         '''
         character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
+        try:
+            const = ctx.session.query(m.Constant)\
+                .filter_by(name=name, character=character).one()
+        except NoResultFound:
+            raise ItemNotFoundError
+        await ctx.send(str(const))
 
-        if name != 'all':
-            try:
-                const = ctx.session.query(m.Constant)\
-                    .filter_by(name=name, character=character).one()
-            except NoResultFound:
-                raise ItemNotFoundError
-
-            await ctx.send(str(const))
-        else:
-            text = ["{}'s consts:\n".format(character)]
-            for const in character.constants:
-                text.append(str(const))
-            await ctx.send('\n'.join(text))
+    @group.command('list')
+    async def list(self, ctx):
+        '''
+        Lists all consts for the user
+        '''
+        character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
+        text = ["{}'s consts:\n".format(character)]
+        for const in character.constants:
+            text.append(str(const))
+        await ctx.send('\n'.join(text))
 
     @group.command('remove', aliases=['delete'])
     async def remove(self, ctx, *, name: str):
@@ -708,8 +714,21 @@ class InitiativeCog (Cog):
 
         await ctx.send('Initiative {} added'.format(str(initiative)))
 
-    @group.command('check', aliases=['list'])
+    @group.command('check')
     async def check(self, ctx):
+        '''
+        Checks the user's initiative for this channel
+        '''
+        character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
+        try:
+            initiative = ctx.session.query(m.Initiative)\
+                .filter_by(character=character, channel=ctx.channel.id).one()
+            await ctx.send(str(initiative))
+        except NoResultFound:
+            await ctx.send('No initiative for {}'.format(str(character)))
+
+    @group.command('list')
+    async def list(self, ctx):
         '''
         Lists all initiatives currently stored in this channel
         '''
