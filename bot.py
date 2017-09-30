@@ -354,9 +354,7 @@ class RollCog (Cog):
         For finer control over advantage/disadvantage the > operator
         picks the larger operand and the < operator picks the smaller
 
-        *Everything past here may change*
-
-        There is a special 'great weapon fighting' operator
+        There is also a special 'great weapon fighting' operator
         which rerolls a 1 or 2, i.e. "2g6+5"
         '''
         if not expression:
