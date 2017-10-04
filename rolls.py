@@ -75,10 +75,9 @@ class RollCog (Cog):
         [name] the name of the roll
         '''
         character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
-        try:
-            roll = ctx.session.query(m.Roll)\
-                .filter_by(name=name, character=character).one()
-        except NoResultFound:
+        roll = ctx.session.query(m.Roll)\
+            .get((character.id, name))
+        if not roll:
             raise ItemNotFoundError
         await ctx.send(str(roll))
 
@@ -103,10 +102,9 @@ class RollCog (Cog):
         '''
         character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
 
-        try:
-            roll = ctx.session.query(m.Roll)\
-                .filter_by(name=name, character=character).one()
-        except NoResultFound:
+        roll = ctx.session.query(m.Roll)\
+            .get((character.id, name))
+        if not roll:
             raise ItemNotFoundError
 
         ctx.session.delete(roll)

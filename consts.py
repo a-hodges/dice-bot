@@ -1,5 +1,4 @@
 from discord.ext import commands
-from sqlalchemy.orm.exc import NoResultFound
 
 import model as m
 from util import Cog, get_character, sql_update, ItemNotFoundError
@@ -42,10 +41,9 @@ class ConstCog (Cog):
         [name] the name of the const
         '''
         character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
-        try:
-            const = ctx.session.query(m.Constant)\
-                .filter_by(name=name, character=character).one()
-        except NoResultFound:
+        const = ctx.session.query(m.Constant)\
+            .get((character.id, name))
+        if not const:
             raise ItemNotFoundError
         await ctx.send(str(const))
 
@@ -70,15 +68,15 @@ class ConstCog (Cog):
         '''
         character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
 
-        try:
-            const = ctx.session.query(m.Constant)\
-                .filter_by(name=name, character=character).one()
-        except NoResultFound:
+        const = ctx.session.query(m.Constant)\
+            .get((character.id, name))
+        if not const:
             raise ItemNotFoundError
 
         ctx.session.delete(const)
         ctx.session.commit()
-        await ctx.send('{} removed'.format(str(const)))
+        await ctx.send('{} no longer has {}'.format(
+            str(character), str(const)))
 
 
 def setup(bot):

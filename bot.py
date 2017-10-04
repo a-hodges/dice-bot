@@ -9,7 +9,6 @@ from contextlib import closing
 from discord.ext import commands
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy.orm.exc import NoResultFound
 
 import equations
 import model as m
@@ -109,10 +108,10 @@ def main(args):
     bot.Session = sessionmaker(bind=engine)
     with closing(bot.Session()) as session:
         for name in bot.config:
-            try:
-                key = session.query(m.Config).filter_by(name=name).one()
+            key = session.query(m.Config).get(name)
+            if key:
                 bot.config[name] = key.value
-            except NoResultFound:
+            else:
                 key = m.Config(name=name, value=bot.config[name])
                 session.add(key)
                 session.commit()

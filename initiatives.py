@@ -1,5 +1,4 @@
 from discord.ext import commands
-from sqlalchemy.orm.exc import NoResultFound
 
 import model as m
 from util import Cog, do_roll, get_character, sql_update, ItemNotFoundError
@@ -59,11 +58,11 @@ class InitiativeCog (Cog):
         Checks the user's initiative for this channel
         '''
         character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
-        try:
-            initiative = ctx.session.query(m.Initiative)\
-                .filter_by(character=character, channel=ctx.channel.id).one()
+        initiative = ctx.session.query(m.Initiative)\
+            .get((character.id, ctx.channel.id))
+        if initiative:
             await ctx.send(str(initiative))
-        except NoResultFound:
+        else:
             await ctx.send('No initiative for {}'.format(str(character)))
 
     @group.command()
@@ -85,11 +84,9 @@ class InitiativeCog (Cog):
         '''
         character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
 
-        try:
-            channel = ctx.channel.id
-            initiative = ctx.session.query(m.Initiative)\
-                .filter_by(character=character, channel=channel).one()
-        except NoResultFound:
+        initiative = ctx.session.query(m.Initiative)\
+            .get((character.id, ctx.channel.id))
+        if not initiative:
             raise ItemNotFoundError
 
         ctx.session.delete(initiative)

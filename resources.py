@@ -1,5 +1,4 @@
 from discord.ext import commands
-from sqlalchemy.orm.exc import NoResultFound
 
 import model as m
 from util import Cog, get_character, sql_update, ItemNotFoundError
@@ -63,10 +62,9 @@ class ResourceCog (Cog):
         '''
         character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
 
-        try:
-            resource = ctx.session.query(m.Resource)\
-                .filter_by(name=name, character=character).one()
-        except NoResultFound:
+        resource = ctx.session.query(m.Resource)\
+            .get((character.id, name))
+        if not resource:
             raise ItemNotFoundError
 
         if resource.current - number >= 0:
@@ -93,10 +91,9 @@ class ResourceCog (Cog):
         '''
         character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
 
-        try:
-            resource = ctx.session.query(m.Resource)\
-                .filter_by(name=name, character=character).one()
-        except NoResultFound:
+        resource = ctx.session.query(m.Resource)\
+            .get((character.id, name))
+        if not resource:
             raise ItemNotFoundError
 
         if uses == 'max':
@@ -117,10 +114,9 @@ class ResourceCog (Cog):
         [name] the name of the resource
         '''
         character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
-        try:
-            resource = ctx.session.query(m.Resource)\
-                .filter_by(name=name, character=character).one()
-        except NoResultFound:
+        resource = ctx.session.query(m.Resource)\
+            .get((character.id, name))
+        if not resource:
             raise ItemNotFoundError
         await ctx.send(str(resource))
 
@@ -145,10 +141,9 @@ class ResourceCog (Cog):
         '''
         character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
 
-        try:
-            resource = ctx.session.query(m.Resource)\
-                .filter_by(name=name, character=character).one()
-        except NoResultFound:
+        resource = ctx.session.query(m.Resource)\
+            .get((character.id, name))
+        if not resource:
             raise ItemNotFoundError
 
         ctx.session.delete(resource)
