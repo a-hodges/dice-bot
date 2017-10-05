@@ -43,7 +43,7 @@ class ConstCog (Cog):
         character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
         const = ctx.session.query(m.Constant)\
             .get((character.id, name))
-        if not const:
+        if const is None:
             raise ItemNotFoundError
         await ctx.send(str(const))
 
@@ -70,7 +70,7 @@ class ConstCog (Cog):
 
         const = ctx.session.query(m.Constant)\
             .get((character.id, name))
-        if not const:
+        if const is None:
             raise ItemNotFoundError
 
         ctx.session.delete(const)

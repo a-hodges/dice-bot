@@ -64,7 +64,7 @@ class ResourceCog (Cog):
 
         resource = ctx.session.query(m.Resource)\
             .get((character.id, name))
-        if not resource:
+        if resource is None:
             raise ItemNotFoundError
 
         if resource.current - number >= 0:
@@ -93,7 +93,7 @@ class ResourceCog (Cog):
 
         resource = ctx.session.query(m.Resource)\
             .get((character.id, name))
-        if not resource:
+        if resource is None:
             raise ItemNotFoundError
 
         if uses == 'max':
@@ -116,7 +116,7 @@ class ResourceCog (Cog):
         character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
         resource = ctx.session.query(m.Resource)\
             .get((character.id, name))
-        if not resource:
+        if resource is None:
             raise ItemNotFoundError
         await ctx.send(str(resource))
 
@@ -143,7 +143,7 @@ class ResourceCog (Cog):
 
         resource = ctx.session.query(m.Resource)\
             .get((character.id, name))
-        if not resource:
+        if resource is None:
             raise ItemNotFoundError
 
         ctx.session.delete(resource)

@@ -109,7 +109,7 @@ def main(args):
     with closing(bot.Session()) as session:
         for name in bot.config:
             key = session.query(m.Config).get(name)
-            if key:
+            if key is not None:
                 bot.config[name] = key.value
             else:
                 key = m.Config(name=name, value=bot.config[name])

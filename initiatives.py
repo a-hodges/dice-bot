@@ -60,7 +60,7 @@ class InitiativeCog (Cog):
         character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
         initiative = ctx.session.query(m.Initiative)\
             .get((character.id, ctx.channel.id))
-        if initiative:
+        if initiative is not None:
             await ctx.send(str(initiative))
         else:
             await ctx.send('No initiative for {}'.format(str(character)))
@@ -86,7 +86,7 @@ class InitiativeCog (Cog):
 
         initiative = ctx.session.query(m.Initiative)\
             .get((character.id, ctx.channel.id))
-        if not initiative:
+        if initiative is None:
             raise ItemNotFoundError
 
         ctx.session.delete(initiative)

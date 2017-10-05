@@ -73,7 +73,7 @@ class RollCog (Cog):
         character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
         roll = ctx.session.query(m.Roll)\
             .get((character.id, name))
-        if not roll:
+        if roll is None:
             raise ItemNotFoundError
         await ctx.send(str(roll))
 
@@ -100,7 +100,7 @@ class RollCog (Cog):
 
         roll = ctx.session.query(m.Roll)\
             .get((character.id, name))
-        if not roll:
+        if roll is None:
             raise ItemNotFoundError
 
         ctx.session.delete(roll)
