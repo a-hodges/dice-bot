@@ -1,5 +1,4 @@
 from discord.ext import commands
-from sqlalchemy.orm.exc import NoResultFound
 
 import model as m
 from util import Cog, do_roll, get_character, sql_update, ItemNotFoundError
@@ -38,11 +37,8 @@ class RollCog (Cog):
 
         expression = expression.strip()
 
-        try:
-            character = ctx.session.query(m.Character)\
-                .filter_by(user=ctx.author.id, server=ctx.guild.id).one()
-        except NoResultFound:
-            character = None
+        character = ctx.session.query(m.Character)\
+            .filter_by(user=ctx.author.id, server=ctx.guild.id).one_or_none()
 
         await do_roll(ctx, ctx.session, character, expression, adv)
 

@@ -1,7 +1,6 @@
 import discord
 from discord.ext import commands
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm.exc import NoResultFound
 
 import model as m
 from util import Cog, get_character
@@ -18,10 +17,9 @@ class CharacterCog (Cog):
         Parameters:
         [name] is the name of the character to associate
         '''
-        try:
-            character = ctx.session.query(m.Character)\
-                .filter_by(name=name, server=ctx.guild.id).one()
-        except NoResultFound:
+        character = ctx.session.query(m.Character)\
+            .filter_by(name=name, server=ctx.guild.id).one_or_none()
+        if character is None:
             character = m.Character(name=name, server=ctx.guild.id)
             ctx.session.add(character)
             await ctx.send('Creating character: {}'.format(name))
@@ -44,13 +42,13 @@ class CharacterCog (Cog):
         '''
         Removes a character association
         '''
-        try:
-            character = ctx.session.query(m.Character)\
-                .filter_by(user=ctx.author.id, server=ctx.guild.id).one()
+        character = ctx.session.query(m.Character)\
+            .filter_by(user=ctx.author.id, server=ctx.guild.id).one_or_none()
+        if character is not None:
             character.user = None
             await ctx.send('{} is no longer playing as {}'.format(
                 ctx.author.mention, str(character)))
-        except NoResultFound:
+        else:
             await ctx.send(
                 '{} does not have a character to remove'.format(
                     ctx.author.mention))

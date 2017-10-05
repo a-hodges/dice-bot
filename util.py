@@ -2,7 +2,6 @@ import random
 import re
 
 from sqlalchemy import func
-from sqlalchemy.orm.exc import NoResultFound
 
 import equations
 import model as m
@@ -139,10 +138,9 @@ def get_character(session, userid, server):
     '''
     Gets a character based on their user
     '''
-    try:
-        character = session.query(m.Character)\
-            .filter_by(user=userid, server=server).one()
-    except NoResultFound:
+    character = session.query(m.Character)\
+        .filter_by(user=userid, server=server).one_or_none()
+    if character is None:
         raise NoCharacterError()
     return character
 
@@ -151,12 +149,12 @@ def sql_update(session, type, keys, values):
     '''
     Updates a sql object
     '''
-    try:
-        obj = session.query(type)\
-            .filter_by(**keys).one()
+    obj = session.query(type)\
+        .filter_by(**keys).one_or_none()
+    if obj is not None:
         for value in values:
             setattr(obj, value, values[value])
-    except NoResultFound:
+    else:
         values = values.copy()
         values.update(keys)
         obj = type(**values)
