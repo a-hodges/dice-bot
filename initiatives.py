@@ -93,14 +93,31 @@ class InitiativeCog (Cog):
         ctx.session.commit()
         await ctx.send('Initiative removed')
 
-    @group.command(aliases=['removeall', 'deleteall'])
-    @commands.has_role('DM')
-    async def endcombat(self, ctx):
+    async def _removeall(self, ctx):
         '''
-        Removes all initiative entries for the current channel
+        Helper method for !initiative removeall and !endcombat
         '''
         ctx.session.query(m.Initiative)\
             .filter_by(channel=ctx.channel.id).delete(False)
+        ctx.send('All initiatives removed')
+
+    @group.command(aliases=['deleteall', 'endcombat'])
+    @commands.has_role('DM')
+    async def removeall(self, ctx):
+        '''
+        Removes all initiative entries for the current channel
+        See also: !endcombat
+        '''
+        await self._removeall(ctx)
+
+    @commands.command()
+    async def endcombat(self, ctx):
+        '''
+        Removes all initiative entries for the current channel
+        See also: !initiative removeall
+        '''
+        await self._removeall(ctx)
+
 
 
 def setup(bot):
