@@ -1,18 +1,14 @@
 # install with: pip install -r requirements.txt
 # discord.py >= 1.0.0
-sqlalchemy >= 1.1.13
+sqlalchemy >= 1.1.14
 bleach >= 2.0.0
 markdown2 >= 2.3.4
 requests >= 2.18.4
 
 # Special discord version
-git+git://github.com/Rapptz/discord.py.git@rewrite#egg=elasticutils
+git+git://github.com/Rapptz/discord.py.git@rewrite#egg=discord-py
 aiohttp>=2.0.0,<2.3.0
 websockets>=3.1,<4.0
 
 # Heroku database
 psycopg2 >= 2.7.3
-
-# Web server stuff
-flask >= 0.12.2
-flask_sqlalchemy >= 2.2
