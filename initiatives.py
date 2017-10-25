@@ -83,7 +83,7 @@ class InitiativeCog (Cog):
         '''
         ctx.session.query(m.Initiative)\
             .filter_by(channel=ctx.channel.id).delete(False)
-        ctx.send('All initiatives removed')
+        await ctx.send('All initiatives removed')
 
     @commands.command()
     @commands.has_role('DM')
