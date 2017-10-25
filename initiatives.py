@@ -12,32 +12,13 @@ class InitiativeCog (Cog):
         '''
         await ctx.send('Invalid subcommand')
 
-    @group.command(aliases=['set', 'update'])
-    async def add(self, ctx, *, value: int):
+    @group.command(aliases=['add', 'update', 'roll'])
+    async def set(self, ctx, *, expression: str):
         '''
         Set initiative
 
         Parameters:
-        [value] the initiative to store
-        '''
-        character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
-
-        initiative = sql_update(ctx.session, m.Initiative, {
-            'character': character,
-            'channel': ctx.channel.id,
-        }, {
-            'value': value,
-        })
-
-        await ctx.send('Initiative {} added'.format(str(initiative)))
-
-    @group.command()
-    async def roll(self, ctx, *, expression: str):
-        '''
-        Roll initiative using the notation from the roll command
-
-        Parameters:
-        [expression] either the expression to roll or the name of a stored roll
+        [expression] a roll expression or the value to set
         '''
         character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
 
