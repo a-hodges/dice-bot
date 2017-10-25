@@ -51,13 +51,12 @@ class ResourceCog (Cog):
             str(character), str(resource)))
 
     @group.command()
-    async def use(self, ctx, number: int, *, name: str):
+    async def expend(self, ctx, number: int, *, name: str):
         '''
-        Consumes 1 use of the resource
+        Consumes a variable number of uses of the resource
 
         Parameters:
         [number] the quantity of the resource to use
-            can be negative to regain, but cannot go above max
         [name] the name of the resource
         '''
         character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
@@ -78,6 +77,27 @@ class ResourceCog (Cog):
         else:
             await ctx.send('{} does not have enough to use: {}'.format(
                 str(character), str(resource)))
+
+    @group.command()
+    async def use(self, ctx, *, name: str):
+        '''
+        Consumes 1 use of the resource
+
+        Parameters:
+        [name] the name of the resource
+        '''
+        await self.expend.callback(ctx, 1, name)
+
+    @group.command()
+    async def regain(self, ctx, number: int, *, name: str):
+        '''
+        Regains a variable number of uses of the resource
+
+        Parameters:
+        [number] the quantity of the resource to regain
+        [name] the name of the resource
+        '''
+        await self.expend.callback(ctx, -number, name)
 
     @group.command()
     async def set(self, ctx, name: str, uses: int_or_max):
