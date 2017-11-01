@@ -47,9 +47,9 @@ def tokenize(equation):
     parens = r'[()]'
     #
     stack = re.split('({}|{}|{})'.format(text, num, parens), equation)
-    stack = filter(None, stack)
-    stack = map(parse_number, stack)
-    return list(stack)
+    stack = filter(None, stack)  # remove empty strings
+    stack = list(map(parse_number, stack))
+    return stack
 
 
 def infix2postfix(
@@ -64,7 +64,7 @@ def infix2postfix(
     output = []
 
     for item in equation:
-        if isinstance(item, int):
+        if isinstance(item, (int, float)):
             output.append(item)
         elif item == '(':
             stack.append(item)
@@ -89,7 +89,7 @@ def infix2postfix(
                 output.append(stack.pop())
             stack.append(item)
         else:
-            raise EquationError('Invalid character found: {} in {}'.format(
+            raise EquationError('Invalid token found: {} in {}'.format(
                 item, equation))
 
     if '(' in stack:
@@ -112,7 +112,7 @@ def solve_postfix(
     stack = []
 
     for item in equation:
-        if isinstance(item, int):
+        if isinstance(item, (int, float)):
             stack.append(item)
         elif item in operations:
             if len(stack) < 2:
