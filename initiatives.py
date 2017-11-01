@@ -23,6 +23,7 @@ class InitiativeCog (Cog):
         character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
 
         value = await do_roll(ctx, ctx.session, character, expression)
+        value = int(value)
 
         initiative = sql_update(ctx.session, m.Initiative, {
             'character': character,
