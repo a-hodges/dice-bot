@@ -9,7 +9,7 @@ class RollCog (Cog):
     async def group(self, ctx, *, expression: str):
         '''
         Rolls dice
-        Note: consts can be used in rolls and are replaced by the const value
+        Note: If a const name is included in a roll the name will be replaced with the value of the const
 
         Parameters:
         [expression] standard dice notation specifying what to roll
