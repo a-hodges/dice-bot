@@ -16,12 +16,19 @@ class RollCog (Cog):
             the expression may include up to 1 saved roll
         [adv] (optional) if present should be adv|disadv to indicate that any
             1d20 should be rolled with advantage or disadvantage respectively
-
-        For finer control over advantage/disadvantage the > operator
-        picks the larger operand and the < operator picks the smaller
-
-        There is also a special 'great weapon fighting' operator
-        which rerolls a 1 or 2, i.e. "2g6+5"
+        
+        Mathematic operations:
+        + : addition
+        - : subtraction
+        * : multiplication
+        / : division
+        //: division, rounded down
+        ^ : exponentiation
+        > : picks larger operand
+        < : picks smaller operand
+        d : NdM rolls an M sided die N times and adds the results together
+            operates specially for adv/disadv
+        g : NgM rolls an M sided die N times, rerolls any 1 or 2 once
         '''
         if not expression:
             raise commands.MissingRequiredArgument('expression')
