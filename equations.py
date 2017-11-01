@@ -7,7 +7,8 @@ operations = {
     '+': operator.add,
     '-': operator.sub,
     '*': operator.mul,
-    '/': operator.floordiv,
+    '/': operator.truediv,
+    '//': operator.floordiv,
     '^': operator.pow,
 }
 order_of_operations = [
