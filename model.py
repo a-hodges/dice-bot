@@ -234,9 +234,9 @@ class Item (Base):
         String(64),
         nullable=False,
         doc='Item name')
-    current = Column(
+    number = Column(
         Integer,
-        doc='The current quantity of the item')
+        doc='The quantity of the item possessed')
     description = Column(
         String,
         doc='A short description of the item')
