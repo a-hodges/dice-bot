@@ -37,6 +37,38 @@ class InventoryCog (Cog):
             await ctx.send('{} already has an item named {}'.format(
                 str(character), name))
 
+    @group.command(aliases=['desc'])
+    async def description(self, ctx, name: str, *, description: str):
+        '''
+        Adds or updates a description for an item
+
+        Parameters:
+        [name] the name of the item
+        [description] the new description for the item
+            the description does not need quotes
+        '''
+        character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
+
+        item = ctx.session.query(m.Item)\
+            .filter_by(character_id=character.id, name=name).one_or_none()
+        if item is None:
+            raise ItemNotFoundError
+
+        item.description = description
+        ctx.session.commit()
+        await ctx.send('{} now has {}'.format(str(character), str(item)))
+
+    @group.command(aliases=['rmdesc'])
+    async def remove_description(self, ctx, *, name: str):
+        '''
+        Removes an item's description
+
+        Parameters:
+        [name] the name of the item to remove the description from
+        '''
+        await self.description.callback(self, ctx, name, description=None)
+
+
     @group.command()
     async def has(self, ctx, number: int, *, name: str):
         '''
@@ -112,7 +144,7 @@ class InventoryCog (Cog):
         text = ["{}'s inventory:".format(character)]
         for item in character.inventory:
             text.append(str(item))
-        await ctx.send('\n'.join(text))
+        await ctx.send('\n\n'.join(text))
 
     @group.command(aliases=['delete'])
     async def remove(self, ctx, *, name: str):

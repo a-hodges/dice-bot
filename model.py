@@ -253,7 +253,7 @@ class Item (Base):
     def __str__(self):
         ret = '{0.name}: {0.number}'.format(self)
         if self.description:
-            ret += '\n\t' + self.description
+            ret += '\n' + self.description
         return '`{}`'.format(ret)
 
 
