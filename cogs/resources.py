@@ -66,13 +66,14 @@ class ResourceCog (Cog):
         if resource is None:
             raise ItemNotFoundError
 
+        prev = resource.current
         if resource.current - number >= 0:
-            resource.current -= number
+            resource.current = resource.current - number
             if resource.current > resource.max:
                 resource.current = resource.max
             ctx.session.commit()
-            await ctx.send('{} used {} {}, {}/{} remaining'.format(
-                str(character), number, resource.name,
+            await ctx.send("{0}'s {1} changed from {2}/{4} to {3}/{4}".format(
+                str(character), resource.name, prev,
                 resource.current, resource.max))
         else:
             await ctx.send('{} does not have enough to use: {}'.format(
