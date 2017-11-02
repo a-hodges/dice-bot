@@ -93,7 +93,7 @@ class CharacterCog (Cog):
         text = ['All characters:']
         for character in characters:
             text.append(str(character))
-        await ctx.send('\n'.join(text))
+        await ctx.send('```\n{}\n```'.format('\n'.join(text)))
 
     @commands.command()
     async def rest(self, ctx, *, rest: str):

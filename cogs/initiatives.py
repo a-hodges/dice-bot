@@ -57,8 +57,8 @@ class InitiativeCog (Cog):
             .filter_by(channel=ctx.channel.id).all()
         text = ['Initiatives:']
         for initiative in initiatives:
-            text.append('`{}`'.format(str(initiative)))
-        await ctx.send('\n'.join(text))
+            text.append(str(initiative))
+        await ctx.send('```\n{}\n```'.format('\n'.join(text)))
 
     @group.command(aliases=['delete'])
     async def remove(self, ctx):

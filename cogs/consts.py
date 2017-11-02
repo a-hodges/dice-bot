@@ -53,10 +53,10 @@ class ConstCog (Cog):
         Lists all of a character's constants
         '''
         character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
-        text = ["`{}`'s constants:\n".format(str(character))]
+        text = ["{}'s constants:\n".format(character.name)]
         for const in character.constants:
-            text.append('`{}`'.format(str(const)))
-        await ctx.send('\n'.join(text))
+            text.append(str(const))
+        await ctx.send('```\n{}\n```'.format('\n'.join(text)))
 
     @group.command(aliases=['delete'])
     async def remove(self, ctx, *, name: str):

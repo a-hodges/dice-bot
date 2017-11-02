@@ -165,10 +165,10 @@ class InventoryCog (Cog):
         Lists character's inventory
         '''
         character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
-        text = ["{}'s inventory:".format(character)]
+        text = ["{}'s inventory:".format(character.name)]
         for item in character.inventory:
-            text.append('`{}`'.format(str(item)))
-        await ctx.send('\n\n'.join(text))
+            text.append(str(item))
+        await ctx.send('```\n{}\n```'.format('\n\n'.join(text)))
 
     @group.command(aliases=['delete'])
     async def remove(self, ctx, *, name: str):

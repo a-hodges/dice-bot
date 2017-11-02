@@ -211,10 +211,10 @@ class RollCog (Cog):
         Lists all of a character's rolls
         '''
         character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
-        text = ["`{}`'s rolls:".format(str(character))]
+        text = ["{}'s rolls:".format(character.name)]
         for roll in character.rolls:
             text.append(str(roll))
-        await ctx.send('\n'.join(text))
+        await ctx.send('```\n{}\n```'.format('\n'.join(text)))
 
     @group.command(aliases=['delete'])
     async def remove(self, ctx, *, name: str):

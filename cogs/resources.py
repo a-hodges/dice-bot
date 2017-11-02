@@ -147,10 +147,10 @@ class ResourceCog (Cog):
         Lists all of a character's resources
         '''
         character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
-        text = ["{}'s resources:".format(character)]
+        text = ["{}'s resources:".format(character.name)]
         for resource in character.resources:
-            text.append('`{}`'.format(str(resource)))
-        await ctx.send('\n'.join(text))
+            text.append(str(resource))
+        await ctx.send('```\n{}\n```'.format('\n'.join(text)))
 
     @group.command(aliases=['delete'])
     async def remove(self, ctx, *, name: str):
