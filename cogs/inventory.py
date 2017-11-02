@@ -54,12 +54,12 @@ class InventoryCog (Cog):
             raise ItemNotFoundError
 
         try:
-            item.name = name
+            item.name = new_name
             ctx.session.commit()
             await ctx.send('{} now has {}'.format(str(character), str(item)))
         except IntegrityError:
             await ctx.send('{} already has an item named {}'.format(
-                str(character), name))
+                str(character), new_name))
 
     @group.command(aliases=['desc'])
     async def description(self, ctx, name: str, *, description: str):
