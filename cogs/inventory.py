@@ -54,6 +54,7 @@ class InventoryCog (Cog):
             raise ItemNotFoundError
 
         item.number = number
+        ctx.session.commit()
         await ctx.send('{} now has {}'.format(str(character), str(item)))
 
     @group.command('+')
@@ -73,6 +74,7 @@ class InventoryCog (Cog):
             raise ItemNotFoundError
 
         item.number += number
+        ctx.session.commit()
         await ctx.send('{} now has {}'.format(str(character), str(item)))
 
     @group.command('-')
