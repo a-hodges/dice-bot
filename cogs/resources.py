@@ -72,7 +72,7 @@ class ResourceCog (Cog):
             if resource.current > resource.max:
                 resource.current = resource.max
             ctx.session.commit()
-            await ctx.send("`{0}`'s `{1}` changed from {2}/{4} to {3}/{4}".format(
+            await ctx.send("`{0}`'s `{1}` went from {2}/{4} to {3}/{4}".format(
                 str(character), resource.name, prev,
                 resource.current, resource.max))
         else:

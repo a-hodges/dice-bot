@@ -83,7 +83,8 @@ def infix2postfix(
                     higher_or_equal_priority.extend(line)
                     line = next(ops)
             except StopIteration:
-                raise SyntaxError('Operator and Order of Operations mismatch: {}'.format(equation))
+                raise SyntaxError('Operator not in Order of Operations: {}'
+                                  .format(equation))
 
             while stack and stack[-1] in higher_or_equal_priority:
                 output.append(stack.pop())

@@ -32,7 +32,8 @@ class InventoryCog (Cog):
             item = None
 
         if item is not None:
-            await ctx.send('`{}` now has `{}`'.format(str(character), str(item)))
+            await ctx.send('`{}` now has `{}`'.format(
+                str(character), str(item)))
         else:
             await ctx.send('`{}` already has an item named `{}`'.format(
                 str(character), name))
@@ -56,7 +57,8 @@ class InventoryCog (Cog):
         try:
             item.name = new_name
             ctx.session.commit()
-            await ctx.send('`{}` now has `{}`'.format(str(character), str(item)))
+            await ctx.send('`{}` now has `{}`'.format(
+                str(character), str(item)))
         except IntegrityError:
             await ctx.send('`{}` already has an item named `{}`'.format(
                 str(character), new_name))
@@ -91,7 +93,6 @@ class InventoryCog (Cog):
         [name] the name of the item to remove the description from
         '''
         await self.description.callback(self, ctx, name, description=None)
-
 
     @group.command()
     async def has(self, ctx, number: int, *, name: str):
