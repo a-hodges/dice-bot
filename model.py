@@ -251,7 +251,7 @@ class Item (Base):
         back_populates='inventory')
 
     def __str__(self):
-        ret = '{0.name}: {0.current}'.format(self)
+        ret = '{0.name}: {0.number}'.format(self)
         if self.description:
             ret += '\n' + self.description
         return '`{}`'.format(ret)
