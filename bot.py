@@ -10,9 +10,8 @@ from discord.ext import commands
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-import equations
 import model as m
-from util import NoCharacterError, ItemNotFoundError
+from util import NoCharacterError, ItemNotFoundError, EquationError
 
 description = '''D&D manager bot for discord based RPGs
 
@@ -95,7 +94,7 @@ for extension in [
     'consts',
     'initiatives',
 ]:
-    bot.load_extension(extension)
+    bot.load_extension('cogs.' + extension)
 
 
 def main(args):

@@ -3,8 +3,9 @@ import re
 
 from sqlalchemy import func
 
-import equations
 import model as m
+from . import equations
+from .equations import EquationError
 
 
 class BotError (Exception):
@@ -92,9 +93,8 @@ async def do_roll(ctx, session, character, expression, adv=0):
     operations['G'] = operations['g']
     operations['>'] = max
     operations['<'] = min
-    order_of_operations = [['d', 'D', 'g', 'G']]
+    order_of_operations = [['d', 'D', 'g', 'G'], ['>', '<']]
     order_of_operations.extend(equations.order_of_operations)
-    order_of_operations.append(['>', '<'])
 
     if character:
         # replace only 1 roll

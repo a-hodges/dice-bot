@@ -16,19 +16,24 @@ class RollCog (Cog):
             the expression may include up to 1 saved roll
         [adv] (optional) if present should be adv|disadv to indicate that any
             1d20 should be rolled with advantage or disadvantage respectively
-        
-        Mathematic operations:
-        + : addition
-        - : subtraction
-        * : multiplication
-        / : division
-        //: division, rounded down
-        ^ : exponentiation
-        > : picks larger operand
-        < : picks smaller operand
+
+        Mathematic operations from highest precedence to lowest:
+
         d : NdM rolls an M sided die N times and adds the results together
             operates specially for adv/disadv
         g : NgM rolls an M sided die N times, rerolls any 1 or 2 once
+
+        > : picks larger operand
+        < : picks smaller operand
+
+        ^ : exponentiation
+
+        * : multiplication
+        / : division
+        //: division, rounded down
+
+        + : addition
+        - : subtraction
         '''
         if not expression:
             raise commands.MissingRequiredArgument('expression')
