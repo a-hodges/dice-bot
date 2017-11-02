@@ -32,9 +32,9 @@ class InventoryCog (Cog):
             item = None
 
         if item is not None:
-            await ctx.send('{} now has {}'.format(str(character), str(item)))
+            await ctx.send('`{}` now has `{}`'.format(str(character), str(item)))
         else:
-            await ctx.send('{} already has an item named {}'.format(
+            await ctx.send('`{}` already has an item named `{}`'.format(
                 str(character), name))
 
     @group.command()
@@ -56,9 +56,9 @@ class InventoryCog (Cog):
         try:
             item.name = new_name
             ctx.session.commit()
-            await ctx.send('{} now has {}'.format(str(character), str(item)))
+            await ctx.send('`{}` now has `{}`'.format(str(character), str(item)))
         except IntegrityError:
-            await ctx.send('{} already has an item named {}'.format(
+            await ctx.send('`{}` already has an item named `{}`'.format(
                 str(character), new_name))
 
     @group.command(aliases=['desc'])
@@ -80,7 +80,7 @@ class InventoryCog (Cog):
 
         item.description = description
         ctx.session.commit()
-        await ctx.send('{} now has {}'.format(str(character), str(item)))
+        await ctx.send('`{}` now has `{}`'.format(str(character), str(item)))
 
     @group.command(aliases=['rmdesc'])
     async def remove_description(self, ctx, *, name: str):
@@ -111,7 +111,7 @@ class InventoryCog (Cog):
 
         item.number = number
         ctx.session.commit()
-        await ctx.send('{} now has {}'.format(str(character), str(item)))
+        await ctx.send('`{}` now has `{}`'.format(str(character), str(item)))
 
     @group.command('+')
     async def plus(self, ctx, number: int, *, name: str):
@@ -131,7 +131,7 @@ class InventoryCog (Cog):
 
         item.number += number
         ctx.session.commit()
-        await ctx.send('{} now has {}'.format(str(character), str(item)))
+        await ctx.send('`{}` now has `{}`'.format(str(character), str(item)))
 
     @group.command('-')
     async def minus(self, ctx, number: int, *, name: str):
@@ -157,7 +157,7 @@ class InventoryCog (Cog):
             .filter_by(character_id=character.id, name=name).one_or_none()
         if item is None:
             raise ItemNotFoundError
-        await ctx.send(str(item))
+        await ctx.send('`{}`'.format(str(item)))
 
     @group.command()
     async def list(self, ctx):
@@ -167,7 +167,7 @@ class InventoryCog (Cog):
         character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
         text = ["{}'s inventory:".format(character)]
         for item in character.inventory:
-            text.append(str(item))
+            text.append('`{}`'.format(str(item)))
         await ctx.send('\n\n'.join(text))
 
     @group.command(aliases=['delete'])
@@ -189,7 +189,7 @@ class InventoryCog (Cog):
 
         ctx.session.delete(item)
         ctx.session.commit()
-        await ctx.send('{} removed'.format(str(item)))
+        await ctx.send('`{}` removed'.format(str(item)))
 
 
 def setup(bot):

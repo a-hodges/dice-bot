@@ -108,7 +108,7 @@ async def do_roll(ctx, session, character, expression, adv=0):
             raise equations.EquationError('Could not find `{}`'.format(token))
 
     # do roll
-    output.append('Rolling: {}'.format(expression))
+    output.append('Rolling: `{}`'.format(expression))
     roll = equations.solve(expression, operations, order_of_operations)
     if roll % 1 == 0:
         roll = int(roll)
@@ -188,7 +188,7 @@ class RollCog (Cog):
             'expression': expression,
         })
 
-        await ctx.send('{} now has {}'.format(str(character), str(roll)))
+        await ctx.send('`{}` now has `{}`'.format(str(character), str(roll)))
 
     @group.command()
     async def check(self, ctx, *, name: str):
@@ -203,7 +203,7 @@ class RollCog (Cog):
             .get((character.id, name))
         if roll is None:
             raise ItemNotFoundError
-        await ctx.send(str(roll))
+        await ctx.send('`{}`'.format(str(roll)))
 
     @group.command()
     async def list(self, ctx):
@@ -211,7 +211,7 @@ class RollCog (Cog):
         Lists all of a character's rolls
         '''
         character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
-        text = ["{}'s rolls:".format(str(character))]
+        text = ["`{}`'s rolls:".format(str(character))]
         for roll in character.rolls:
             text.append(str(roll))
         await ctx.send('\n'.join(text))
@@ -233,7 +233,7 @@ class RollCog (Cog):
 
         ctx.session.delete(roll)
         ctx.session.commit()
-        await ctx.send('{} removed'.format(str(roll)))
+        await ctx.send('`{}` removed'.format(str(roll)))
 
 
 def setup(bot):

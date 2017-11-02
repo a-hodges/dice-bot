@@ -81,7 +81,7 @@ class Character (Base):
         back_populates='character')
 
     def __str__(self):
-        return '`{}`'.format(self.name)
+        return str(self.name)
 
 
 class Rest (enum.Enum):
@@ -124,10 +124,9 @@ class Resource (Base):
         back_populates='resources')
 
     def __str__(self):
-        ret = '`{0.name}: {0.current}/{0.max}'.format(self)
+        ret = '{0.name}: {0.current}/{0.max}'.format(self)
         if self.recover != Rest.other:
             ret += ' per {} rest'.format(self.recover.name)
-        ret += '`'
         return ret
 
 
@@ -156,7 +155,7 @@ class Roll (Base):
         back_populates='rolls')
 
     def __str__(self):
-        return '`{0.name}: {0.expression}`'.format(self)
+        return '{0.name}: {0.expression}'.format(self)
 
 
 class Constant (Base):
@@ -184,7 +183,7 @@ class Constant (Base):
         back_populates='constants')
 
     def __str__(self):
-        return '`{0.name}: {0.value}`'.format(self)
+        return '{0.name}: {0.value}'.format(self)
 
 
 class Initiative (Base):
@@ -212,7 +211,7 @@ class Initiative (Base):
         back_populates='initiatives')
 
     def __str__(self):
-        return '`{0.character.name}: {0.value}`'.format(self)
+        return '{0.character.name}: {0.value}'.format(self)
 
 
 class Item (Base):
@@ -254,7 +253,7 @@ class Item (Base):
         ret = '{0.name}: {0.number}'.format(self)
         if self.description:
             ret += '\n' + self.description
-        return '`{}`'.format(ret)
+        return ret
 
 
 if __name__ == '__main__':

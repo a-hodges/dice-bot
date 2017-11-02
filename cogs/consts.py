@@ -30,7 +30,7 @@ class ConstCog (Cog):
             'value': value,
         })
 
-        await ctx.send('{} now has {}'.format(str(character), str(const)))
+        await ctx.send('`{}` now has `{}`'.format(str(character), str(const)))
 
     @group.command()
     async def check(self, ctx, *, name: str):
@@ -45,7 +45,7 @@ class ConstCog (Cog):
             .get((character.id, name))
         if const is None:
             raise ItemNotFoundError
-        await ctx.send(str(const))
+        await ctx.send('`{}`'.format(str(const)))
 
     @group.command()
     async def list(self, ctx):
@@ -53,9 +53,9 @@ class ConstCog (Cog):
         Lists all of a character's constants
         '''
         character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
-        text = ["{}'s constants:\n".format(character)]
+        text = ["`{}`'s constants:\n".format(str(character))]
         for const in character.constants:
-            text.append(str(const))
+            text.append('`{}`'.format(str(const)))
         await ctx.send('\n'.join(text))
 
     @group.command(aliases=['delete'])
@@ -75,7 +75,7 @@ class ConstCog (Cog):
 
         ctx.session.delete(const)
         ctx.session.commit()
-        await ctx.send('{} no longer has {}'.format(
+        await ctx.send('`{}` no longer has `{}`'.format(
             str(character), str(const)))
 
 
