@@ -50,8 +50,8 @@ class ResourceCog (Cog):
         await ctx.send('{} now has {}'.format(
             str(character), str(resource)))
 
-    @group.command('-')
-    async def minus(self, ctx, number: int, *, name: str):
+    @group.command(aliases=['-'])
+    async def consume(self, ctx, number: int, *, name: str):
         '''
         Consumes a number of uses of the resource
 
@@ -86,10 +86,10 @@ class ResourceCog (Cog):
         Parameters:
         [name] the name of the resource
         '''
-        await self.minus.callback(self, ctx, 1, name=name)
+        await self.consume.callback(self, ctx, 1, name=name)
 
-    @group.command('+')
-    async def plus(self, ctx, number: int, *, name: str):
+    @group.command(aliases=['+'])
+    async def regain(self, ctx, number: int, *, name: str):
         '''
         Regains a number of uses of the resource
 
@@ -97,7 +97,7 @@ class ResourceCog (Cog):
         [number] the quantity of the resource to regain
         [name] the name of the resource
         '''
-        await self.minus.callback(self, ctx, -number, name=name)
+        await self.consume.callback(self, ctx, -number, name=name)
 
     @group.command()
     async def set(self, ctx, name: str, uses: int_or_max):
