@@ -1,7 +1,8 @@
 from discord.ext import commands
 
 import model as m
-from util import Cog, do_roll, get_character, sql_update, ItemNotFoundError
+from util import Cog, get_character, sql_update, ItemNotFoundError
+from .rolls import do_roll
 
 
 class InitiativeCog (Cog):
@@ -73,7 +74,7 @@ class InitiativeCog (Cog):
 
         ctx.session.delete(initiative)
         ctx.session.commit()
-        await ctx.send('Initiative removed')
+        await ctx.send("{}'s initiative removed".format(str(character)))
 
     @group.command(aliases=['deleteall', 'endcombat'])
     @commands.has_role('DM')

@@ -11,7 +11,8 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 import model as m
-from util import NoCharacterError, ItemNotFoundError, EquationError
+from util import NoCharacterError, ItemNotFoundError
+from util.equations import EquationError
 
 description = '''D&D manager bot for discord based RPGs
 
@@ -72,7 +73,7 @@ async def on_command_error(ctx, error):
         await ctx.send('User does not have a character')
     elif isinstance(error, ItemNotFoundError):
         await ctx.send('Could not find requested item')
-    elif isinstance(error, equations.EquationError):
+    elif isinstance(error, EquationError):
         if error.args:
             await ctx.send('Invalid dice expression: {}'.format(error.args[0]))
         else:
