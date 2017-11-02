@@ -44,9 +44,11 @@ class Character (Base):
         doc='An autonumber id')
     name = Column(
         String(64),
+        nullable=False,
         doc='The name of the character')
     server = Column(
         Integer,
+        nullable=False,
         doc='The server the character is on')
     user = Column(
         BigInteger,
@@ -72,6 +74,10 @@ class Character (Base):
     initiatives = relationship(
         'Initiative',
         order_by='Initiative.channel',
+        back_populates='character')
+    inventory = relationship(
+        'Item',
+        order_by='Item.name',
         back_populates='character')
 
     def __str__(self):
@@ -207,6 +213,49 @@ class Initiative (Base):
 
     def __str__(self):
         return '`{0.character.name}: {0.value}`'.format(self)
+
+
+class Item (Base):
+    '''
+    Character inventory
+    '''
+    __tablename__ = 'items'
+
+    id = Column(
+        Integer,
+        primary_key=True,
+        doc='An autonumber id')
+    character_id = Column(
+        Integer,
+        ForeignKey('characters.id'),
+        nullable=False,
+        doc='Character foreign key')
+    name = Column(
+        String(64),
+        nullable=False,
+        doc='Item name')
+    current = Column(
+        Integer,
+        doc='The current quantity of the item')
+    description = Column(
+        String,
+        doc='A short description of the item')
+
+    __table_args__ = (
+        Index('_inventory_index', character_id, name, unique=True),
+    )
+
+    character = relationship(
+        'Character',
+        foreign_keys=[character_id],
+        back_populates='inventory')
+
+    def __str__(self):
+        ret = '{0.name}: {0.current}'.format(self)
+        if self.description:
+            ret += '\n' + self.description
+        return '`{}`'.format(ret)
+
 
 if __name__ == '__main__':
     from operator import attrgetter
