@@ -208,7 +208,7 @@ class RollCog (Cog):
     @group.command()
     async def list(self, ctx):
         '''
-        Lists all rolls for the user
+        Lists all of a character's rolls
         '''
         character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
         text = ["{}'s rolls:".format(str(character))]

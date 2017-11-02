@@ -143,7 +143,7 @@ class ResourceCog (Cog):
     @group.command()
     async def list(self, ctx):
         '''
-        Lists all resources for the user
+        Lists all of a character's resources
         '''
         character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
         text = ["{}'s resources:".format(character)]

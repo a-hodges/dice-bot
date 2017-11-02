@@ -5,7 +5,7 @@ from util import Cog, get_character, sql_update, ItemNotFoundError
 
 
 class ConstCog (Cog):
-    @commands.group('const', invoke_without_command=True)
+    @commands.group('constant', aliases=['const'], invoke_without_command=True)
     async def group(self, ctx, *, expression: str):
         '''
         Manage character values
@@ -15,10 +15,10 @@ class ConstCog (Cog):
     @group.command(aliases=['set', 'update'])
     async def add(self, ctx, name: str, value: int):
         '''
-        Adds/updates a new const for a character
+        Adds/updates a new constant for a character
 
         Parameters:
-        [name] name of const to store
+        [name] name of constant to store
         [value] value to store
         '''
         character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
@@ -35,10 +35,10 @@ class ConstCog (Cog):
     @group.command()
     async def check(self, ctx, *, name: str):
         '''
-        Checks the status of a const
+        Checks the status of a constant
 
         Parameters:
-        [name] the name of the const
+        [name] the name of the constant
         '''
         character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
         const = ctx.session.query(m.Constant)\
@@ -50,10 +50,10 @@ class ConstCog (Cog):
     @group.command()
     async def list(self, ctx):
         '''
-        Lists all consts for the user
+        Lists all of a character's constants
         '''
         character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
-        text = ["{}'s consts:\n".format(character)]
+        text = ["{}'s constants:\n".format(character)]
         for const in character.constants:
             text.append(str(const))
         await ctx.send('\n'.join(text))
@@ -61,10 +61,10 @@ class ConstCog (Cog):
     @group.command(aliases=['delete'])
     async def remove(self, ctx, *, name: str):
         '''
-        Deletes a const from the character
+        Deletes a constant from the character
 
         Parameters:
-        [name] the name of the const
+        [name] the name of the constant
         '''
         character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
 

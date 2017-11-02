@@ -84,6 +84,18 @@ class CharacterCog (Cog):
             await ctx.send('There is already a character with that name')
 
     @commands.command()
+    async def listcharacters(self, ctx):
+        '''
+        Lists all of the characters for this server
+        '''
+        characters = ctx.session.query(m.Character)\
+            .filter_by(server=ctx.guild.id).all()
+        text = ['All characters:']
+        for character in characters:
+            text.append(str(character))
+        await ctx.send('\n'.join(text))
+
+    @commands.command()
     async def rest(self, ctx, *, rest: str):
         '''
         Take a rest
