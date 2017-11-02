@@ -37,6 +37,30 @@ class InventoryCog (Cog):
             await ctx.send('{} already has an item named {}'.format(
                 str(character), name))
 
+    @group.command()
+    async def rename(self, ctx, name: str, * new_name: str):
+        '''
+        Changes the name of an inventory item
+
+        Parameters:
+        [name] the name of the item to change
+        [new_name] the new name of the item
+        '''
+        character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
+
+        item = ctx.session.query(m.Item)\
+            .filter_by(character_id=character.id, name=name).one_or_none()
+        if item is None:
+            raise ItemNotFoundError
+
+        try:
+            item.name = name
+            ctx.session.commit()
+            await ctx.send('{} now has {}'.format(str(character), str(item)))
+        except IntegrityError:
+            await ctx.send('{} already has an item named {}'.format(
+                str(character), name))
+
     @group.command(aliases=['desc'])
     async def description(self, ctx, name: str, *, description: str):
         '''
