@@ -94,6 +94,7 @@ for extension in [
     'resources',
     'consts',
     'initiatives',
+    'inventory',
 ]:
     bot.load_extension('cogs.' + extension)
 
