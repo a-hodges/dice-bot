@@ -44,7 +44,7 @@ class ConstCog (Cog):
         const = ctx.session.query(m.Constant)\
             .get((character.id, name))
         if const is None:
-            raise ItemNotFoundError
+            raise ItemNotFoundError(name)
         await ctx.send('`{}`'.format(str(const)))
 
     @group.command()
@@ -71,7 +71,7 @@ class ConstCog (Cog):
         const = ctx.session.query(m.Constant)\
             .get((character.id, name))
         if const is None:
-            raise ItemNotFoundError
+            raise ItemNotFoundError(name)
 
         ctx.session.delete(const)
         ctx.session.commit()

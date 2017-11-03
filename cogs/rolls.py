@@ -202,7 +202,7 @@ class RollCog (Cog):
         roll = ctx.session.query(m.Roll)\
             .get((character.id, name))
         if roll is None:
-            raise ItemNotFoundError
+            raise ItemNotFoundError(name)
         await ctx.send('`{}`'.format(str(roll)))
 
     @group.command()
@@ -229,7 +229,7 @@ class RollCog (Cog):
         roll = ctx.session.query(m.Roll)\
             .get((character.id, name))
         if roll is None:
-            raise ItemNotFoundError
+            raise ItemNotFoundError(name)
 
         ctx.session.delete(roll)
         ctx.session.commit()

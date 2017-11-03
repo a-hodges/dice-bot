@@ -10,7 +10,8 @@ class NoCharacterError (BotError):
 
 
 class ItemNotFoundError (BotError):
-    pass
+    def __init__(self, value=None):
+        self.value = value
 
 
 class Cog:

@@ -52,7 +52,7 @@ class InventoryCog (Cog):
         item = ctx.session.query(m.Item)\
             .filter_by(character_id=character.id, name=name).one_or_none()
         if item is None:
-            raise ItemNotFoundError
+            raise ItemNotFoundError(name)
 
         try:
             item.name = new_name
@@ -78,7 +78,7 @@ class InventoryCog (Cog):
         item = ctx.session.query(m.Item)\
             .filter_by(character_id=character.id, name=name).one_or_none()
         if item is None:
-            raise ItemNotFoundError
+            raise ItemNotFoundError(name)
 
         item.description = description
         ctx.session.commit()
@@ -108,7 +108,7 @@ class InventoryCog (Cog):
         item = ctx.session.query(m.Item)\
             .filter_by(character_id=character.id, name=name).one_or_none()
         if item is None:
-            raise ItemNotFoundError
+            raise ItemNotFoundError(name)
 
         item.number = number
         ctx.session.commit()
@@ -128,7 +128,7 @@ class InventoryCog (Cog):
         item = ctx.session.query(m.Item)\
             .filter_by(character_id=character.id, name=name).one_or_none()
         if item is None:
-            raise ItemNotFoundError
+            raise ItemNotFoundError(name)
 
         item.number += number
         ctx.session.commit()
@@ -157,7 +157,7 @@ class InventoryCog (Cog):
         item = ctx.session.query(m.Item)\
             .filter_by(character_id=character.id, name=name).one_or_none()
         if item is None:
-            raise ItemNotFoundError
+            raise ItemNotFoundError(name)
         await ctx.send('`{}`'.format(str(item)))
 
     @group.command()
@@ -186,7 +186,7 @@ class InventoryCog (Cog):
         item = ctx.session.query(m.Item)\
             .filter_by(character_id=character.id, name=name).one_or_none()
         if item is None:
-            raise ItemNotFoundError
+            raise ItemNotFoundError(name)
 
         ctx.session.delete(item)
         ctx.session.commit()

@@ -70,7 +70,7 @@ class InitiativeCog (Cog):
         initiative = ctx.session.query(m.Initiative)\
             .get((character.id, ctx.channel.id))
         if initiative is None:
-            raise ItemNotFoundError
+            raise ItemNotFoundError()
 
         ctx.session.delete(initiative)
         ctx.session.commit()
