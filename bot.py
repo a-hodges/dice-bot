@@ -17,7 +17,7 @@ from util.equations import EquationError
 description = '''D&D manager bot for discord based RPGs
 
 Note:
-Any parameters that have spaces in them need to be wrapped in quotes "
+Any parameter value that has spaces in it needs to be wrapped in quotes " unless it is the final parameter
 '''
 bot = commands.Bot(
     command_prefix='!',
