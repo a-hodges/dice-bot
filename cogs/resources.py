@@ -20,7 +20,9 @@ class ResourceCog (Cog):
         '''
         Manages character resources
         '''
-        await ctx.send('Invalid subcommand')
+        message = 'Command "{} {}" is not found'.format(
+            ctx.invoked_with, ctx.message.content.split()[1])
+        raise commands.CommandNotFound(message)
 
     @group.command(aliases=['update'])
     async def add(self, ctx, name: str, max_uses: int, recover: str):

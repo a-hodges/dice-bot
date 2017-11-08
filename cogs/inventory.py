@@ -11,7 +11,9 @@ class InventoryCog (Cog):
         '''
         Manages character inventory
         '''
-        await ctx.send('Invalid subcommand')
+        message = 'Command "{} {}" is not found'.format(
+            ctx.invoked_with, ctx.message.content.split()[1])
+        raise commands.CommandNotFound(message)
 
     @group.command()
     async def add(self, ctx, name: str, number: int):

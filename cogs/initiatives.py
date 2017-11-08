@@ -11,7 +11,9 @@ class InitiativeCog (Cog):
         '''
         Manage initiative by channel
         '''
-        await ctx.send('Invalid subcommand')
+        message = 'Command "{} {}" is not found'.format(
+            ctx.invoked_with, ctx.message.content.split()[1])
+        raise commands.CommandNotFound(message)
 
     @group.command(aliases=['add', 'update', 'roll'])
     async def set(self, ctx, *, expression: str):

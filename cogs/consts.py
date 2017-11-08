@@ -6,11 +6,13 @@ from util import Cog, get_character, sql_update, ItemNotFoundError
 
 class ConstCog (Cog):
     @commands.group('constant', aliases=['const'], invoke_without_command=True)
-    async def group(self, ctx, *, expression: str):
+    async def group(self, ctx):
         '''
         Manage character values
         '''
-        await ctx.send('Invalid subcommand')
+        message = 'Command "{} {}" is not found'.format(
+            ctx.invoked_with, ctx.message.content.split()[1])
+        raise commands.CommandNotFound(message)
 
     @group.command(aliases=['set', 'update'])
     async def add(self, ctx, name: str, value: int):

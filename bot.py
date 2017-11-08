@@ -58,7 +58,12 @@ async def on_command_error(ctx, error):
     if (isinstance(error, commands.CommandInvokeError)):
         error = error.original
 
-    if isinstance(error, commands.BadArgument):
+    if isinstance(error, commands.CommandNotFound):
+        if error.args:
+            await ctx.send(error.args[0])
+        else:
+            await ctx.send('Error: command not found')
+    elif isinstance(error, commands.BadArgument):
         await ctx.send(
             '{}\n'.format(error) +
             'See the help text for valid parameters')
