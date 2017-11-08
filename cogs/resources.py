@@ -27,7 +27,7 @@ class ResourceCog (Cog):
             message = 'Command "{} {}" is not found'.format(
                 ctx.invoked_with, ctx.message.content.split()[1])
             raise commands.CommandNotFound(message)
-        await self.consume.callback(self, ctx, -number, name=name)
+        await self.plus.callback(self, ctx, number, name=name)
 
     @group.command(aliases=['update'])
     async def add(self, ctx, name: str, max_uses: int, recover: str):
@@ -57,13 +57,13 @@ class ResourceCog (Cog):
         await ctx.send('`{}` now has `{}`'.format(
             str(character), str(resource)))
 
-    @group.command(aliases=['-'])
-    async def consume(self, ctx, number: int, *, name: str):
+    @group.command('+')
+    async def plus(self, ctx, number: int, *, name: str):
         '''
-        Consumes a number of uses of the resource
+        Regains a number of uses of the resource
 
         Parameters:
-        [number] the quantity of the resource to use
+        [number] the quantity of the resource to regain
         [name] the name of the resource
         '''
         character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
@@ -74,8 +74,8 @@ class ResourceCog (Cog):
             raise ItemNotFoundError(name)
 
         prev = resource.current
-        if resource.current - number >= 0:
-            resource.current = resource.current - number
+        if resource.current + number >= 0:
+            resource.current = resource.current + number
             if resource.current > resource.max:
                 resource.current = resource.max
             ctx.session.commit()
@@ -83,8 +83,19 @@ class ResourceCog (Cog):
                 str(character), resource.name, prev,
                 resource.current, resource.max))
         else:
-            await ctx.send('`{}` does not have enough to use: `{}`'.format(
-                str(character), str(resource)))
+            await ctx.send('`{}` does not have enough `{}` to use {}'.format(
+                str(character), str(resource), -number))
+
+    @group.command('-')
+    async def minus(self, ctx, number: int, *, name: str):
+        '''
+        Consumes a number of uses of the resource
+
+        Parameters:
+        [number] the quantity of the resource to use
+        [name] the name of the resource
+        '''
+        await self.plus.callback(self, ctx, -number, name=name)
 
     @group.command()
     async def use(self, ctx, *, name: str):
@@ -94,18 +105,7 @@ class ResourceCog (Cog):
         Parameters:
         [name] the name of the resource
         '''
-        await self.consume.callback(self, ctx, 1, name=name)
-
-    @group.command(aliases=['+'])
-    async def regain(self, ctx, number: int, *, name: str):
-        '''
-        Regains a number of uses of the resource
-
-        Parameters:
-        [number] the quantity of the resource to regain
-        [name] the name of the resource
-        '''
-        await self.consume.callback(self, ctx, -number, name=name)
+        await self.plus.callback(self, ctx, -1, name=name)
 
     @group.command()
     async def set(self, ctx, name: str, uses: int_or_max):
