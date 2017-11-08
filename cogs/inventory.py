@@ -7,13 +7,18 @@ from util import Cog, get_character, ItemNotFoundError
 
 class InventoryCog (Cog):
     @commands.group('inventory', aliases=['inv'], invoke_without_command=True)
-    async def group(self, ctx):
+    async def group(self, ctx, *, input: str):
         '''
         Manages character inventory
         '''
-        message = 'Command "{} {}" is not found'.format(
-            ctx.invoked_with, ctx.message.content.split()[1])
-        raise commands.CommandNotFound(message)
+        try:
+            number, name = input.split(maxsplit=1)
+            number = int(number)
+        except ValueError:
+            message = 'Command "{} {}" is not found'.format(
+                ctx.invoked_with, ctx.message.content.split()[1])
+            raise commands.CommandNotFound(message)
+        await self.plus.callback(self, ctx, number, name=name)
 
     @group.command()
     async def add(self, ctx, name: str, number: int):

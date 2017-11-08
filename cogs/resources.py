@@ -16,13 +16,18 @@ def int_or_max(value: str):
 
 class ResourceCog (Cog):
     @commands.group('resource', invoke_without_command=True)
-    async def group(self, ctx):
+    async def group(self, ctx, *, input: str):
         '''
         Manages character resources
         '''
-        message = 'Command "{} {}" is not found'.format(
-            ctx.invoked_with, ctx.message.content.split()[1])
-        raise commands.CommandNotFound(message)
+        try:
+            number, name = input.split(maxsplit=1)
+            number = int(number)
+        except ValueError:
+            message = 'Command "{} {}" is not found'.format(
+                ctx.invoked_with, ctx.message.content.split()[1])
+            raise commands.CommandNotFound(message)
+        await self.consume.callback(self, ctx, -number, name=name)
 
     @group.command(aliases=['update'])
     async def add(self, ctx, name: str, max_uses: int, recover: str):
