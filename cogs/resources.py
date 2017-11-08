@@ -4,16 +4,6 @@ import model as m
 from util import Cog, get_character, sql_update, ItemNotFoundError
 
 
-def int_or_max(value: str):
-    if value == 'max':
-        return value
-    else:
-        try:
-            return int(value)
-        except ValueError:
-            raise commands.BadArgument(value)
-
-
 class ResourceCog (Cog):
     @commands.group('resource', invoke_without_command=True)
     async def group(self, ctx, *, input: str):
@@ -108,14 +98,13 @@ class ResourceCog (Cog):
         await self.plus.callback(self, ctx, -1, name=name)
 
     @group.command()
-    async def set(self, ctx, name: str, uses: int_or_max):
+    async def set(self, ctx, name: str, uses: int):
         '''
         Sets the remaining uses of a resource
 
         Parameters:
         [name] the name of the resource
-        [uses] can be the number of remaining uses or
-            the special value "max" to refill all uses
+        [uses] the new number of remaining uses
         '''
         character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
 
@@ -124,10 +113,28 @@ class ResourceCog (Cog):
         if resource is None:
             raise ItemNotFoundError(name)
 
-        if uses == 'max':
-            resource.current = resource.max
-        else:
-            resource.current = uses
+        resource.current = uses
+        ctx.session.commit()
+
+        await ctx.send('`{}` now has {}/{} uses of `{}`'.format(
+            str(character), resource.current, resource.max, resource.name))
+
+    @group.command()
+    async def regain(self, ctx, *, name: str):
+        '''
+        Returns the remaining uses of a resource to max
+
+        Parameters:
+        [name] the name of the resource
+        '''
+        character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
+
+        resource = ctx.session.query(m.Resource)\
+            .get((character.id, name))
+        if resource is None:
+            raise ItemNotFoundError(name)
+
+        resource.current = resource.max
         ctx.session.commit()
 
         await ctx.send('`{}` now has {}/{} uses of `{}`'.format(
