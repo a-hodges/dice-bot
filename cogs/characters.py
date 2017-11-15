@@ -31,6 +31,7 @@ class CharacterCog (Cog):
                 await ctx.send('{} is `{}`'.format(
                     ctx.author.mention, str(character)))
             except IntegrityError:
+                ctx.session.rollback()
                 await ctx.send(
                     'You are already using a different character')
         else:
@@ -81,6 +82,7 @@ class CharacterCog (Cog):
             await ctx.send("{} has changed `{}`'s name to `{}`".format(
                 ctx.author.mention, original_name, name))
         except IntegrityError:
+            ctx.session.rollback()
             await ctx.send('There is already a character with that name')
 
     @commands.command()

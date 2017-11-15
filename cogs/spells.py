@@ -57,6 +57,7 @@ class SpellCog (Cog):
             await ctx.send('`{}` now has `{}`'.format(
                 str(character), str(spell)))
         except IntegrityError:
+            ctx.session.rollback()
             await ctx.send('`{}` already has a spell named `{}`'.format(
                 str(character), new_name))
 

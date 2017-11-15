@@ -36,6 +36,7 @@ class InventoryCog (Cog):
             ctx.session.add(item)
             ctx.session.commit()
         except IntegrityError:
+            ctx.session.rollback()
             item = None
 
         if item is not None:
@@ -67,6 +68,7 @@ class InventoryCog (Cog):
             await ctx.send('`{}` now has `{}`'.format(
                 str(character), str(item)))
         except IntegrityError:
+            ctx.session.rollback()
             await ctx.send('`{}` already has an item named `{}`'.format(
                 str(character), new_name))
 
