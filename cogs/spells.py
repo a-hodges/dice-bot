@@ -33,7 +33,7 @@ class SpellCog (Cog):
             'level': level,
         })
 
-        await ctx.send('`{}` now has `{}`'.format(str(character), str(spell)))
+        await ctx.send('{} now has {}'.format(str(character), str(spell)))
 
     @group.command()
     async def rename(self, ctx, name: str, *, new_name: str):
@@ -54,11 +54,11 @@ class SpellCog (Cog):
         try:
             spell.name = new_name
             ctx.session.commit()
-            await ctx.send('`{}` now has `{}`'.format(
+            await ctx.send('{} now has {}'.format(
                 str(character), str(spell)))
         except IntegrityError:
             ctx.session.rollback()
-            await ctx.send('`{}` already has a spell named `{}`'.format(
+            await ctx.send('{} already has a spell named {}'.format(
                 str(character), new_name))
 
     @group.command()
@@ -79,7 +79,7 @@ class SpellCog (Cog):
 
         spell.level = level
         ctx.session.commit()
-        await ctx.send('`{}` now has `{}`'.format(str(character), str(spell)))
+        await ctx.send('{} now has {}'.format(str(character), str(spell)))
 
     @group.command(aliases=['desc'])
     async def description(self, ctx, name: str, *, description: str):
@@ -100,7 +100,7 @@ class SpellCog (Cog):
 
         spell.description = description
         ctx.session.commit()
-        await ctx.send('`{}` now has `{}`'.format(str(character), str(spell)))
+        await ctx.send('{} now has {}'.format(str(character), str(spell)))
 
     @group.command(aliases=['rmdesc'])
     async def remove_description(self, ctx, *, name: str):
@@ -125,7 +125,7 @@ class SpellCog (Cog):
             .filter_by(character_id=character.id, name=name).one_or_none()
         if spell is None:
             raise ItemNotFoundError(name)
-        await ctx.send('`{}`'.format(str(spell)))
+        await ctx.send(str(spell))
 
     @group.command()
     async def list(self, ctx):
@@ -136,7 +136,7 @@ class SpellCog (Cog):
         text = ["{}'s spells:".format(character.name)]
         for spell in character.spells:
             text.append(str(spell))
-        await ctx.send('```\n{}\n```'.format('\n\n'.join(text)))
+        await ctx.send('\n\n'.join(text))
 
     @group.command(aliases=['delete'])
     async def remove(self, ctx, *, name: str):
@@ -155,7 +155,7 @@ class SpellCog (Cog):
 
         ctx.session.delete(spell)
         ctx.session.commit()
-        await ctx.send('`{}` no longer has `{}`'.format(
+        await ctx.send('{} no longer has {}'.format(
             str(character), str(spell)))
 
 

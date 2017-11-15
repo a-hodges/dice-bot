@@ -44,7 +44,7 @@ class ResourceCog (Cog):
             'recover': recover,
         })
 
-        await ctx.send('`{}` now has `{}`'.format(
+        await ctx.send('{} now has {}'.format(
             str(character), str(resource)))
 
     @group.command('+')
@@ -69,11 +69,11 @@ class ResourceCog (Cog):
             if resource.current > resource.max:
                 resource.current = resource.max
             ctx.session.commit()
-            await ctx.send("`{0}`'s `{1}` went from {2}/{4} to {3}/{4}".format(
+            await ctx.send("{0}'s {1} went from {2}/{4} to {3}/{4}".format(
                 str(character), resource.name, prev,
                 resource.current, resource.max))
         else:
-            await ctx.send('`{}` does not have enough `{}` to use {}'.format(
+            await ctx.send('{} does not have enough {} to use {}'.format(
                 str(character), str(resource), -number))
 
     @group.command('-')
@@ -116,7 +116,7 @@ class ResourceCog (Cog):
         resource.current = uses
         ctx.session.commit()
 
-        await ctx.send('`{}` now has {}/{} uses of `{}`'.format(
+        await ctx.send('{} now has {}/{} uses of {}'.format(
             str(character), resource.current, resource.max, resource.name))
 
     @group.command()
@@ -137,7 +137,7 @@ class ResourceCog (Cog):
         resource.current = resource.max
         ctx.session.commit()
 
-        await ctx.send('`{}` now has {}/{} uses of `{}`'.format(
+        await ctx.send('{} now has {}/{} uses of {}'.format(
             str(character), resource.current, resource.max, resource.name))
 
     @group.command()
@@ -153,7 +153,7 @@ class ResourceCog (Cog):
             .get((character.id, name))
         if resource is None:
             raise ItemNotFoundError(name)
-        await ctx.send('`{}`'.format(str(resource)))
+        await ctx.send(str(resource))
 
     @group.command()
     async def list(self, ctx):
@@ -164,7 +164,7 @@ class ResourceCog (Cog):
         text = ["{}'s resources:".format(character.name)]
         for resource in character.resources:
             text.append(str(resource))
-        await ctx.send('```\n{}\n```'.format('\n'.join(text)))
+        await ctx.send('\n'.join(text))
 
     @group.command(aliases=['delete'])
     async def remove(self, ctx, *, name: str):
@@ -183,7 +183,7 @@ class ResourceCog (Cog):
 
         ctx.session.delete(resource)
         ctx.session.commit()
-        await ctx.send('`{}` removed'.format(str(resource)))
+        await ctx.send('{} removed'.format(str(resource)))
 
 
 def setup(bot):

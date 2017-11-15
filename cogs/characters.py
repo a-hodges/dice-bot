@@ -28,14 +28,14 @@ class CharacterCog (Cog):
             character.user = ctx.author.id
             try:
                 ctx.session.commit()
-                await ctx.send('{} is `{}`'.format(
+                await ctx.send('{} is {}'.format(
                     ctx.author.mention, str(character)))
             except IntegrityError:
                 ctx.session.rollback()
                 await ctx.send(
                     'You are already using a different character')
         else:
-            await ctx.send('Someone else is using `{}`'.format(
+            await ctx.send('Someone else is using {}'.format(
                 str(character)))
 
     @commands.command()
@@ -47,7 +47,7 @@ class CharacterCog (Cog):
             .filter_by(user=ctx.author.id, server=ctx.guild.id).one_or_none()
         if character is not None:
             character.user = None
-            await ctx.send('{} is no longer playing as `{}`'.format(
+            await ctx.send('{} is no longer playing as {}'.format(
                 ctx.author.mention, str(character)))
         else:
             await ctx.send(
@@ -64,7 +64,7 @@ class CharacterCog (Cog):
         [user] should be a user on this channel
         '''
         character = get_character(ctx.session, member.id, ctx.guild.id)
-        await ctx.send('{} is `{}`'.format(member.mention, str(character)))
+        await ctx.send('{} is {}'.format(member.mention, str(character)))
 
     @commands.command()
     async def changename(self, ctx, *, name: str):
@@ -79,7 +79,7 @@ class CharacterCog (Cog):
             original_name = character.name
             character.name = name
             ctx.session.commit()
-            await ctx.send("{} has changed `{}`'s name to `{}`".format(
+            await ctx.send("{} has changed {}'s name to {}".format(
                 ctx.author.mention, original_name, name))
         except IntegrityError:
             ctx.session.rollback()
@@ -95,7 +95,7 @@ class CharacterCog (Cog):
         text = ['All characters:']
         for character in characters:
             text.append(str(character))
-        await ctx.send('```\n{}\n```'.format('\n'.join(text)))
+        await ctx.send('\n'.join(text))
 
     @commands.command()
     async def rest(self, ctx, *, rest: str):
@@ -120,7 +120,7 @@ class CharacterCog (Cog):
             ctx.session.commit()
 
             await ctx.send(
-                '`{}` has taken a {} rest, resources recovered'.format(
+                '{} has taken a {} rest, resources recovered'.format(
                     str(character), rest))
         else:
             await ctx.send('User has no character')

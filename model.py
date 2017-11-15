@@ -159,7 +159,7 @@ class Roll (Base):
         back_populates='rolls')
 
     def __str__(self):
-        return '{0.name}: {0.expression}'.format(self)
+        return '{0.name}: `{0.expression}`'.format(self)
 
 
 class Constant (Base):

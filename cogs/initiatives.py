@@ -36,7 +36,7 @@ class InitiativeCog (Cog):
             'value': value,
         })
 
-        await ctx.send('Initiative `{}` added'.format(str(initiative)))
+        await ctx.send('Initiative {} added'.format(str(initiative)))
 
     @group.command()
     async def check(self, ctx):
@@ -47,9 +47,9 @@ class InitiativeCog (Cog):
         initiative = ctx.session.query(m.Initiative)\
             .get((character.id, ctx.channel.id))
         if initiative is not None:
-            await ctx.send('`{}`'.format(str(initiative)))
+            await ctx.send(str(initiative))
         else:
-            await ctx.send('No initiative for `{}`'.format(str(character)))
+            await ctx.send('No initiative for {}'.format(str(character)))
 
     @group.command()
     async def list(self, ctx):
@@ -61,7 +61,7 @@ class InitiativeCog (Cog):
         text = ['Initiatives:']
         for initiative in initiatives:
             text.append(str(initiative))
-        await ctx.send('```\n{}\n```'.format('\n'.join(text)))
+        await ctx.send('\n'.join(text))
 
     @group.command(aliases=['delete'])
     async def remove(self, ctx):
@@ -77,7 +77,7 @@ class InitiativeCog (Cog):
 
         ctx.session.delete(initiative)
         ctx.session.commit()
-        await ctx.send("`{}`'s initiative removed".format(str(character)))
+        await ctx.send("{}'s initiative removed".format(str(character)))
 
     @group.command(aliases=['deleteall', 'endcombat'])
     @commands.has_role('DM')
