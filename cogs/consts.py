@@ -5,7 +5,7 @@ from util import Cog, get_character, sql_update, ItemNotFoundError
 
 
 class ConstCog (Cog):
-    @commands.group('constant', aliases=['const'], invoke_without_command=True)
+    @commands.group('constant', aliases=['con'], invoke_without_command=True)
     async def group(self, ctx):
         '''
         Manage character values

@@ -5,7 +5,7 @@ from util import Cog, get_character, sql_update, ItemNotFoundError
 
 
 class ResourceCog (Cog):
-    @commands.group('resource', invoke_without_command=True)
+    @commands.group('resource', aliases=['res'], invoke_without_command=True)
     async def group(self, ctx, *, input: str):
         '''
         Manages character resources

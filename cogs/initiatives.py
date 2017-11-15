@@ -6,7 +6,8 @@ from .rolls import do_roll
 
 
 class InitiativeCog (Cog):
-    @commands.group('initiative', invoke_without_command=True)
+    @commands.group('initiative', aliases=['init'],
+                    invoke_without_command=True)
     async def group(self, ctx):
         '''
         Manage initiative by channel

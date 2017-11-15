@@ -120,7 +120,7 @@ async def do_roll(ctx, session, character, expression, adv=0):
 
 
 class RollCog (Cog):
-    @commands.group('roll', invoke_without_command=True)
+    @commands.group('roll', aliases=['r'], invoke_without_command=True)
     async def group(self, ctx, *, expression: str):
         '''
         Rolls dice
