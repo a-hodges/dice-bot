@@ -1,4 +1,5 @@
 from discord.ext import commands
+from sqlalchemy.exc import IntegrityError
 
 import model as m
 from util import Cog, get_character, sql_update, ItemNotFoundError
