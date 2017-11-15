@@ -79,6 +79,10 @@ class Character (Base):
         'Item',
         order_by='Item.name',
         back_populates='character')
+    spells = relationship(
+        'Spell',
+        order_by='Spell.level,Spell.name',
+        back_populates='character')
 
     def __str__(self):
         return str(self.name)
@@ -251,6 +255,49 @@ class Item (Base):
 
     def __str__(self):
         ret = '{0.name}: {0.number}'.format(self)
+        if self.description:
+            ret += '\n' + self.description
+        return ret
+
+
+class Spell (Base):
+    '''
+    Character spell list
+    '''
+    __tablename__ = 'spells'
+
+    id = Column(
+        Integer,
+        primary_key=True,
+        doc='An autonumber id')
+    character_id = Column(
+        Integer,
+        ForeignKey('characters.id'),
+        nullable=False,
+        doc='Character foreign key')
+    name = Column(
+        String(64),
+        nullable=False,
+        doc='Spell name')
+    level = Column(
+        Integer,
+        nullable=False,
+        doc='Spell level')
+    description = Column(
+        String,
+        doc='A short description of the spell')
+
+    __table_args__ = (
+        Index('_spell_index', character_id, name, unique=True),
+    )
+
+    character = relationship(
+        'Character',
+        foreign_keys=[character_id],
+        back_populates='spells')
+
+    def __str__(self):
+        ret = '{0.name} | level {0.level}'.format(self)
         if self.description:
             ret += '\n' + self.description
         return ret
