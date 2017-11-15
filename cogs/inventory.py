@@ -46,7 +46,7 @@ class InventoryCog (Cog):
                 str(character), name))
 
     @group.command()
-    async def rename(self, ctx, name: str, * new_name: str):
+    async def rename(self, ctx, name: str, *, new_name: str):
         '''
         Changes the name of an inventory item
 

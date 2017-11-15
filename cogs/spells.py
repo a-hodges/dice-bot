@@ -36,7 +36,7 @@ class SpellCog (Cog):
         await ctx.send('`{}` now has `{}`'.format(str(character), str(spell)))
 
     @group.command()
-    async def rename(self, ctx, name: str, * new_name: str):
+    async def rename(self, ctx, name: str, *, new_name: str):
         '''
         Changes the name of a spell
 
