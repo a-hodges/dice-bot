@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import re
 import argparse
 import asyncio
 import logging
@@ -20,8 +21,19 @@ Note:
 Any parameter value that has spaces in it needs to be wrapped in quotes "
 unless it is the final parameter
 '''
+
+
+async def get_prefix(bot, message):
+    '''
+    Hack to prevent the bot from complaining about messages like `!!!`
+    '''
+    if re.match(r'!\w', message.content):
+        return '!'
+    else:
+        return '...'  # return an invalid prefix since None isn't valid
+
 bot = commands.Bot(
-    command_prefix='!',
+    command_prefix=get_prefix,
     description=description,
     loop=asyncio.new_event_loop())
 
