@@ -1,5 +1,12 @@
 #!/usr/bin/env python3
 
+'''D&D manager bot for discord based RPGs
+
+Note:
+Any parameter value that has spaces in it needs to be wrapped in quotes "
+unless it is the final parameter
+'''
+
 import re
 import argparse
 import asyncio
@@ -15,13 +22,6 @@ import model as m
 from util import NoCharacterError, ItemNotFoundError
 from util.equations import EquationError
 
-description = '''D&D manager bot for discord based RPGs
-
-Note:
-Any parameter value that has spaces in it needs to be wrapped in quotes "
-unless it is the final parameter
-'''
-
 
 async def get_prefix(bot, message):
     '''
@@ -34,7 +34,7 @@ async def get_prefix(bot, message):
 
 bot = commands.Bot(
     command_prefix=get_prefix,
-    description=description,
+    description=__doc__,
     loop=asyncio.new_event_loop())
 
 
