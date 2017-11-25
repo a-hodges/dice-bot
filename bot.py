@@ -5,6 +5,7 @@
 Note:
 Any parameter value that has spaces in it needs to be wrapped in quotes "
 unless it is the final parameter
+Certain commands are only usable by the @DM role
 '''
 
 import re
