@@ -104,6 +104,29 @@ class CharacterCog (Cog):
             text.append(str(character))
         await ctx.send('\n'.join(text))
 
+    # @commands.command()
+    @commands.has_role('DM')
+    async def kill(self, ctx, *, name: str):
+        '''
+        Deletes a character
+        This is permanent and removes all associated attributes!
+
+        Parameters:
+        [name] the name of the character to delete
+        '''
+        character = ctx.session.query(m.Character)\
+            .filter_by(name=name, server=ctx.guild.id).one_or_none()
+        if character is not None:
+            for attribute in character.attributes:
+                for item in getattr(character, attribute):
+                    ctx.session.delete(item)
+            ctx.session.commit()
+            ctx.session.delete(character)
+            ctx.session.commit()
+            await ctx.send('{} is dead'.format(str(character)))
+        else:
+            await ctx.send('Error: No character named {}'.format(name))
+
     @commands.command()
     async def rest(self, ctx, *, rest: str):
         '''
