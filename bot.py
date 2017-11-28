@@ -72,7 +72,10 @@ async def on_command_error(ctx, error):
     if (isinstance(error, commands.CommandInvokeError)):
         error = error.original
 
-    if isinstance(error, commands.CommandNotFound):
+    if isinstance(error, commands.CheckFailure):
+        await ctx.send(
+            'Error: You do not meet the requirements to use this command')
+    elif isinstance(error, commands.CommandNotFound):
         if error.args:
             await ctx.send(error.args[0])
         else:
