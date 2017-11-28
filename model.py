@@ -84,6 +84,15 @@ class Character (Base):
         order_by='Spell.level,Spell.name',
         back_populates='character')
 
+    attributes = [
+        'resources',
+        'rolls',
+        'constants',
+        'initiatives',
+        'inventory',
+        'spells',
+    ]
+
     def __str__(self):
         return str(self.name)
 
