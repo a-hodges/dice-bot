@@ -19,7 +19,13 @@ class CharacterCog (Cog):
         '''
         character = ctx.session.query(m.Character)\
             .filter_by(name=name, server=ctx.guild.id).one_or_none()
-        if character is None:
+        user = ctx.session.query(m.Character)\
+            .filter_by(user=ctx.author.id, server=ctx.guild.id).one_or_none()
+        if user is not None:
+            await ctx.send(
+                'Error: You are already using a different character')
+            return
+        elif character is None:
             character = m.Character(name=name, server=ctx.guild.id)
             ctx.session.add(character)
             await ctx.send('Creating character: {}'.format(name))
@@ -33,9 +39,9 @@ class CharacterCog (Cog):
             except IntegrityError:
                 ctx.session.rollback()
                 await ctx.send(
-                    'You are already using a different character')
+                    'Error: You are already using a different character')
         else:
-            await ctx.send('Someone else is using {}'.format(
+            await ctx.send('Error: Someone else is using {}'.format(
                 str(character)))
 
     @commands.command()
@@ -51,7 +57,7 @@ class CharacterCog (Cog):
                 ctx.author.mention, str(character)))
         else:
             await ctx.send(
-                '{} does not have a character to remove'.format(
+                'Error: {} does not have a character to remove'.format(
                     ctx.author.mention))
         ctx.session.commit()
 
@@ -83,7 +89,8 @@ class CharacterCog (Cog):
                 ctx.author.mention, original_name, name))
         except IntegrityError:
             ctx.session.rollback()
-            await ctx.send('There is already a character with that name')
+            await ctx.send(
+                'Error: There is already a character with that name')
 
     @commands.command()
     async def listcharacters(self, ctx):
