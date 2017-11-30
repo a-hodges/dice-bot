@@ -31,7 +31,7 @@ async def get_prefix(bot, message):
     if re.match(r'!\w', message.content):
         return '!'
     else:
-        return '...'  # return an invalid prefix since None isn't valid
+        return '\0'  # return an invalid prefix since None isn't valid
 
 bot = commands.Bot(
     command_prefix=get_prefix,
