@@ -64,17 +64,11 @@ class ResourceCog (Cog):
             raise ItemNotFoundError(name)
 
         prev = resource.current
-        if resource.current + number >= 0:
-            resource.current = resource.current + number
-            if resource.current > resource.max:
-                resource.current = resource.max
-            ctx.session.commit()
-            await ctx.send("{0}'s {1} went from {2}/{4} to {3}/{4}".format(
-                str(character), resource.name, prev,
-                resource.current, resource.max))
-        else:
-            await ctx.send('{} does not have enough {} to use {}'.format(
-                str(character), str(resource), -number))
+        resource.current = resource.current + number
+        ctx.session.commit()
+        await ctx.send("{0}'s {1} went from {2}/{4} to {3}/{4}".format(
+            str(character), resource.name, prev,
+            resource.current, resource.max))
 
     @group.command('-')
     async def minus(self, ctx, number: int, *, name: str):
