@@ -89,7 +89,22 @@ class ResourceCog (Cog):
         Parameters:
         [name] the name of the resource
         '''
-        await self.plus.callback(self, ctx, -1, name=name)
+        character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
+
+        resource = ctx.session.query(m.Resource)\
+            .get((character.id, name))
+        if resource is None:
+            raise ItemNotFoundError(name)
+
+        if resource.current >= 1:
+            prev = resource.current
+            resource.current = resource.current - 1
+            ctx.session.commit()
+            await ctx.send("{0}'s {1} went from {2}/{4} to {3}/{4}".format(
+                str(character), resource.name, prev,
+                resource.current, resource.max))
+        else:
+            await ctx.send("{} has no {} to use".format(str(character), resource.name))
 
     @group.command()
     async def set(self, ctx, name: str, uses: int):
