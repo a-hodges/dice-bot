@@ -115,11 +115,11 @@ async def do_roll(ctx, session, character, expression):
     # validate
     for token in re.findall(r'[a-zA-Z]+', expression):
         if token not in operations:
-            search = r'[a-zA-Z]*' + re.escape(token) + r'[a-zA-Z]*'
-            search = re.findall(search, original_expression)
+            search = r'[a-zA-Z]*({})[a-zA-Z]*'.format(re.escape(token))
+            search = re.search(search, original_expression)
             if search:
-                token = search[0]
-            raise equations.EquationError('Could not find {}'.format(token))
+                token = search.group(1)
+            raise equations.EquationError('Could not find: {}'.format(token))
 
     # do roll
     output.append('Rolling: `{}`'.format(expression))
