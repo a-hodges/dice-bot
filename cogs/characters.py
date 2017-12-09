@@ -32,14 +32,9 @@ class CharacterCog (Cog):
 
         if character.user is None:
             character.user = ctx.author.id
-            try:
-                ctx.session.commit()
-                await ctx.send('{} is {}'.format(
-                    ctx.author.mention, str(character)))
-            except IntegrityError:
-                ctx.session.rollback()
-                await ctx.send(
-                    'Error: You are already using a different character')
+            ctx.session.commit()
+            await ctx.send('{} is {}'.format(
+                ctx.author.mention, str(character)))
         else:
             await ctx.send('Error: Someone else is using {}'.format(
                 str(character)))
