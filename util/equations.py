@@ -43,7 +43,7 @@ def tokenize(equation):
     '''
     # things to split by
     text = r'[a-zA-Z]+'
-    num = r'(?<![)\d])-?\d*\.?\d+'
+    num = r'\d*\.?\d+'
     parens = r'[()]'
     #
     stack = re.split('({}|{}|{})'.format(text, num, parens), equation)
