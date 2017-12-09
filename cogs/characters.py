@@ -19,10 +19,6 @@ class CharacterCog (Cog):
         '''
         user = ctx.session.query(m.Character)\
             .filter_by(user=ctx.author.id, server=ctx.guild.id).one_or_none()
-        if user is not None:
-            await ctx.send(
-                'Error: You are already using a different character')
-            return
 
         character = ctx.session.query(m.Character)\
             .filter_by(name=name, server=ctx.guild.id).one_or_none()
@@ -33,6 +29,11 @@ class CharacterCog (Cog):
             await ctx.send('Creating character: {}'.format(name))
 
         if character.user is None:
+            if user is not None:
+                user.user = None
+                await ctx.send('{} is no longer playing as {}'.format(
+                    ctx.author.mention, str(user)))
+
             character.user = ctx.author.id
             ctx.session.commit()
             await ctx.send('{} is {}'.format(
