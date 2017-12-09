@@ -17,9 +17,6 @@ class CharacterCog (Cog):
         Parameters:
         [name] is the name of the character to associate
         '''
-        user = ctx.session.query(m.Character)\
-            .filter_by(user=ctx.author.id, server=ctx.guild.id).one_or_none()
-
         character = ctx.session.query(m.Character)\
             .filter_by(name=name, server=ctx.guild.id).one_or_none()
 
@@ -29,6 +26,9 @@ class CharacterCog (Cog):
             await ctx.send('Creating character: {}'.format(name))
 
         if character.user is None:
+
+            user = ctx.session.query(m.Character).filter_by(
+                user=ctx.author.id, server=ctx.guild.id).one_or_none()
             if user is not None:
                 user.user = None
                 await ctx.send('{} is no longer playing as {}'.format(
