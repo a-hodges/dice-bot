@@ -104,7 +104,8 @@ class ResourceCog (Cog):
                 str(character), resource.name, prev,
                 resource.current, resource.max))
         else:
-            await ctx.send("{} has no {} to use".format(str(character), resource.name))
+            await ctx.send("{} has no {} to use".format(
+                str(character), resource.name))
 
     @group.command()
     async def set(self, ctx, name: str, uses: int):
