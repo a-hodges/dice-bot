@@ -8,10 +8,19 @@ import model as m
 from util import Cog, get_character, sql_update, ItemNotFoundError, equations
 
 
-async def do_roll(ctx, session, character, expression, adv=0):
+async def do_roll(ctx, session, character, expression):
     '''
     Does the dice rolling after const replacement
     '''
+    if expression.endswith(' disadv'):
+        adv = -1
+        expression = expression[:-7]
+    elif expression.endswith(' adv'):
+        adv = 1
+        expression = expression[:-4]
+    else:
+        adv = 0
+
     original_expression = expression
     output = []
 
@@ -154,21 +163,10 @@ class RollCog (Cog):
         if not expression:
             raise commands.MissingRequiredArgument('expression')
 
-        if expression.endswith(' disadv'):
-            adv = -1
-            expression = expression[:-7]
-        elif expression.endswith(' adv'):
-            adv = 1
-            expression = expression[:-4]
-        else:
-            adv = 0
-
-        expression = expression.strip()
-
         character = ctx.session.query(m.Character)\
             .filter_by(user=ctx.author.id, server=ctx.guild.id).one_or_none()
 
-        await do_roll(ctx, ctx.session, character, expression, adv)
+        await do_roll(ctx, ctx.session, character, expression)
 
     @group.command(aliases=['set', 'update'])
     async def add(self, ctx, name: str, expression: str):
