@@ -1,5 +1,6 @@
 import re
 import random
+from itertools import chain
 
 from discord.ext import commands
 from sqlalchemy import func
@@ -79,19 +80,19 @@ async def do_roll(ctx, session, character, expression):
         return out
 
     operations = equations.operations.copy()
+    operations.append({'>': max, '<': min})
+
+    dice = {}
     if adv == 0:
-        operations['d'] = roll_dice
+        dice['d'] = roll_dice
     elif adv > 0:
-        operations['d'] = roll_advantage
+        dice['d'] = roll_advantage
     else:
-        operations['d'] = roll_disadvantage
-    operations['D'] = operations['d']
-    operations['g'] = great_weapon_fighting
-    operations['G'] = operations['g']
-    operations['>'] = max
-    operations['<'] = min
-    order_of_operations = [['d', 'D', 'g', 'G'], ['>', '<']]
-    order_of_operations.extend(equations.order_of_operations)
+        dice['d'] = roll_disadvantage
+    dice['D'] = dice['d']
+    dice['g'] = great_weapon_fighting
+    dice['G'] = dice['g']
+    operations.append(dice)
 
     if character:
         # replace only 1 roll
@@ -114,7 +115,7 @@ async def do_roll(ctx, session, character, expression):
 
     # validate
     for token in re.findall(r'[a-zA-Z]+', expression):
-        if token not in operations:
+        if token not in chain(*operations):
             search = r'[a-zA-Z]*({})[a-zA-Z]*'.format(re.escape(token))
             search = re.search(search, original_expression)
             if search:
@@ -123,7 +124,7 @@ async def do_roll(ctx, session, character, expression):
 
     # do roll
     output.append('Rolling: `{}`'.format(expression))
-    roll = equations.solve(expression, operations, order_of_operations)
+    roll = equations.solve(expression, operations)
     if roll % 1 == 0:
         roll = int(roll)
     output.append('I rolled {}'.format(roll))

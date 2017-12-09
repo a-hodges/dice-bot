@@ -1,20 +1,21 @@
-#!/usr/bin/env python3
-
 import operator
 import re
+from pprint import pformat
 
-operations = {
-    '+': operator.add,
-    '-': operator.sub,
-    '*': operator.mul,
-    '/': operator.truediv,
-    '//': operator.floordiv,
-    '^': operator.pow,
-}
-order_of_operations = [
-    ['^'],
-    ['*', '/', '//'],
-    ['+', '-'],
+operations = [
+    {
+        '+': operator.add,
+        '-': operator.sub,
+    },
+    {
+        '*': operator.mul,
+        '/': operator.truediv,
+        '//': operator.floordiv,
+        '%': operator.mod,
+    },
+    {
+        '^': operator.pow,
+    },
 ]
 
 
@@ -22,79 +23,72 @@ class EquationError (Exception):
     pass
 
 
-def parse_number(num):
+def types(stack):
     '''
-    Converts a string to an int if possible,
-    otherwise float if possible,
-    otherwise returns the original string
+    Gets the types list from a token list
     '''
-    try:
-        return int(num)
-    except ValueError:
-        try:
-            return float(num)
-        except ValueError:
-            return num
+    return next(zip(*stack)) if stack else []
 
 
-def tokenize(equation):
+def tokenize(expression, operations=operations):
     '''
-    Tokenizes an infix equation to create a list
+    Parses a mathematic expression into tokens
     '''
-    # things to split by
-    text = r'[a-zA-Z]+'
-    num = r'\d*\.?\d+'
-    parens = r'[()]'
-    #
-    stack = re.split('({}|{}|{})'.format(text, num, parens), equation)
-    stack = filter(None, stack)  # remove empty strings
-    stack = list(map(parse_number, stack))
-    return stack
+    def token(t):
+        def callback(scanner, match):
+            return t, match
+        return callback
+    l = [(r'\s+', 'WHITESPACE')]
+    l.extend((r'|'.join(map(re.escape, ops)), i)
+             for i, ops in enumerate(operations))
+    l.extend([
+        (r'-', len(operations)),  # ???
+        (r'\d*\.\d+', 'FLOAT'),
+        (r'\d+', 'INT'),
+        (r'\(', 'PAREN_OPEN'),
+        (r'\)', 'PAREN_CLOSE'),
+    ])
+    scanner = re.Scanner([(p, token(t)) for p, t in l])
+    out, rest = scanner.scan(expression)
+    if rest:
+        raise ValueError('Could not parse equation from: {}'.format(rest))
+    return [(t, m) for t, m in out if t != 'WHITESPACE']
 
 
-def infix2postfix(
-        equation,
-        operations=operations,
-        order_of_operations=order_of_operations):
+def infix2postfix(expression, operations=operations):
     '''
-    Converts a tokenized infix equation to postfix
+    Converts an infix expression to a postfix token list
     '''
-    equation = list(equation)
+    equation = tokenize(expression, operations)
     stack = []
     output = []
 
     for item in equation:
-        if isinstance(item, (int, float)):
+        type, token = item
+        # print(equation, stack, output, token, sep='\n')
+        if type in ('INT', 'FLOAT'):
             output.append(item)
-        elif item == '(':
+        elif type == 'PAREN_OPEN':
             stack.append(item)
-        elif item == ')':
-            if '(' not in stack:
-                raise EquationError('Invalid equation: {}'.format(equation))
-            while stack[-1] != '(':
+        elif type == 'PAREN_CLOSE':
+            if 'PAREN_OPEN' not in types(stack):
+                raise EquationError('Missing open parenthesis: {}'.format(
+                    expression))
+            while stack[-1][0] != 'PAREN_OPEN':
                 output.append(stack.pop())
             stack.pop()
-        elif item in operations:
-            higher_or_equal_priority = []
-            ops = iter(order_of_operations)
-            line = next(ops)
-            try:
-                while item not in line:
-                    higher_or_equal_priority.extend(line)
-                    line = next(ops)
-            except StopIteration:
-                raise SyntaxError('Operator not in Order of Operations: {}'
-                                  .format(equation))
-
-            while stack and stack[-1] in higher_or_equal_priority:
+        elif isinstance(type, int):  # operators
+            while (stack and isinstance(stack[-1][0], int) and
+                   stack[-1][0] >= type):
                 output.append(stack.pop())
             stack.append(item)
         else:
             raise EquationError('Invalid token found: {} in {}'.format(
-                item, equation))
+                token, equation))
 
-    if '(' in stack:
-        raise EquationError('Invalid equation: {}'.format(equation))
+    if 'PAREN_OPEN' in types(stack):
+        raise EquationError('Missing closing parenthesis: {}'.format(
+            expression))
 
     while stack:
         output.append(stack.pop())
@@ -102,51 +96,43 @@ def infix2postfix(
     return output
 
 
-def solve_postfix(
-        equation,
-        operations=operations,
-        order_of_operations=order_of_operations):
+def solve(expression, operations=operations):
     '''
-    Solves a tokenized postfix equation
+    Solves an infix expression
+
+    Operations is a list of operation dicts in reverse precedence order
+        The keys of each dict should be the operator and the values should be
+        a binary function to apply to the operands
+        The functions should be able to take int or float arguments
     '''
-    equation = list(equation)
+    equation = infix2postfix(expression, operations)
     stack = []
 
-    for item in equation:
-        if isinstance(item, (int, float)):
-            stack.append(item)
-        elif item == '-' and len(stack) < 2:
+    for type, token in equation:
+        # print(equation, stack, token, sep='\n')
+        if type == 'INT':
+            stack.append(int(token))
+        elif type == 'FLOAT':
+            stack.append(float(token))
+        elif type == len(operations) or token == '-' and len(stack) < 2:
+            # unary negative operator
             stack.append(-stack.pop())
-        elif item in operations:
+        elif isinstance(type, int):
             if len(stack) < 2:
                 raise EquationError('Not enough operands for {} in {}'.format(
-                    item, equation))
+                    token, expression))
             else:
-                b = stack.pop()
-                a = stack.pop()
-                stack.append(operations[item](a, b))
+                b, a = stack.pop(), stack.pop()
+                stack.append(operations[type][token](a, b))
         else:
-            raise EquationError('Invalid operand/operator: {} in '.format(
-                item, equation))
+            raise EquationError('Invalid token: {} in {}'.format(
+                token, expression))
 
     if len(stack) != 1:
-        raise EquationError('Invalid equation: {}'.format(equation))
+        raise EquationError('Missing operator in {}'.format(expression))
 
     return stack[0]
 
-
-def solve(
-        equation,
-        operations=operations,
-        order_of_operations=order_of_operations):
-    '''
-    Runs equation2list, infix2postfix, and solve_postfix in order
-    '''
-    equation = re.sub('\s', '', equation)  # remove whitespace
-    equation = tokenize(equation)
-    postfix = infix2postfix(equation, operations, order_of_operations)
-    value = solve_postfix(postfix, operations, order_of_operations)
-    return value
 
 if __name__ == '__main__':
     print(solve(input('Eq: ')))
