@@ -17,15 +17,17 @@ class CharacterCog (Cog):
         Parameters:
         [name] is the name of the character to associate
         '''
-        character = ctx.session.query(m.Character)\
-            .filter_by(name=name, server=ctx.guild.id).one_or_none()
         user = ctx.session.query(m.Character)\
             .filter_by(user=ctx.author.id, server=ctx.guild.id).one_or_none()
         if user is not None:
             await ctx.send(
                 'Error: You are already using a different character')
             return
-        elif character is None:
+
+        character = ctx.session.query(m.Character)\
+            .filter_by(name=name, server=ctx.guild.id).one_or_none()
+
+        if character is None:
             character = m.Character(name=name, server=ctx.guild.id)
             ctx.session.add(character)
             await ctx.send('Creating character: {}'.format(name))
