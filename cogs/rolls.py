@@ -28,7 +28,12 @@ async def do_roll(ctx, session, character, expression):
     def roll_dice(a, b, *, silent=False):
         out = 0
         for _ in range(a):
-            n = random.randint(1, b)
+            if b > 0:
+                n = random.randint(1, b)
+            elif b < 0:
+                n = random.randint(b, -1)
+            else:
+                n = 0
             out += n
         if not silent:
             output.append('{}d{}: {}'.format(a, b, out))
