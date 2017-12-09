@@ -115,6 +115,8 @@ def solve_postfix(
     for item in equation:
         if isinstance(item, (int, float)):
             stack.append(item)
+        elif item == '-' and len(stack) < 2:
+            stack.append(-stack.pop())
         elif item in operations:
             if len(stack) < 2:
                 raise EquationError('Not enough operands for {} in {}'.format(
