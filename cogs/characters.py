@@ -31,6 +31,7 @@ class CharacterCog (Cog):
                 user=ctx.author.id, server=ctx.guild.id).one_or_none()
             if user is not None:
                 user.user = None
+                ctx.session.commit()
                 await ctx.send('{} is no longer playing as {}'.format(
                     ctx.author.mention, str(user)))
 
