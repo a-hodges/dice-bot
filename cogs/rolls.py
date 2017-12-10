@@ -249,10 +249,13 @@ class RollCog (Cog):
         '''
         character = ctx.session.query(m.Character)\
             .filter_by(name=character, server=ctx.guild.id).one_or_none()
-        text = ["{}'s rolls:".format(character.name)]
-        for item in character.rolls:
-            text.append(str(item))
-        await ctx.send('\n'.join(text))
+        if character is None:
+            await ctx.send('No character named {}'.format(character))
+        else:
+            text = ["{}'s rolls:".format(character.name)]
+            for item in character.rolls:
+                text.append(str(item))
+            await ctx.send('\n'.join(text))
 
 
 def setup(bot):

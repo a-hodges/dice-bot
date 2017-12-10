@@ -205,10 +205,13 @@ class ResourceCog (Cog):
         '''
         character = ctx.session.query(m.Character)\
             .filter_by(name=character, server=ctx.guild.id).one_or_none()
-        text = ["{}'s resources:".format(character.name)]
-        for item in character.resources:
-            text.append(str(item))
-        await ctx.send('\n'.join(text))
+        if character is None:
+            await ctx.send('No character named {}'.format(character))
+        else:
+            text = ["{}'s resources:".format(character.name)]
+            for item in character.resources:
+                text.append(str(item))
+            await ctx.send('\n'.join(text))
 
 
 def setup(bot):

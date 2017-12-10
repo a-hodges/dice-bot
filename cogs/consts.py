@@ -90,10 +90,13 @@ class ConstCog (Cog):
         '''
         character = ctx.session.query(m.Character)\
             .filter_by(name=character, server=ctx.guild.id).one_or_none()
-        text = ["{}'s constants:\n".format(character.name)]
-        for item in character.constants:
-            text.append(str(item))
-        await ctx.send('\n'.join(text))
+        if character is None:
+            await ctx.send('No character named {}'.format(character))
+        else:
+            text = ["{}'s constants:\n".format(character.name)]
+            for item in character.constants:
+                text.append(str(item))
+            await ctx.send('\n'.join(text))
 
 
 def setup(bot):
