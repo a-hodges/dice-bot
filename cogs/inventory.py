@@ -202,17 +202,17 @@ class InventoryCog (Cog):
         await ctx.send('{} removed'.format(str(item)))
 
     @group.command()
-    async def inspect(self, ctx, *, character: str):
+    async def inspect(self, ctx, *, name: str):
         '''
         Lists the inventory for a specified character
 
         Parameters:
-        [character] the name of the character to inspect
+        [name] the name of the character to inspect
         '''
         character = ctx.session.query(m.Character)\
-            .filter_by(name=character, server=ctx.guild.id).one_or_none()
+            .filter_by(name=name, server=ctx.guild.id).one_or_none()
         if character is None:
-            await ctx.send('No character named {}'.format(character))
+            await ctx.send('No character named {}'.format(name))
         else:
             text = ["{}'s inventory:".format(character.name)]
             for item in character.inventory:
