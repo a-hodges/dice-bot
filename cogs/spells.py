@@ -158,6 +158,21 @@ class SpellCog (Cog):
         await ctx.send('{} no longer has {}'.format(
             str(character), str(spell)))
 
+    @group.command()
+    async def inspect(self, ctx, *, character: str):
+        '''
+        Lists the spells for a specified character
+
+        Parameters:
+        [character] the name of the character to inspect
+        '''
+        character = ctx.session.query(m.Character)\
+            .filter_by(name=character, server=ctx.guild.id).one_or_none()
+        text = ["{}'s spells:".format(character.name)]
+        for item in character.spells:
+            text.append(str(item))
+        await ctx.send('\n\n'.join(text))
+
 
 def setup(bot):
     bot.add_cog(SpellCog(bot))

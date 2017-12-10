@@ -239,6 +239,21 @@ class RollCog (Cog):
         ctx.session.commit()
         await ctx.send('{} removed'.format(str(roll)))
 
+    @group.command()
+    async def inspect(self, ctx, *, character: str):
+        '''
+        Lists the rolls for a specified character
+
+        Parameters:
+        [character] the name of the character to inspect
+        '''
+        character = ctx.session.query(m.Character)\
+            .filter_by(name=character, server=ctx.guild.id).one_or_none()
+        text = ["{}'s rolls:".format(character.name)]
+        for item in character.rolls:
+            text.append(str(item))
+        await ctx.send('\n'.join(text))
+
 
 def setup(bot):
     bot.add_cog(RollCog(bot))

@@ -201,6 +201,21 @@ class InventoryCog (Cog):
         ctx.session.commit()
         await ctx.send('{} removed'.format(str(item)))
 
+    @group.command()
+    async def inspect(self, ctx, *, character: str):
+        '''
+        Lists the inventory for a specified character
+
+        Parameters:
+        [character] the name of the character to inspect
+        '''
+        character = ctx.session.query(m.Character)\
+            .filter_by(name=character, server=ctx.guild.id).one_or_none()
+        text = ["{}'s inventory:".format(character.name)]
+        for item in character.inventory:
+            text.append(str(item))
+        await ctx.send('\n\n'.join(text))
+
 
 def setup(bot):
     bot.add_cog(InventoryCog(bot))
