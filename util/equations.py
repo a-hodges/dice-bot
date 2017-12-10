@@ -1,6 +1,5 @@
 import operator
 import re
-from pprint import pformat
 
 operations = [
     {

@@ -101,7 +101,8 @@ async def on_command_error(ctx, error):
             await ctx.send("Couldn't find requested item")
     elif isinstance(error, EquationError):
         if error.args:
-            await ctx.send('Invalid dice expression: `{}`'.format(error.args[0]))
+            await ctx.send('Invalid dice expression: `{}`'.format(
+                error.args[0]))
         else:
             await ctx.send('Invalid dice expression')
     elif isinstance(error, ValueError):
