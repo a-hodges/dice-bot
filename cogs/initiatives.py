@@ -1,3 +1,4 @@
+import discord
 from discord.ext import commands
 
 import model as m
@@ -52,9 +53,12 @@ class InitiativeCog (Cog):
             await ctx.send('No initiative for {}'.format(str(character)))
 
     @group.command()
-    async def list(self, ctx):
+    async def list(self, ctx, channel: discord.TextChannel):
         '''
-        Lists all initiatives currently stored in this channel
+        Lists all initiatives currently stored in the specified channel
+
+        Parameters:
+        [channel] the channel to list initiative for
         '''
         initiatives = ctx.session.query(m.Initiative)\
             .filter_by(channel=ctx.channel.id).all()
