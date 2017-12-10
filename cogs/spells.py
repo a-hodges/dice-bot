@@ -136,7 +136,7 @@ class SpellCog (Cog):
         text = ["{}'s spells:".format(character.name)]
         for spell in character.spells:
             text.append(str(spell))
-        await ctx.send('\n\n'.join(text))
+        await ctx.send('\n'.join(text))
 
     @group.command(aliases=['delete'])
     async def remove(self, ctx, *, name: str):
@@ -174,7 +174,7 @@ class SpellCog (Cog):
             text = ["{}'s spells:".format(character.name)]
             for item in character.spells:
                 text.append(str(item))
-            await ctx.send('\n\n'.join(text))
+            await ctx.send('\n'.join(text))
 
 
 def setup(bot):

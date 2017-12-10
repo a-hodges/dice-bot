@@ -178,7 +178,7 @@ class InventoryCog (Cog):
         text = ["{}'s inventory:".format(character.name)]
         for item in character.inventory:
             text.append(str(item))
-        await ctx.send('\n\n'.join(text))
+        await ctx.send('\n'.join(text))
 
     @group.command(aliases=['delete'])
     async def remove(self, ctx, *, name: str):
@@ -217,7 +217,7 @@ class InventoryCog (Cog):
             text = ["{}'s inventory:".format(character.name)]
             for item in character.inventory:
                 text.append(str(item))
-            await ctx.send('\n\n'.join(text))
+            await ctx.send('\n'.join(text))
 
 
 def setup(bot):
