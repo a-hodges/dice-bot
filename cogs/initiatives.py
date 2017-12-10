@@ -61,7 +61,8 @@ class InitiativeCog (Cog):
         [channel] the channel to list initiative for
         '''
         initiatives = ctx.session.query(m.Initiative)\
-            .filter_by(channel=ctx.channel.id).all()
+            .filter_by(channel=channel.id)\
+            .order_by(m.Initiative.value.desc()).all()
         text = ['Initiatives:']
         for initiative in initiatives:
             text.append(str(initiative))
