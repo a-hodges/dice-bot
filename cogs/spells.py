@@ -151,7 +151,7 @@ class SpellCog (Cog):
             .filter_by(character_id=character.id, level=level)\
             .order_by(m.Spell.name).all()
         text = ["{}'s spells:".format(character.name)]
-        for spell in character.spells:
+        for spell in spells:
             text.append(str(spell))
         await ctx.send('\n'.join(text))
 
