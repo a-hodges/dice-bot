@@ -138,6 +138,23 @@ class SpellCog (Cog):
             text.append(str(spell))
         await ctx.send('\n'.join(text))
 
+    @group.command()
+    async def level(self, ctx, level: int):
+        '''
+        Lists all of a character's spells of a given level
+
+        Parameters:
+        [level] the level of spells to show
+        '''
+        character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
+        spells = ctx.session.query(m.Spell)\
+            .filter_by(character_id=character.id, level=level)\
+            .order_by(m.Spell.name).all()
+        text = ["{}'s spells:".format(character.name)]
+        for spell in character.spells:
+            text.append(str(spell))
+        await ctx.send('\n'.join(text))
+
     @group.command(aliases=['delete'])
     async def remove(self, ctx, *, name: str):
         '''
