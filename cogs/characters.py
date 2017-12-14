@@ -7,6 +7,15 @@ from util import Cog, get_character
 
 
 class CharacterCog (Cog):
+    @commands.group('character', aliases=['char'], invoke_without_command=True)
+    async def group(self, ctx):
+        '''
+        Manage character data
+        '''
+        message = 'Command "{} {}" is not found'.format(
+            ctx.invoked_with, ctx.message.content.split()[1])
+        raise commands.CommandNotFound(message)
+
     @commands.command()
     async def iam(self, ctx, *, name: str):
         '''
@@ -43,8 +52,8 @@ class CharacterCog (Cog):
             await ctx.send('Error: Someone else is using {}'.format(
                 str(character)))
 
-    @commands.command()
-    async def iamdone(self, ctx):
+    @group.command()
+    async def none(self, ctx):
         '''
         Removes a character association
         '''
@@ -71,8 +80,8 @@ class CharacterCog (Cog):
         character = get_character(ctx.session, member.id, ctx.guild.id)
         await ctx.send('{} is {}'.format(member.mention, str(character)))
 
-    @commands.command()
-    async def changename(self, ctx, *, name: str):
+    @group.command()
+    async def rename(self, ctx, *, name: str):
         '''
         Changes the character's name
 
@@ -91,8 +100,8 @@ class CharacterCog (Cog):
             await ctx.send(
                 'Error: There is already a character with that name')
 
-    @commands.command()
-    async def listcharacters(self, ctx):
+    @group.command()
+    async def list(self, ctx):
         '''
         Lists all of the characters for this server
         '''
@@ -103,7 +112,7 @@ class CharacterCog (Cog):
             text.append(str(character))
         await ctx.send('\n'.join(text))
 
-    # @commands.command()
+    # @group.command()
     @commands.has_role('DM')
     async def kill(self, ctx, *, name: str):
         '''
