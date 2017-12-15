@@ -119,7 +119,7 @@ for extension in [
     'characters',
     'rolls',
     'resources',
-    'consts',
+    'constants',
     'initiatives',
     'inventory',
     'spells',

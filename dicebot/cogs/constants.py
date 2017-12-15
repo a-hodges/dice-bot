@@ -4,7 +4,7 @@ import model as m
 from util import Cog, get_character, sql_update, ItemNotFoundError
 
 
-class ConstCog (Cog):
+class ConstantCog (Cog):
     @commands.group('constant', aliases=['const'], invoke_without_command=True)
     async def group(self, ctx):
         '''
@@ -100,4 +100,4 @@ class ConstCog (Cog):
 
 
 def setup(bot):
-    bot.add_cog(ConstCog(bot))
+    bot.add_cog(ConstantCog(bot))
