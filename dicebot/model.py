@@ -14,7 +14,17 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.schema import Index, UniqueConstraint
 from sqlalchemy.ext.declarative import declarative_base
 
-Base = declarative_base()
+
+class Base:
+    def dict(self):
+        '''
+        Returns a dict of the object
+        Primarily for json serialization
+        '''
+        return {c.key: getattr(self, c.key) for c in self.__mapper__.column_attrs}
+
+
+Base = declarative_base(cls=Base)
 
 
 class Config (Base):
@@ -30,13 +40,6 @@ class Config (Base):
     value = Column(
         'setting', String,
         doc="The setting's value")
-
-    def dict(self):
-        '''
-        Returns a dict of the object
-        Primarily for json serialization
-        '''
-        return {c.key: getattr(self, c.key) for c in self.__mapper__.column_attrs}
 
 
 class Character (Base):
