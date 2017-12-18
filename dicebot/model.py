@@ -122,14 +122,18 @@ class Resource (Base):
     '''
     __tablename__ = 'resources'
 
+    id = Column(
+        Integer,
+        primary_key=True,
+        doc='An autonumber id')
     character_id = Column(
         Integer,
         ForeignKey('characters.id'),
-        primary_key=True,
+        nullable=False,
         doc='Character foreign key')
     name = Column(
         String(64),
-        primary_key=True,
+        nullable=False,
         doc='Resource name')
     max = Column(
         Integer,
@@ -140,6 +144,10 @@ class Resource (Base):
     recover = Column(
         Enum(Rest),
         doc='How the character recovers the resource')
+
+    __table_args__ = (
+        Index('_resource_index', character_id, name, unique=True),
+    )
 
     character = relationship(
         'Character',
@@ -159,18 +167,26 @@ class Roll (Base):
     '''
     __tablename__ = 'rolls'
 
+    id = Column(
+        Integer,
+        primary_key=True,
+        doc='An autonumber id')
     character_id = Column(
         Integer,
         ForeignKey('characters.id'),
-        primary_key=True,
+        nullable=False,
         doc='Character foreign key')
     name = Column(
         String(64),
-        primary_key=True,
+        nullable=False,
         doc='Roll name')
     expression = Column(
         String,
         doc='The dice expression to roll')
+
+    __table_args__ = (
+        Index('_roll_index', character_id, name, unique=True),
+    )
 
     character = relationship(
         'Character',
@@ -187,18 +203,26 @@ class Constant (Base):
     '''
     __tablename__ = 'constants'
 
+    id = Column(
+        Integer,
+        primary_key=True,
+        doc='An autonumber id')
     character_id = Column(
         Integer,
         ForeignKey('characters.id'),
-        primary_key=True,
+        nullable=False,
         doc='Character foreign key')
     name = Column(
         String(64),
-        primary_key=True,
+        nullable=False,
         doc='Constant name')
     value = Column(
         Integer,
         doc='The value of the constant')
+
+    __table_args__ = (
+        Index('_constant_index', character_id, name, unique=True),
+    )
 
     character = relationship(
         'Character',
