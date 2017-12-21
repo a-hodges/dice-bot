@@ -204,7 +204,7 @@ class RollCog (Cog):
         '''
         character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
         roll = ctx.session.query(m.Roll)\
-            .get((character.id, name))
+            .filter_by(character_id=character.id, name=name).one_or_none()
         if roll is None:
             raise ItemNotFoundError(name)
         await ctx.send(str(roll))
@@ -231,7 +231,7 @@ class RollCog (Cog):
         character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
 
         roll = ctx.session.query(m.Roll)\
-            .get((character.id, name))
+            .filter_by(character_id=character.id, name=name).one_or_none()
         if roll is None:
             raise ItemNotFoundError(name)
 

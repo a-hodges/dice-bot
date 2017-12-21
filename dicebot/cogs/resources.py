@@ -59,7 +59,7 @@ class ResourceCog (Cog):
         character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
 
         resource = ctx.session.query(m.Resource)\
-            .get((character.id, name))
+            .filter_by(character_id=character.id, name=name).one_or_none()
         if resource is None:
             raise ItemNotFoundError(name)
 
@@ -92,7 +92,7 @@ class ResourceCog (Cog):
         character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
 
         resource = ctx.session.query(m.Resource)\
-            .get((character.id, name))
+            .filter_by(character_id=character.id, name=name).one_or_none()
         if resource is None:
             raise ItemNotFoundError(name)
 
@@ -119,7 +119,7 @@ class ResourceCog (Cog):
         character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
 
         resource = ctx.session.query(m.Resource)\
-            .get((character.id, name))
+            .filter_by(character_id=character.id, name=name).one_or_none()
         if resource is None:
             raise ItemNotFoundError(name)
 
@@ -140,7 +140,7 @@ class ResourceCog (Cog):
         character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
 
         resource = ctx.session.query(m.Resource)\
-            .get((character.id, name))
+            .filter_by(character_id=character.id, name=name).one_or_none()
         if resource is None:
             raise ItemNotFoundError(name)
 
@@ -160,7 +160,7 @@ class ResourceCog (Cog):
         '''
         character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
         resource = ctx.session.query(m.Resource)\
-            .get((character.id, name))
+            .filter_by(character_id=character.id, name=name).one_or_none()
         if resource is None:
             raise ItemNotFoundError(name)
         await ctx.send(str(resource))
@@ -187,7 +187,7 @@ class ResourceCog (Cog):
         character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
 
         resource = ctx.session.query(m.Resource)\
-            .get((character.id, name))
+            .filter_by(character_id=character.id, name=name).one_or_none()
         if resource is None:
             raise ItemNotFoundError(name)
 

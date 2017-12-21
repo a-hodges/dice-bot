@@ -44,7 +44,7 @@ class ConstantCog (Cog):
         '''
         character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
         const = ctx.session.query(m.Constant)\
-            .get((character.id, name))
+            .filter_by(character_id=character.id, name=name).one_or_none()
         if const is None:
             raise ItemNotFoundError(name)
         await ctx.send(str(const))
@@ -71,7 +71,7 @@ class ConstantCog (Cog):
         character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
 
         const = ctx.session.query(m.Constant)\
-            .get((character.id, name))
+            .filter_by(character_id=character.id, name=name).one_or_none()
         if const is None:
             raise ItemNotFoundError(name)
 
