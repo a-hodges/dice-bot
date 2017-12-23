@@ -15,6 +15,7 @@ import logging
 from collections import OrderedDict
 from contextlib import closing
 
+import discord
 from discord.ext import commands
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -23,18 +24,8 @@ import model as m
 from util import NoCharacterError, ItemNotFoundError
 from util.equations import EquationError
 
-
-async def get_prefix(bot, message):
-    '''
-    Hack to prevent the bot from complaining about messages like `!!!`
-    '''
-    if re.match(r'!\w', message.content):
-        return '!'
-    else:
-        return '\0'  # return an invalid prefix since None isn't valid
-
 bot = commands.Bot(
-    command_prefix=get_prefix,
+    command_prefix=';',
     description=__doc__,
     loop=asyncio.new_event_loop())
 
@@ -48,6 +39,7 @@ async def on_ready():
     print(bot.user.name)
     print(bot.user.id)
     print('------')
+    bot.change_presence(game=discord.Game(name='Type {}help for command list'.format(bot.command_prefix)))
 
 
 @bot.before_invoke
