@@ -39,7 +39,7 @@ async def on_ready():
     print(bot.user.name)
     print(bot.user.id)
     print('------')
-    bot.change_presence(game=discord.Game(name='Type {}help for command list'.format(bot.command_prefix)))
+    await bot.change_presence(game=discord.Game(name='Type {}help for command list'.format(bot.command_prefix)))
 
 
 @bot.before_invoke
