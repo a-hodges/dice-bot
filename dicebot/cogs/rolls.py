@@ -13,12 +13,14 @@ async def do_roll(ctx, session, character, expression):
     '''
     Does the dice rolling after const replacement
     '''
-    if expression.endswith(' disadv'):
-        adv = -1
-        expression = expression[:-7]
-    elif expression.endswith(' adv'):
-        adv = 1
-        expression = expression[:-4]
+    expression = expression.strip()
+    match = re.match(r'^(.*)\s+((?:dis)?adv)$', expression)
+    if match:
+        expression = match.group(1)
+        if match.group(2) == 'adv':
+            adv = 1
+        else:
+            adv = -1
     else:
         adv = 0
 
