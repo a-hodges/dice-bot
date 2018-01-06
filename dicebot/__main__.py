@@ -8,7 +8,6 @@ unless it is the final parameter
 Certain commands are only usable by the @DM role
 '''
 
-import re
 import argparse
 import asyncio
 import logging

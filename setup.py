@@ -7,5 +7,4 @@ setup(name='Dice-bot',
       description='Discord bot for managing D&D characters',
       author='Brian Hodges',
       url='https://github.com/b-hodges/dice-bot',
-      packages=['dicebot'],
-     )
+      packages=['dicebot'])

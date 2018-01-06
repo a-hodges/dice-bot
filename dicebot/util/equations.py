@@ -37,17 +37,17 @@ def tokenize(expression, operations=operations):
         def callback(scanner, match):
             return t, match
         return callback
-    l = [(r'\s+', 'WHITESPACE')]
-    l.extend((r'|'.join(map(re.escape, ops)), i)
-             for i, ops in enumerate(operations))
-    l.extend([
+    tokens = [(r'\s+', 'WHITESPACE')]
+    tokens.extend((r'|'.join(map(re.escape, ops)), i)
+                  for i, ops in enumerate(operations))
+    tokens.extend([
         (r'-', len(operations)),  # ???
         (r'\d*\.\d+', 'FLOAT'),
         (r'\d+', 'INT'),
         (r'\(', 'PAREN_OPEN'),
         (r'\)', 'PAREN_CLOSE'),
     ])
-    scanner = re.Scanner([(p, token(t)) for p, t in l])
+    scanner = re.Scanner([(p, token(t)) for p, t in tokens])
     out, rest = scanner.scan(expression)
     if rest:
         raise ValueError('Could not parse equation from: {}'.format(rest))
