@@ -27,17 +27,17 @@ class CharacterCog (Cog):
         [name] is the name of the character to associate
         '''
         character = ctx.session.query(m.Character)\
-            .filter_by(name=name, server=ctx.guild.id).one_or_none()
+            .filter_by(name=name, server=str(ctx.guild.id)).one_or_none()
 
         if character is None:
-            character = m.Character(name=name, server=ctx.guild.id)
+            character = m.Character(name=name, server=str(ctx.guild.id))
             ctx.session.add(character)
             await ctx.send('Creating character: {}'.format(name))
 
         if character.user is None:
 
             user = ctx.session.query(m.Character).filter_by(
-                user=ctx.author.id, server=ctx.guild.id).one_or_none()
+                user=str(ctx.author.id), server=str(ctx.guild.id)).one_or_none()
             if user is not None:
                 user.user = None
                 ctx.session.commit()
@@ -58,7 +58,7 @@ class CharacterCog (Cog):
         Removes a character association
         '''
         character = ctx.session.query(m.Character)\
-            .filter_by(user=ctx.author.id, server=ctx.guild.id).one_or_none()
+            .filter_by(user=str(ctx.author.id), server=str(ctx.guild.id)).one_or_none()
         if character is not None:
             character.user = None
             await ctx.send('{} is no longer playing as {}'.format(
@@ -106,7 +106,7 @@ class CharacterCog (Cog):
         Lists all of the characters for this server
         '''
         characters = ctx.session.query(m.Character)\
-            .filter_by(server=ctx.guild.id).all()
+            .filter_by(server=str(ctx.guild.id)).all()
         text = ['All characters:']
         for character in characters:
             text.append(str(character))
@@ -126,7 +126,7 @@ class CharacterCog (Cog):
         '''
         if confirmation == '100%':
             character = ctx.session.query(m.Character)\
-                .filter_by(name=name, server=ctx.guild.id).one_or_none()
+                .filter_by(name=name, server=str(ctx.guild.id)).one_or_none()
             if character is not None:
                 for attribute in character.attributes:
                     for item in getattr(character, attribute):

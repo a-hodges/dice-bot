@@ -184,7 +184,7 @@ class SpellCog (Cog):
         [name] the name of the character to inspect
         '''
         character = ctx.session.query(m.Character)\
-            .filter_by(name=name, server=ctx.guild.id).one_or_none()
+            .filter_by(name=name, server=str(ctx.guild.id)).one_or_none()
         if character is None:
             await ctx.send('No character named {}'.format(name))
         else:

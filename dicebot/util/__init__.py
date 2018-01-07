@@ -24,7 +24,7 @@ def get_character(session, userid, server):
     Gets a character based on their user
     '''
     character = session.query(m.Character)\
-        .filter_by(user=userid, server=server).one_or_none()
+        .filter_by(user=str(userid), server=str(server)).one_or_none()
     if character is None:
         raise NoCharacterError()
     return character
