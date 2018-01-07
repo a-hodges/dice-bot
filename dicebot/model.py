@@ -57,11 +57,11 @@ class Character (Base):
         nullable=False,
         doc='The name of the character')
     server = Column(
-        Integer,
+        String,
         nullable=False,
         doc='The server the character is on')
     user = Column(
-        BigInteger,
+        String,
         doc='The id of the user of the character')
 
     __table_args__ = (
