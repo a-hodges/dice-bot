@@ -44,7 +44,7 @@ class CharacterCog (Cog):
                 await ctx.send('{} is no longer playing as {}'.format(
                     ctx.author.mention, str(user)))
 
-            character.user = ctx.author.id
+            character.user = str(ctx.author.id)
             ctx.session.commit()
             await ctx.send('{} is {}'.format(
                 ctx.author.mention, str(character)))
