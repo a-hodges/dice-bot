@@ -346,6 +346,46 @@ class Spell (Base):
         return ret
 
 
+class Information (Base):
+    '''
+    Character information
+    '''
+    __tablename__ = 'information'
+
+    id = Column(
+        Integer,
+        primary_key=True,
+        doc='An autonumber id')
+    character_id = Column(
+        Integer,
+        ForeignKey('characters.id'),
+        nullable=False,
+        doc='Character foreign key')
+    name = Column(
+        String(64),
+        nullable=False,
+        doc='Info block name')
+    description = Column(
+        String,
+        nullable=False, default='',
+        doc='The actual info block')
+
+    __table_args__ = (
+        Index('_information_index', character_id, name, unique=True),
+    )
+
+    character = relationship(
+        'Character',
+        foreign_keys=[character_id],
+        back_populates='information')
+
+    def __str__(self):
+        ret = '{0.name}'.format(self)
+        if self.description:
+            ret += '\n' + self.description
+        return ret
+
+
 if __name__ == '__main__':
     from operator import attrgetter
 
