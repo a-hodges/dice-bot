@@ -12,8 +12,7 @@ class CharacterCog (Cog):
         '''
         Manage character data
         '''
-        message = 'Command "{} {}" is not found'.format(
-            ctx.invoked_with, ctx.message.content.split()[1])
+        message = 'Command "{} {}" is not found'.format(ctx.invoked_with, ctx.message.content.split()[1])
         raise commands.CommandNotFound(message)
 
     @commands.command()
@@ -36,21 +35,18 @@ class CharacterCog (Cog):
 
         if character.user is None:
 
-            user = ctx.session.query(m.Character).filter_by(
-                user=str(ctx.author.id), server=str(ctx.guild.id)).one_or_none()
+            user = ctx.session.query(m.Character)\
+                .filter_by(user=str(ctx.author.id), server=str(ctx.guild.id)).one_or_none()
             if user is not None:
                 user.user = None
                 ctx.session.commit()
-                await ctx.send('{} is no longer playing as {}'.format(
-                    ctx.author.mention, str(user)))
+                await ctx.send('{} is no longer playing as {}'.format(ctx.author.mention, str(user)))
 
             character.user = str(ctx.author.id)
             ctx.session.commit()
-            await ctx.send('{} is {}'.format(
-                ctx.author.mention, str(character)))
+            await ctx.send('{} is {}'.format(ctx.author.mention, str(character)))
         else:
-            await ctx.send('Error: Someone else is using {}'.format(
-                str(character)))
+            await ctx.send('Error: Someone else is using {}'.format(str(character)))
 
     @group.command()
     async def none(self, ctx):
@@ -61,12 +57,9 @@ class CharacterCog (Cog):
             .filter_by(user=str(ctx.author.id), server=str(ctx.guild.id)).one_or_none()
         if character is not None:
             character.user = None
-            await ctx.send('{} is no longer playing as {}'.format(
-                ctx.author.mention, str(character)))
+            await ctx.send('{} is no longer playing as {}'.format(ctx.author.mention, str(character)))
         else:
-            await ctx.send(
-                'Error: {} does not have a character to remove'.format(
-                    ctx.author.mention))
+            await ctx.send('Error: {} does not have a character to remove'.format(ctx.author.mention))
         ctx.session.commit()
 
     @commands.command()
@@ -93,12 +86,10 @@ class CharacterCog (Cog):
             original_name = character.name
             character.name = name
             ctx.session.commit()
-            await ctx.send("{} has changed {}'s name to {}".format(
-                ctx.author.mention, original_name, name))
+            await ctx.send("{} has changed {}'s name to {}".format(ctx.author.mention, original_name, name))
         except IntegrityError:
             ctx.session.rollback()
-            await ctx.send(
-                'Error: There is already a character with that name')
+            await ctx.send('Error: There is already a character with that name')
 
     @group.command()
     async def list(self, ctx):
@@ -162,9 +153,7 @@ class CharacterCog (Cog):
 
             ctx.session.commit()
 
-            await ctx.send(
-                '{} has taken a {} rest, resources recovered'.format(
-                    str(character), rest))
+            await ctx.send('{} has taken a {} rest, resources recovered'.format(str(character), rest))
         else:
             await ctx.send('User has no character')
 

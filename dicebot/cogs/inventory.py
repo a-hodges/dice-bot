@@ -15,8 +15,7 @@ class InventoryCog (Cog):
             number, name = input.split(maxsplit=1)
             number = int(number)
         except ValueError:
-            message = 'Command "{} {}" is not found'.format(
-                ctx.invoked_with, ctx.message.content.split()[1])
+            message = 'Command "{} {}" is not found'.format(ctx.invoked_with, ctx.message.content.split()[1])
             raise commands.CommandNotFound(message)
         await self.plus.callback(self, ctx, number, name=name)
 
@@ -40,11 +39,9 @@ class InventoryCog (Cog):
             item = None
 
         if item is not None:
-            await ctx.send('{} now has {}'.format(
-                str(character), str(item)))
+            await ctx.send('{} now has {}'.format(str(character), str(item)))
         else:
-            await ctx.send('{} already has an item named {}'.format(
-                str(character), name))
+            await ctx.send('{} already has an item named {}'.format(str(character), name))
 
     @group.command()
     async def rename(self, ctx, name: str, *, new_name: str):
@@ -65,12 +62,10 @@ class InventoryCog (Cog):
         try:
             item.name = new_name
             ctx.session.commit()
-            await ctx.send('{} now has {}'.format(
-                str(character), str(item)))
+            await ctx.send('{} now has {}'.format(str(character), str(item)))
         except IntegrityError:
             ctx.session.rollback()
-            await ctx.send('{} already has an item named {}'.format(
-                str(character), new_name))
+            await ctx.send('{} already has an item named {}'.format(str(character), new_name))
 
     @group.command(aliases=['desc'])
     async def description(self, ctx, name: str, *, description: str):

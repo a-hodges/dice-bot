@@ -10,8 +10,7 @@ class VariableCog (Cog):
         '''
         Manage character values
         '''
-        message = 'Command "{} {}" is not found'.format(
-            ctx.invoked_with, ctx.message.content.split()[1])
+        message = 'Command "{} {}" is not found'.format(ctx.invoked_with, ctx.message.content.split()[1])
         raise commands.CommandNotFound(message)
 
     @group.command(aliases=['set', 'update'])
@@ -77,8 +76,7 @@ class VariableCog (Cog):
 
         ctx.session.delete(variable)
         ctx.session.commit()
-        await ctx.send('{} no longer has {}'.format(
-            str(character), str(variable)))
+        await ctx.send('{} no longer has {}'.format(str(character), str(variable)))
 
     @group.command()
     async def inspect(self, ctx, *, name: str):

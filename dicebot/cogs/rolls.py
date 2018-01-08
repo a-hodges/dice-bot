@@ -49,8 +49,7 @@ async def do_roll(ctx, session, character, expression):
             if n <= 2:
                 n2 = random.randint(1, b)
                 if not silent:
-                    output.append('1d{0}: {1}, rerolling, 1d{0}: {2}'.format(
-                        b, n, n2))
+                    output.append('1d{0}: {1}, rerolling, 1d{0}: {2}'.format(b, n, n2))
                 n = n2
             elif not silent:
                 output.append('1d{}: {}'.format(b, n))
@@ -63,8 +62,7 @@ async def do_roll(ctx, session, character, expression):
             second = roll_dice(a, b, silent=True)
             out = max(first, second)
             if not silent:
-                output.append('{}d{}, picking larger of {} and {}: {}'.format(
-                    a, b, first, second, out))
+                output.append('{}d{}, picking larger of {} and {}: {}'.format(a, b, first, second, out))
         else:
             out = roll_dice(a, b, silent=silent)
         return out
@@ -75,8 +73,7 @@ async def do_roll(ctx, session, character, expression):
             second = roll_dice(a, b, silent=True)
             out = min(first, second)
             if not silent:
-                output.append('{}d{}, picking smaller of {} and {}: {}'.format(
-                    a, b, first, second, out))
+                output.append('{}d{}, picking smaller of {} and {}: {}'.format(a, b, first, second, out))
         else:
             out = roll_dice(a, b, silent=silent)
         return out
@@ -103,8 +100,7 @@ async def do_roll(ctx, session, character, expression):
             .order_by(func.char_length(m.Roll.name).desc())
         for roll in rolls:
             if roll.name in expression:
-                expression = expression.replace(
-                    roll.name, '({})'.format(roll.expression), 1)
+                expression = expression.replace(roll.name, '({})'.format(roll.expression), 1)
                 break
 
         # replace variables
@@ -112,8 +108,7 @@ async def do_roll(ctx, session, character, expression):
             .filter_by(character=character)\
             .order_by(func.char_length(m.Variable.name).desc())
         for variable in variables:
-            expression = expression.replace(
-                variable.name, '({})'.format(variable.value))
+            expression = expression.replace(variable.name, '({})'.format(variable.value))
 
     # validate
     for token in re.findall(r'[a-zA-Z]+', expression):
@@ -141,19 +136,15 @@ class RollCog (Cog):
     async def group(self, ctx, *, expression: str):
         '''
         Rolls dice
-        Note: If a variable name is included in a roll the name will be replaced
-            with the value of the variable
+        Note: If a variable name is included in a roll the name will be replaced with the value of the variable
 
         Parameters:
-        [expression] standard dice notation specifying what to roll
-            the expression may include up to 1 saved roll
-        [adv] (optional) if present should be adv|disadv to indicate that any
-            1d20 should be rolled with advantage or disadvantage respectively
+        [expression] standard dice notation specifying what to roll the expression may include up to 1 saved roll
+        [adv] (optional) if present should be adv|disadv to roll any 1d20s with advantage or disadvantage respectively
 
         Mathematic operations from highest precedence to lowest:
 
         d : NdM rolls an M sided die N times and adds the results together
-            operates specially for adv/disadv
         g : NgM rolls an M sided die N times, rerolls any 1 or 2 once
 
         > : picks larger operand

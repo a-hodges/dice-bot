@@ -7,14 +7,12 @@ from .rolls import do_roll
 
 
 class InitiativeCog (Cog):
-    @commands.group('initiative', aliases=['init'],
-                    invoke_without_command=True)
+    @commands.group('initiative', aliases=['init'], invoke_without_command=True)
     async def group(self, ctx):
         '''
         Manage initiative by channel
         '''
-        message = 'Command "{} {}" is not found'.format(
-            ctx.invoked_with, ctx.message.content.split()[1])
+        message = 'Command "{} {}" is not found'.format(ctx.invoked_with, ctx.message.content.split()[1])
         raise commands.CommandNotFound(message)
 
     @group.command(aliases=['add', 'update', 'roll'])
@@ -45,8 +43,7 @@ class InitiativeCog (Cog):
         Checks the user's initiative for this channel
         '''
         character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
-        initiative = ctx.session.query(m.Initiative)\
-            .get((character.id, ctx.channel.id))
+        initiative = ctx.session.query(m.Initiative).get((character.id, ctx.channel.id))
         if initiative is not None:
             await ctx.send(str(initiative))
         else:

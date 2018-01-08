@@ -14,8 +14,7 @@ class ResourceCog (Cog):
             number, name = input.split(maxsplit=1)
             number = int(number)
         except ValueError:
-            message = 'Command "{} {}" is not found'.format(
-                ctx.invoked_with, ctx.message.content.split()[1])
+            message = 'Command "{} {}" is not found'.format(ctx.invoked_with, ctx.message.content.split()[1])
             raise commands.CommandNotFound(message)
         await self.plus.callback(self, ctx, number, name=name)
 
@@ -44,8 +43,7 @@ class ResourceCog (Cog):
             'recover': recover,
         })
 
-        await ctx.send('{} now has {}'.format(
-            str(character), str(resource)))
+        await ctx.send('{} now has {}'.format(str(character), str(resource)))
 
     @group.command('+')
     async def plus(self, ctx, number: int, *, name: str):
@@ -67,8 +65,7 @@ class ResourceCog (Cog):
         resource.current = resource.current + number
         ctx.session.commit()
         await ctx.send("{0}'s {1} went from {2}/{4} to {3}/{4}".format(
-            str(character), resource.name, prev,
-            resource.current, resource.max))
+            str(character), resource.name, prev, resource.current, resource.max))
 
     @group.command('-')
     async def minus(self, ctx, number: int, *, name: str):
@@ -101,11 +98,9 @@ class ResourceCog (Cog):
             resource.current = resource.current - 1
             ctx.session.commit()
             await ctx.send("{0}'s {1} went from {2}/{4} to {3}/{4}".format(
-                str(character), resource.name, prev,
-                resource.current, resource.max))
+                str(character), resource.name, prev, resource.current, resource.max))
         else:
-            await ctx.send("{} has no {} to use".format(
-                str(character), resource.name))
+            await ctx.send("{} has no {} to use".format(str(character), resource.name))
 
     @group.command()
     async def set(self, ctx, name: str, uses: int):

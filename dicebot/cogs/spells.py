@@ -11,8 +11,7 @@ class SpellCog (Cog):
         '''
         Manage character spell list
         '''
-        message = 'Command "{} {}" is not found'.format(
-            ctx.invoked_with, ctx.message.content.split()[1])
+        message = 'Command "{} {}" is not found'.format(ctx.invoked_with, ctx.message.content.split()[1])
         raise commands.CommandNotFound(message)
 
     @group.command(aliases=['update'])
@@ -54,12 +53,10 @@ class SpellCog (Cog):
         try:
             spell.name = new_name
             ctx.session.commit()
-            await ctx.send('{} now has {}'.format(
-                str(character), str(spell)))
+            await ctx.send('{} now has {}'.format(str(character), str(spell)))
         except IntegrityError:
             ctx.session.rollback()
-            await ctx.send('{} already has a spell named {}'.format(
-                str(character), new_name))
+            await ctx.send('{} already has a spell named {}'.format(str(character), new_name))
 
     @group.command()
     async def setlevel(self, ctx, level: int, *, name: str):
@@ -172,8 +169,7 @@ class SpellCog (Cog):
 
         ctx.session.delete(spell)
         ctx.session.commit()
-        await ctx.send('{} no longer has {}'.format(
-            str(character), str(spell)))
+        await ctx.send('{} no longer has {}'.format(str(character), str(spell)))
 
     @group.command()
     async def inspect(self, ctx, *, name: str):

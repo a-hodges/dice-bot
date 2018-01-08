@@ -3,8 +3,7 @@
 '''D&D manager bot for discord based RPGs
 
 Note:
-Any parameter value that has spaces in it needs to be wrapped in quotes "
-unless it is the final parameter
+Any parameter value that has spaces in it needs to be wrapped in quotes " unless it is the final parameter
 Certain commands are only usable by the @DM role
 '''
 
@@ -64,36 +63,28 @@ async def on_command_error(ctx, error):
         error = error.original
 
     if isinstance(error, commands.CheckFailure):
-        await ctx.send(
-            'Error: You do not meet the requirements to use this command')
+        await ctx.send('Error: You do not meet the requirements to use this command')
     elif isinstance(error, commands.CommandNotFound):
         if error.args:
             await ctx.send(error.args[0])
         else:
             await ctx.send('Error: command not found')
     elif isinstance(error, commands.BadArgument):
-        await ctx.send(
-            '{}\n'.format(error) +
-            'See the help text for valid parameters')
+        await ctx.send('{}\nSee the help text for valid parameters'.format(error))
     elif isinstance(error, commands.MissingRequiredArgument):
-        await ctx.send(
-            'Missing parameter: {}\n'.format(error.param) +
-            'See the help text for valid parameters')
+        await ctx.send('Missing parameter: {}\nSee the help text for valid parameters'.format(error.param))
     elif isinstance(error, commands.TooManyArguments):
-        await ctx.send(
-            'Too many parameters\nSee the help text for valid parameters')
+        await ctx.send('Too many parameters\nSee the help text for valid parameters')
     elif isinstance(error, NoCharacterError):
         await ctx.send('User does not have a character')
     elif isinstance(error, ItemNotFoundError):
         if error.value:
-            await ctx.send("Couldn't find requested item: `{}`".format(
-                error.value))
+            await ctx.send("Couldn't find requested item: `{}`".format(error.value))
         else:
             await ctx.send("Couldn't find requested item")
     elif isinstance(error, EquationError):
         if error.args:
-            await ctx.send('Invalid dice expression: `{}`'.format(
-                error.args[0]))
+            await ctx.send('Invalid dice expression: `{}`'.format(error.args[0]))
         else:
             await ctx.send('Invalid dice expression')
     elif isinstance(error, ValueError):
@@ -137,8 +128,7 @@ def main(args):
                 session.commit()
 
             if args.initialize:
-                arg = input('[{}] (default: {}): '.format(
-                    name, repr(key.value)))
+                arg = input('[{}] (default: {}): '.format(name, repr(key.value)))
                 if arg:
                     key.value = arg
                     bot.config[name] = arg
@@ -148,14 +138,11 @@ def main(args):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(
-        description='Discord D&D bot')
-    parser.add_argument(
-        'database', nargs='?', default='sqlite:///:memory:',
-        help='The database url to be accessed')
-    parser.add_argument(
-        '-i, --initialize', dest='initialize', action='store_true',
-        help='Allows for initialization of config values')
+    parser = argparse.ArgumentParser(description='Discord D&D bot')
+    parser.add_argument('database', nargs='?', default='sqlite:///:memory:',
+                        help='The database url to be accessed')
+    parser.add_argument('-i, --initialize', dest='initialize', action='store_true',
+                        help='Allows for initialization of config values')
     args = parser.parse_args()
 
     logging.basicConfig(level=logging.INFO)
