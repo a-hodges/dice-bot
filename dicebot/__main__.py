@@ -105,6 +105,7 @@ for extension in [
     'initiatives',
     'inventory',
     'spells',
+    'information',
 ]:
     bot.load_extension('cogs.' + extension)
 
