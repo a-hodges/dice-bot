@@ -93,6 +93,10 @@ class Character (Base):
         'Spell',
         order_by='Spell.level,Spell.name',
         back_populates='character')
+    information = relationship(
+        'Information',
+        order_by='Information.name',
+        back_populates='character')
 
     attributes = [
         'resources',
@@ -101,6 +105,7 @@ class Character (Base):
         'initiatives',
         'inventory',
         'spells',
+        'information',
     ]
 
     def __str__(self):
