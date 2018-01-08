@@ -11,7 +11,7 @@ from util import Cog, get_character, sql_update, ItemNotFoundError, equations
 
 async def do_roll(ctx, session, character, expression):
     '''
-    Does the dice rolling after const replacement
+    Does the variable replacement and dice rolling
     '''
     expression = expression.strip()
     match = re.match(r'^(.*)\s+((?:dis)?adv)$', expression)
@@ -107,13 +107,13 @@ async def do_roll(ctx, session, character, expression):
                     roll.name, '({})'.format(roll.expression), 1)
                 break
 
-        # replace constants
-        consts = session.query(m.Constant)\
+        # replace variables
+        variables = session.query(m.Variable)\
             .filter_by(character=character)\
-            .order_by(func.char_length(m.Constant.name).desc())
-        for const in consts:
+            .order_by(func.char_length(m.Variable.name).desc())
+        for variable in variables:
             expression = expression.replace(
-                const.name, '({})'.format(const.value))
+                variable.name, '({})'.format(variable.value))
 
     # validate
     for token in re.findall(r'[a-zA-Z]+', expression):
@@ -141,8 +141,8 @@ class RollCog (Cog):
     async def group(self, ctx, *, expression: str):
         '''
         Rolls dice
-        Note: If a const name is included in a roll the name will be replaced
-            with the value of the const
+        Note: If a variable name is included in a roll the name will be replaced
+            with the value of the variable
 
         Parameters:
         [expression] standard dice notation specifying what to roll

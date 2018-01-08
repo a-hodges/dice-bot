@@ -77,9 +77,9 @@ class Character (Base):
         'Roll',
         order_by='Roll.name',
         back_populates='character')
-    constants = relationship(
-        'Constant',
-        order_by='Constant.name',
+    variables = relationship(
+        'Variable',
+        order_by='Variable.name',
         back_populates='character')
     initiatives = relationship(
         'Initiative',
@@ -97,7 +97,7 @@ class Character (Base):
     attributes = [
         'resources',
         'rolls',
-        'constants',
+        'variables',
         'initiatives',
         'inventory',
         'spells',
@@ -197,11 +197,11 @@ class Roll (Base):
         return '{0.name}: `{0.expression}`'.format(self)
 
 
-class Constant (Base):
+class Variable (Base):
     '''
     Character values to store
     '''
-    __tablename__ = 'constants'
+    __tablename__ = 'variables'
 
     id = Column(
         Integer,
@@ -215,19 +215,19 @@ class Constant (Base):
     name = Column(
         String(64),
         nullable=False,
-        doc='Constant name')
+        doc='Variable name')
     value = Column(
         Integer,
-        doc='The value of the constant')
+        doc='The value of the variable')
 
     __table_args__ = (
-        Index('_constant_index', character_id, name, unique=True),
+        Index('_variable_index', character_id, name, unique=True),
     )
 
     character = relationship(
         'Character',
         foreign_keys=[character_id],
-        back_populates='constants')
+        back_populates='variables')
 
     def __str__(self):
         return '{0.name}: {0.value}'.format(self)

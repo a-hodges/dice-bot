@@ -4,8 +4,8 @@ import model as m
 from util import Cog, get_character, sql_update, ItemNotFoundError
 
 
-class ConstantCog (Cog):
-    @commands.group('constant', aliases=['const'], invoke_without_command=True)
+class VariableCog (Cog):
+    @commands.group('variable', aliases=['var'], invoke_without_command=True)
     async def group(self, ctx):
         '''
         Manage character values
@@ -17,73 +17,73 @@ class ConstantCog (Cog):
     @group.command(aliases=['set', 'update'])
     async def add(self, ctx, name: str, value: int):
         '''
-        Adds/updates a new constant for a character
+        Adds/updates a new variable for a character
 
         Parameters:
-        [name] name of constant to store
+        [name] name of variable to store
         [value] value to store
         '''
         character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
 
-        const = sql_update(ctx.session, m.Constant, {
+        variable = sql_update(ctx.session, m.Variable, {
             'character': character,
             'name': name,
         }, {
             'value': value,
         })
 
-        await ctx.send('{} now has {}'.format(str(character), str(const)))
+        await ctx.send('{} now has {}'.format(str(character), str(variable)))
 
     @group.command()
     async def check(self, ctx, *, name: str):
         '''
-        Checks the status of a constant
+        Checks the status of a variable
 
         Parameters:
-        [name] the name of the constant
+        [name] the name of the variable
         '''
         character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
-        const = ctx.session.query(m.Constant)\
+        variable = ctx.session.query(m.Variable)\
             .filter_by(character_id=character.id, name=name).one_or_none()
-        if const is None:
+        if variable is None:
             raise ItemNotFoundError(name)
-        await ctx.send(str(const))
+        await ctx.send(str(variable))
 
     @group.command()
     async def list(self, ctx):
         '''
-        Lists all of a character's constants
+        Lists all of a character's variables
         '''
         character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
-        text = ["{}'s constants:\n".format(character.name)]
-        for const in character.constants:
-            text.append(str(const))
+        text = ["{}'s variables:\n".format(character.name)]
+        for variable in character.variables:
+            text.append(str(variable))
         await ctx.send('\n'.join(text))
 
     @group.command(aliases=['delete'])
     async def remove(self, ctx, *, name: str):
         '''
-        Deletes a constant from the character
+        Deletes a variable from the character
 
         Parameters:
-        [name] the name of the constant
+        [name] the name of the variable
         '''
         character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
 
-        const = ctx.session.query(m.Constant)\
+        variable = ctx.session.query(m.Variable)\
             .filter_by(character_id=character.id, name=name).one_or_none()
-        if const is None:
+        if variable is None:
             raise ItemNotFoundError(name)
 
-        ctx.session.delete(const)
+        ctx.session.delete(variable)
         ctx.session.commit()
         await ctx.send('{} no longer has {}'.format(
-            str(character), str(const)))
+            str(character), str(variable)))
 
     @group.command()
     async def inspect(self, ctx, *, name: str):
         '''
-        Lists the constants for a specified character
+        Lists the variables for a specified character
 
         Parameters:
         [name] the name of the character to inspect
@@ -93,11 +93,11 @@ class ConstantCog (Cog):
         if character is None:
             await ctx.send('No character named {}'.format(name))
         else:
-            text = ["{}'s constants:\n".format(character.name)]
-            for item in character.constants:
+            text = ["{}'s variables:\n".format(character.name)]
+            for item in character.variables:
                 text.append(str(item))
             await ctx.send('\n'.join(text))
 
 
 def setup(bot):
-    bot.add_cog(ConstantCog(bot))
+    bot.add_cog(VariableCog(bot))
