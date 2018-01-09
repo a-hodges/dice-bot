@@ -29,7 +29,76 @@ unary = {
 
 
 class EquationError (Exception):
-    pass
+    '''
+    Base class for exceptions
+    '''
+
+
+class ParseError (EquationError):
+    '''
+    Could not parse the expression into tokens
+    '''
+    def __init__(self, expression, rest):
+        self.expression = expression
+        self.rest = rest
+        super().__init__('Could not parse equation starting at: {}'.format(rest))
+
+
+class InvalidToken (EquationError):
+    '''
+    A token was found that is not a number, parens, or operator
+    '''
+    def __init__(self, expression, token):
+        self.expression = expression
+        self.token = token
+        super().__init__('Invalid token {} found in {}'.format(token, expression))
+
+
+class NotEnoughOperands (EquationError):
+    '''
+    Not enough operands for an operator
+    The .unary attribute specifies whether the exception is for a unary operator
+    '''
+    def __init__(self, expression, token, unary=False):
+        self.expression = expression
+        self.token = token
+        self.unary = unary
+        if unary:
+            token = 'unary ' + str(token)
+        super().__init__('Not enough operands for {} in {}'.format(token, expression))
+
+
+class TooManyOperands (EquationError):
+    '''
+    Not enough operators to evaluate expression
+    '''
+    def __init__(self, expression):
+        self.expression = expression
+        super().__init__('Too many operands for operators in {}'.format(expression))
+
+
+class MissingParens (EquationError):
+    '''
+    Base class for errors involving parentheses
+    '''
+
+
+class MissingOpenParens (MissingParens):
+    '''
+    More closing parentheses than opening parentheses
+    '''
+    def __init__(self, expression):
+        self.expression = expression
+        super().__init__('Missing open parenthesis: {}'.format(expression))
+
+
+class MissingCloseParens (MissingParens):
+    '''
+    More opening parentheses than closing parentheses
+    '''
+    def __init__(self, expression):
+        self.expression = expression
+        super().__init__('Missing closing parenthesis: {}'.format(expression))
 
 
 def types(stack):
@@ -62,7 +131,7 @@ def tokenize(expression, operations=operations, unary=unary):
     scanner = re.Scanner([(p, token(t)) for p, t in tokens])
     out, rest = scanner.scan(expression)
     if rest:
-        raise ValueError('Could not parse equation from: {}'.format(rest))
+        raise ParseError(rest)
     return [(t, m) for t, m in out if t != 'WHITESPACE']
 
 
@@ -83,7 +152,7 @@ def infix2postfix(expression, operations=operations, unary=unary):
             stack.append(item)
         elif type == 'PAREN_CLOSE':
             if 'PAREN_OPEN' not in types(stack):
-                raise EquationError('Missing open parenthesis: {}'.format(expression))
+                raise MissingOpenParens(expression)
             while stack[-1][0] != 'PAREN_OPEN':
                 output.append(stack.pop())
             stack.pop()
@@ -92,17 +161,19 @@ def infix2postfix(expression, operations=operations, unary=unary):
         elif isinstance(type, int):  # operators
             if prev_type == 'PAREN_OPEN' or isinstance(prev_type, int):
                 # unary operation
+                if token not in unary:
+                    raise NotEnoughOperands(equation, token)
                 output.append(('UNARY', token))
             else:
                 while stack and isinstance(stack[-1][0], int) and stack[-1][0] >= type:
                     output.append(stack.pop())
                 stack.append(item)
         else:
-            raise EquationError('Invalid token found: {} in {}'.format(token, equation))
+            raise InvalidToken(expression, token)
         prev_type = type
 
     if 'PAREN_OPEN' in types(stack):
-        raise EquationError('Missing closing parenthesis: {}'.format(expression))
+        raise MissingCloseParens(expression)
 
     while stack:
         output.append(stack.pop())
@@ -117,10 +188,9 @@ def solve(expression, operations=operations, unary=unary):
     Operations is a list of operation dicts in reverse precedence order (highest precedence last)
         The keys of each dict should be the operator and the values should be binary functions to apply to the operands
         The functions should be able to take int or float arguments
-    
+
     Unary is a dict of unary operations
-        The keys of the dict should be the operator and the values should be
-        a unary function to apply to the operands
+        The keys of the dict should be the operator and the values should be unary functions to apply to the operands
         The functions should be able to take int or float arguments
     '''
     equation = infix2postfix(expression, operations=operations, unary=unary)
@@ -134,20 +204,20 @@ def solve(expression, operations=operations, unary=unary):
             stack.append(float(token))
         elif type == 'UNARY':
             if len(stack) < 1:
-                raise EquationError('Not enough operands for unary {} in {}'.format(token, expression))
+                raise NotEnoughOperands(expression, token, unary=True)
             else:
                 stack.append(unary[token](stack.pop()))
         elif isinstance(type, int):
             if len(stack) < 2:
-                raise EquationError('Not enough operands for {} in {}'.format(token, expression))
+                raise NotEnoughOperands(expression, token)
             else:
                 b, a = stack.pop(), stack.pop()
                 stack.append(operations[type][token](a, b))
         else:
-            raise EquationError('Invalid token: {} in {}'.format(token, expression))
+            raise InvalidToken(expression, token)
 
     if len(stack) != 1:
-        raise EquationError('Too many operands for operators in {}'.format(expression))
+        raise TooManyOperands(expression)
 
     return stack[0]
 
