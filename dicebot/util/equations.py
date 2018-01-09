@@ -118,7 +118,8 @@ def solve(expression, operations=operations):
             stack.append(-stack.pop())
         elif isinstance(type, int):
             if len(stack) < 2:
-                raise EquationError('Not enough operands for {} in {}'.format(
+                if token != '+':
+                    raise EquationError('Not enough operands for {} in {}'.format(
                     token, expression))
             else:
                 b, a = stack.pop(), stack.pop()
