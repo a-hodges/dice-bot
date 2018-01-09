@@ -65,7 +65,7 @@ class CharacterCog (Cog):
             await ctx.send('There is no character named {}'.format(name))
 
     @commands.command()
-    def iam(self, ctx, *, name: str):
+    async def iam(self, ctx, *, name: str):
         '''
         Associates a user with a character
         See `character claim` for more information
