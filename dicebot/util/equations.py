@@ -38,8 +38,7 @@ def tokenize(expression, operations=operations):
             return t, match
         return callback
     tokens = [(r'\s+', 'WHITESPACE')]
-    tokens.extend((r'|'.join(map(re.escape, ops)), i)
-                  for i, ops in enumerate(operations))
+    tokens.extend((r'|'.join(map(re.escape, ops)), i) for i, ops in enumerate(operations))
     tokens.extend([
         (r'-', len(operations)),  # ???
         (r'\d*\.\d+', 'FLOAT'),
@@ -64,30 +63,25 @@ def infix2postfix(expression, operations=operations):
 
     for item in equation:
         type, token = item
-        # print(equation, stack, output, token, sep='\n')
         if type in ('INT', 'FLOAT'):
             output.append(item)
         elif type == 'PAREN_OPEN':
             stack.append(item)
         elif type == 'PAREN_CLOSE':
             if 'PAREN_OPEN' not in types(stack):
-                raise EquationError('Missing open parenthesis: {}'.format(
-                    expression))
+                raise EquationError('Missing open parenthesis: {}'.format(expression))
             while stack[-1][0] != 'PAREN_OPEN':
                 output.append(stack.pop())
             stack.pop()
         elif isinstance(type, int):  # operators
-            while (stack and isinstance(stack[-1][0], int) and
-                   stack[-1][0] >= type):
+            while stack and isinstance(stack[-1][0], int) and stack[-1][0] >= type:
                 output.append(stack.pop())
             stack.append(item)
         else:
-            raise EquationError('Invalid token found: {} in {}'.format(
-                token, equation))
+            raise EquationError('Invalid token found: {} in {}'.format(token, equation))
 
     if 'PAREN_OPEN' in types(stack):
-        raise EquationError('Missing closing parenthesis: {}'.format(
-            expression))
+        raise EquationError('Missing closing parenthesis: {}'.format(expression))
 
     while stack:
         output.append(stack.pop())
@@ -119,14 +113,12 @@ def solve(expression, operations=operations):
         elif isinstance(type, int):
             if len(stack) < 2:
                 if token != '+':
-                    raise EquationError('Not enough operands for {} in {}'.format(
-                    token, expression))
+                    raise EquationError('Not enough operands for {} in {}'.format(token, expression))
             else:
                 b, a = stack.pop(), stack.pop()
                 stack.append(operations[type][token](a, b))
         else:
-            raise EquationError('Invalid token: {} in {}'.format(
-                token, expression))
+            raise EquationError('Invalid token: {} in {}'.format(token, expression))
 
     if len(stack) != 1:
         raise EquationError('Missing operator in {}'.format(expression))
