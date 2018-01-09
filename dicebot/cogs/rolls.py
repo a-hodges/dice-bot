@@ -124,7 +124,11 @@ async def do_roll(ctx, session, character, expression):
     roll = equations.solve(expression, operations)
     if roll % 1 == 0:
         roll = int(roll)
-    output.append('I rolled {}'.format(roll))
+
+    if character:
+        output.append('{} rolled {}'.format(str(character), roll))
+    else:
+        output.append('I rolled {}'.format(roll))
 
     await ctx.send('\n'.join(output))
 
