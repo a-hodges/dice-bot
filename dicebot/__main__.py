@@ -102,7 +102,7 @@ for extension in [
     'rolls',
     'resources',
     'variables',
-    'initiatives',
+    # 'initiatives',
     'inventory',
     'spells',
     'information',
