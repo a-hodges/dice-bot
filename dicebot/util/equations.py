@@ -88,11 +88,11 @@ def infix2postfix(expression, operations=operations, unary=unary):
                 output.append(stack.pop())
             stack.pop()
         elif type == 'UNARY':
-            stack.append(item)
+            output.append(item)
         elif isinstance(type, int):  # operators
             if prev_type == 'PAREN_OPEN' or isinstance(prev_type, int):
                 # unary operation
-                stack.append(('UNARY', token))
+                output.append(('UNARY', token))
             else:
                 while stack and isinstance(stack[-1][0], int) and stack[-1][0] >= type:
                     output.append(stack.pop())
@@ -114,9 +114,8 @@ def solve(expression, operations=operations, unary=unary):
     '''
     Solves an infix expression
 
-    Operations is a list of operation dicts in reverse precedence order
-        The keys of each dict should be the operator and the values should be
-        a binary function to apply to the operands
+    Operations is a list of operation dicts in reverse precedence order (highest precedence last)
+        The keys of each dict should be the operator and the values should be binary functions to apply to the operands
         The functions should be able to take int or float arguments
     
     Unary is a dict of unary operations
