@@ -28,25 +28,22 @@ class CharacterCog (Cog):
         character = ctx.session.query(m.Character)\
             .filter_by(name=name, server=str(ctx.guild.id)).one_or_none()
 
-        if character is None:
-            character = m.Character(name=name, server=str(ctx.guild.id))
-            ctx.session.add(character)
-            await ctx.send('Creating character: {}'.format(name))
+        if character is not None:
+            if character.user is None:
+                user = ctx.session.query(m.Character)\
+                    .filter_by(user=str(ctx.author.id), server=str(ctx.guild.id)).one_or_none()
+                if user is not None:
+                    user.user = None
+                    ctx.session.commit()
+                    await ctx.send('{} is no longer playing as {}'.format(ctx.author.mention, str(user)))
 
-        if character.user is None:
-
-            user = ctx.session.query(m.Character)\
-                .filter_by(user=str(ctx.author.id), server=str(ctx.guild.id)).one_or_none()
-            if user is not None:
-                user.user = None
+                character.user = str(ctx.author.id)
                 ctx.session.commit()
-                await ctx.send('{} is no longer playing as {}'.format(ctx.author.mention, str(user)))
-
-            character.user = str(ctx.author.id)
-            ctx.session.commit()
-            await ctx.send('{} is {}'.format(ctx.author.mention, str(character)))
+                await ctx.send('{} is {}'.format(ctx.author.mention, str(character)))
+            else:
+                await ctx.send('Error: Someone else is using {}'.format(str(character)))
         else:
-            await ctx.send('Error: Someone else is using {}'.format(str(character)))
+            await ctx.send('There is no character named {}'.format(name))
 
     @commands.command()
     def iam(self, ctx, *, name: str):
