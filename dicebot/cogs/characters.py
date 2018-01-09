@@ -16,6 +16,25 @@ class CharacterCog (Cog):
         raise commands.CommandNotFound(message)
 
     @group.command()
+    async def create(self, ctx, *, name: str):
+        '''
+        Creates a character then claims it
+
+        Parameters:
+        [name] is the name of the character to associate
+        '''
+        character = ctx.session.query(m.Character)\
+            .filter_by(name=name, server=str(ctx.guild.id)).one_or_none()
+
+        if character is None:
+            character = m.Character(name=name, server=str(ctx.guild.id))
+            ctx.session.add(character)
+            ctx.session.commit()
+            await ctx.send('Creating character: {}'.format(name))
+
+        await self.claim.callback(self, ctx, name=name)
+
+    @group.command()
     async def claim(self, ctx, *, name: str):
         '''
         Associates user with a character
@@ -54,7 +73,7 @@ class CharacterCog (Cog):
         Parameters:
         [name] is the name of the character to associate
         '''
-        await self.claim.callback(self, ctx, name=name)
+        await self.create.callback(self, ctx, name=name)
 
     @group.command()
     async def none(self, ctx):
