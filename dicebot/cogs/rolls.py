@@ -4,9 +4,10 @@ from itertools import chain
 
 from discord.ext import commands
 from sqlalchemy import func
+import equations
 
 import model as m
-from util import Cog, get_character, sql_update, ItemNotFoundError, equations
+from util import Cog, get_character, sql_update, ItemNotFoundError
 
 
 async def do_roll(ctx, session, character, expression):

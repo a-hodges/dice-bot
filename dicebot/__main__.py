@@ -17,10 +17,10 @@ import discord
 from discord.ext import commands
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from equations import EquationError
 
 import model as m
 from util import NoCharacterError, ItemNotFoundError
-from util.equations import EquationError
 
 bot = commands.Bot(
     command_prefix=';',

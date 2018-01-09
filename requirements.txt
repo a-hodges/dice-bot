@@ -1,6 +1,7 @@
 # install with: pip install -r requirements.txt
 # discord.py ~= 1.0.0
 sqlalchemy ~= 1.1.14
+git+git://github.com/b-hodges/equations.git@master#egg=equations
 
 # Special discord version
 git+git://github.com/Rapptz/discord.py.git@rewrite#egg=discord-py
