@@ -17,6 +17,11 @@ operations = [
     },
 ]
 
+unary = {
+    '+': operator.pos,
+    '-': operator.neg,
+}
+
 
 class EquationError (Exception):
     pass
@@ -61,6 +66,7 @@ def infix2postfix(expression, operations=operations):
     stack = []
     output = []
 
+    prev_type = -1
     for item in equation:
         type, token = item
         if type in ('INT', 'FLOAT'):
@@ -74,11 +80,16 @@ def infix2postfix(expression, operations=operations):
                 output.append(stack.pop())
             stack.pop()
         elif isinstance(type, int):  # operators
-            while stack and isinstance(stack[-1][0], int) and stack[-1][0] >= type:
-                output.append(stack.pop())
-            stack.append(item)
+            if prev_type == 'PAREN_OPEN' or isinstance(prev_type, int):
+                # unary operation
+                stack.append(('UNARY', token))
+            else:
+                while stack and isinstance(stack[-1][0], int) and stack[-1][0] >= type:
+                    output.append(stack.pop())
+                stack.append(item)
         else:
             raise EquationError('Invalid token found: {} in {}'.format(token, equation))
+        prev_type = type
 
     if 'PAREN_OPEN' in types(stack):
         raise EquationError('Missing closing parenthesis: {}'.format(expression))
@@ -107,13 +118,14 @@ def solve(expression, operations=operations):
             stack.append(int(token))
         elif type == 'FLOAT':
             stack.append(float(token))
-        elif type == len(operations) or token == '-' and len(stack) < 2:
-            # unary negative operator
-            stack.append(-stack.pop())
+        elif type == 'UNARY':
+            if len(stack) < 1:
+                raise EquationError('Not enough operands for unary {} in {}'.format(token, expression))
+            else:
+                stack.append(unary[token](stack.pop()))
         elif isinstance(type, int):
             if len(stack) < 2:
-                if token != '+':
-                    raise EquationError('Not enough operands for {} in {}'.format(token, expression))
+                raise EquationError('Not enough operands for {} in {}'.format(token, expression))
             else:
                 b, a = stack.pop(), stack.pop()
                 stack.append(operations[type][token](a, b))
