@@ -140,7 +140,7 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Discord D&D bot')
-    parser.add_argument('database', nargs='?', default='sqlite:///:memory:',
+    parser.add_argument('database',
                         help='The database url to be accessed')
     parser.add_argument('-i, --initialize', dest='initialize', action='store_true',
                         help='Allows for initialization of config values')
