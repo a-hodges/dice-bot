@@ -128,7 +128,7 @@ async def do_roll(ctx, session, character, expression):
     if character:
         output.append('{} rolled {}'.format(str(character), roll))
     else:
-        output.append('I rolled {}'.format(roll))
+        output.append('You rolled {}'.format(roll))
 
     await ctx.send('\n'.join(output))
 
