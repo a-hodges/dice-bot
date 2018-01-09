@@ -15,8 +15,8 @@ class CharacterCog (Cog):
         message = 'Command "{} {}" is not found'.format(ctx.invoked_with, ctx.message.content.split()[1])
         raise commands.CommandNotFound(message)
 
-    @commands.command()
-    async def iam(self, ctx, *, name: str):
+    @group.command()
+    async def claim(self, ctx, *, name: str):
         '''
         Associates user with a character
         It is highly encouraged to change your nickname to match the character
@@ -47,6 +47,17 @@ class CharacterCog (Cog):
             await ctx.send('{} is {}'.format(ctx.author.mention, str(character)))
         else:
             await ctx.send('Error: Someone else is using {}'.format(str(character)))
+
+    @commands.command()
+    def iam(self, ctx, *, name: str):
+        '''
+        Associates a user with a character
+        See `character claim` for more information
+
+        Parameters:
+        [name] is the name of the character to associate
+        '''
+        await self.claim.callback(self, ctx, name=name)
 
     @group.command()
     async def none(self, ctx):
