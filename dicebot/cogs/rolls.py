@@ -30,7 +30,7 @@ async def do_roll(ctx, session, character, expression):
 
     # Set up operations
     def roll_dice(a, b, *, silent=False):
-        out = 0
+        rolls = []
         for _ in range(a):
             if b > 0:
                 n = random.randint(1, b)
@@ -38,24 +38,31 @@ async def do_roll(ctx, session, character, expression):
                 n = random.randint(b, -1)
             else:
                 n = 0
-            out += n
+            rolls.append(n)
+        value = sum(rolls)
         if not silent:
-            output.append('{}d{}: {}'.format(a, b, out))
-        return out
+            output.append('{}d{}: {} = {}'.format(a, b, ' + '.join(map(str, rolls)), value))
+        return value
 
-    def great_weapon_fighting(a, b, *, silent=False):
-        out = 0
+    def great_weapon_fighting(a, b, low=2, *, silent=False):
+        rolls = []
+        rerolls = []
+        value = 0
         for _ in range(a):
             n = roll_dice(1, b, silent=True)
-            if n <= 2:
+            rolls.append(n)
+            if n <= low:
                 n2 = random.randint(1, b)
-                if not silent:
-                    output.append('1d{0}: {1}, rerolling, 1d{0}: {2}'.format(b, n, n2))
-                n = n2
-            elif not silent:
-                output.append('1d{}: {}'.format(b, n))
-            out += n
-        return out
+                rerolls.append(n2)
+                value += n2
+            else:
+                value += n
+        if not silent:
+            rerolled = [rerolls.pop(0) if r < low else r for r in rolls]
+            rolled = ' + '.join(map(str, rolls))
+            rerolled = ' + '.join(map(str, rerolled))
+            output.append('{}d{}: {}, reroll: {} = {}'.format(a, b, rolled, rerolled, value))
+        return value
 
     def roll_advantage(a, b, *, silent=False):
         if a == 1 and b == 20:
@@ -63,7 +70,7 @@ async def do_roll(ctx, session, character, expression):
             second = roll_dice(a, b, silent=True)
             out = max(first, second)
             if not silent:
-                output.append('{}d{}, picking larger of {} and {}: {}'.format(a, b, first, second, out))
+                output.append('{}d{}: max({}, {}) = {}'.format(a, b, first, second, out))
         else:
             out = roll_dice(a, b, silent=silent)
         return out
@@ -74,7 +81,7 @@ async def do_roll(ctx, session, character, expression):
             second = roll_dice(a, b, silent=True)
             out = min(first, second)
             if not silent:
-                output.append('{}d{}, picking smaller of {} and {}: {}'.format(a, b, first, second, out))
+                output.append('{}d{}: min({}, {}) = {}'.format(a, b, first, second, out))
         else:
             out = roll_dice(a, b, silent=silent)
         return out
