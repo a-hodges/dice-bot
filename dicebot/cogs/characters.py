@@ -125,10 +125,12 @@ class CharacterCog (Cog):
         '''
         characters = ctx.session.query(m.Character)\
             .filter_by(server=str(ctx.guild.id)).all()
-        text = ['All characters:']
+        text = commands.Paginator(prefix='', suffix='')
+        text.add_line('All characters')
         for character in characters:
-            text.append(str(character))
-        await ctx.send('\n'.join(text))
+            text.add_line(str(character))
+        for page in text.pages:
+            await ctx.send(page)
 
     @group.command()
     @commands.has_role('DM')

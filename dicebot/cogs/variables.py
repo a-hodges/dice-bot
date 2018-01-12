@@ -54,10 +54,12 @@ class VariableCog (Cog):
         Lists all of a character's variables
         '''
         character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
-        text = ["{}'s variables:\n".format(character.name)]
-        for variable in character.variables:
-            text.append(str(variable))
-        await ctx.send('\n'.join(text))
+        text = commands.Paginator(prefix='', suffix='')
+        text.add_line("{}'s variables:".format(character.name))
+        for item in character.variables:
+            text.add_line(str(item))
+        for page in text.pages:
+            await ctx.send(page)
 
     @group.command(aliases=['delete'])
     async def remove(self, ctx, *, name: str):
