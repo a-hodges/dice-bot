@@ -175,7 +175,7 @@ class InventoryCog (Cog):
         for item in character.inventory:
             line = '***{}***'.format(str(item))
             if item.description:
-                line += '\n' + item.description
+                line += item.description
             text.add_line(line)
         for page in text.pages:
             await ctx.send(page)
@@ -219,7 +219,7 @@ class InventoryCog (Cog):
             for item in character.inventory:
                 line = '***{}***'.format(str(item))
                 if item.description:
-                    line += '\n' + item.description
+                    line += item.description
                 text.add_line(line)
             for page in text.pages:
                 await ctx.send(page)
