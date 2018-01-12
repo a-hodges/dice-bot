@@ -114,10 +114,15 @@ class InformationCog (Cog):
         Lists character's information
         '''
         character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
-        text = ["{}'s information:".format(character.name)]
-        for info in character.information:
-            text.append(str(info))
-        await ctx.send('\n'.join(text))
+        text = commands.Paginator(prefix='', suffix='')
+        text.add_line("{}'s information:".format(character.name))
+        for item in character.information:
+            line = '***{}***'.format(str(item))
+            if item.description:
+                line += '\n' + item.description
+            text.add_line(line)
+        for page in text.pages:
+            await ctx.send(page)
 
     @group.command(aliases=['delete'])
     async def remove(self, ctx, *, name: str):
@@ -152,10 +157,15 @@ class InformationCog (Cog):
         if character is None:
             await ctx.send('No character named {}'.format(name))
         else:
-            text = ["{}'s information:".format(character.name)]
-            for info in character.information:
-                text.append(str(info))
-            await ctx.send('\n'.join(text))
+            text = commands.Paginator(prefix='', suffix='')
+            text.add_line("{}'s information:".format(character.name))
+            for item in character.information:
+                line = '***{}***'.format(str(item))
+                if item.description:
+                    line += '\n' + item.description
+                text.add_line(line)
+            for page in text.pages:
+                await ctx.send(page)
 
 
 def setup(bot):

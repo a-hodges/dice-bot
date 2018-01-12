@@ -170,10 +170,15 @@ class InventoryCog (Cog):
         Lists character's inventory
         '''
         character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
-        text = ["{}'s inventory:".format(character.name)]
+        text = commands.Paginator(prefix='', suffix='')
+        text.add_line("{}'s inventory:".format(character.name))
         for item in character.inventory:
-            text.append(str(item))
-        await ctx.send('\n'.join(text))
+            line = '***{}***'.format(str(item))
+            if item.description:
+                line += '\n' + item.description
+            text.add_line(line)
+        for page in text.pages:
+            await ctx.send(page)
 
     @group.command(aliases=['delete'])
     async def remove(self, ctx, *, name: str):
@@ -209,10 +214,15 @@ class InventoryCog (Cog):
         if character is None:
             await ctx.send('No character named {}'.format(name))
         else:
-            text = ["{}'s inventory:".format(character.name)]
+            text = commands.Paginator(prefix='', suffix='')
+            text.add_line("{}'s inventory:".format(character.name))
             for item in character.inventory:
-                text.append(str(item))
-            await ctx.send('\n'.join(text))
+                line = '***{}***'.format(str(item))
+                if item.description:
+                    line += '\n' + item.description
+                text.add_line(line)
+            for page in text.pages:
+                await ctx.send(page)
 
 
 def setup(bot):

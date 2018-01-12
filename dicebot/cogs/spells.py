@@ -130,10 +130,15 @@ class SpellCog (Cog):
         Lists all of a character's spells
         '''
         character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
-        text = ["{}'s spells:".format(character.name)]
-        for spell in character.spells:
-            text.append(str(spell))
-        await ctx.send('\n'.join(text))
+        text = commands.Paginator(prefix='', suffix='')
+        text.add_line("{}'s spells:".format(character.name))
+        for item in character.spells:
+            line = '***{}***'.format(str(item))
+            if item.description:
+                line += '\n' + item.description
+            text.add_line(line)
+        for page in text.pages:
+            await ctx.send(page)
 
     @group.command()
     async def level(self, ctx, level: int):
@@ -184,10 +189,15 @@ class SpellCog (Cog):
         if character is None:
             await ctx.send('No character named {}'.format(name))
         else:
-            text = ["{}'s spells:".format(character.name)]
+            text = commands.Paginator(prefix='', suffix='')
+            text.add_line("{}'s spells:".format(character.name))
             for item in character.spells:
-                text.append(str(item))
-            await ctx.send('\n'.join(text))
+                line = '***{}***'.format(str(item))
+                if item.description:
+                    line += '\n' + item.description
+                text.add_line(line)
+            for page in text.pages:
+                await ctx.send(page)
 
 
 def setup(bot):

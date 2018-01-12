@@ -303,8 +303,6 @@ class Item (Base):
 
     def __str__(self):
         ret = '{0.name}: {0.number}'.format(self)
-        if self.description:
-            ret += '\n' + self.description
         return ret
 
 
@@ -346,8 +344,6 @@ class Spell (Base):
 
     def __str__(self):
         ret = '{0.name} | level {0.level}'.format(self)
-        if self.description:
-            ret += '\n' + self.description
         return ret
 
 
@@ -386,8 +382,6 @@ class Information (Base):
 
     def __str__(self):
         ret = '{0.name}'.format(self)
-        if self.description:
-            ret += '\n' + self.description
         return ret
 
 
