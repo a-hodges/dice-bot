@@ -184,7 +184,7 @@ class CharacterCog (Cog):
         [type] should be short|long
         '''
         if rest not in ['short', 'long']:
-            raise commands.BadArgument('rest')
+            raise commands.BadArgument('Bad argument: rest')
         character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
 
         if character:
@@ -203,7 +203,7 @@ class CharacterCog (Cog):
         [type] should be short|long
         '''
         if rest not in ['short', 'long']:
-            raise commands.BadArgument('rest')
+            raise commands.BadArgument('Bad argument: rest')
         characters = ctx.session.query(m.Character)\
             .filter_by(server=str(ctx.guild.id)).all()
 

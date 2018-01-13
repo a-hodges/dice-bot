@@ -30,7 +30,7 @@ class ResourceCog (Cog):
             can be short|long|other
         '''
         if recover not in ['short', 'long', 'other']:
-            raise commands.BadArgument('recover')
+            raise commands.BadArgument('Bad argument: recover')
 
         character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
 
