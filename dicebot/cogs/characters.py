@@ -181,7 +181,7 @@ class CharacterCog (Cog):
         A long rest recovers both long and short rest resources
 
         Parameters:
-        [type] should be short|long
+        [rest] should be short|long
         '''
         if rest not in ['short', 'long']:
             raise commands.BadArgument('Bad argument: rest')
@@ -200,7 +200,7 @@ class CharacterCog (Cog):
         Have all characters on the server rest
 
         Parameters:
-        [type] should be short|long
+        [rest] should be short|long
         '''
         if rest not in ['short', 'long']:
             raise commands.BadArgument('Bad argument: rest')
