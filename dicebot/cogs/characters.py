@@ -40,6 +40,7 @@ class CharacterCog (Cog):
         Associates user with a character
         It is highly encouraged to change your nickname to match the character
         A user can only be associated with 1 character at a time
+        The character must be created first with the create command
 
         Parameters:
         [name] is the name of the character to associate
