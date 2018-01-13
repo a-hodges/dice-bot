@@ -58,10 +58,13 @@ async def do_roll(ctx, session, character, expression):
             else:
                 value += n
         if not silent:
-            rerolled = [rerolls.pop(0) if r < low else r for r in rolls]
             rolled = ' + '.join(map(str, rolls))
-            rerolled = ' + '.join(map(str, rerolled))
-            output.append('{}d{}: {}, reroll: {} = {}'.format(a, b, rolled, rerolled, value))
+            if rerolls:
+                rerolled = [rerolls.pop(0) if r < low else r for r in rolls]
+                rerolled = ' + '.join(map(str, rerolled))
+                output.append('{}d{}: {}, rerolled: {} = {}'.format(a, b, rolled, rerolled, value))
+            else:
+                output.append('{}d{}: {} = {}'.format(a, b, rolled, value))
         return value
 
     def roll_advantage(a, b, *, silent=False):
