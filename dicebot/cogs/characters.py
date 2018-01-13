@@ -73,7 +73,7 @@ class CharacterCog (Cog):
         Parameters:
         [name] is the name of the character to associate
         '''
-        await self.create.callback(self, ctx, name=name)
+        await self.claim.callback(self, ctx, name=name)
 
     @group.command()
     async def none(self, ctx):
