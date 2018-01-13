@@ -161,31 +161,55 @@ class CharacterCog (Cog):
         else:
             await ctx.send('Error: please confirm deletion correctly')
 
+    def recover_resources(self, ctx, character, rest):
+        '''
+        Helper function for recovering resources
+        '''
+        for resource in character.resources:
+            if resource.recover == m.Rest.long and rest == 'long':
+                resource.current = resource.max
+            elif resource.recover == m.Rest.short:
+                resource.current = resource.max
+        ctx.session.commit()
+
+
     @commands.command()
     async def rest(self, ctx, *, rest: str):
         '''
         Take a rest
+        A short rest recovers only short rest resources
+        A long rest recovers both long and short rest resources
 
         Parameters:
         [type] should be short|long
         '''
         if rest not in ['short', 'long']:
             raise commands.BadArgument('rest')
-        # short or long rest
         character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
 
         if character:
-            for resource in character.resources:
-                if resource.recover == m.Rest.long and rest == 'long':
-                    resource.current = resource.max
-                elif resource.recover == m.Rest.short:
-                    resource.current = resource.max
-
-            ctx.session.commit()
-
+            self.recover_resources(ctx, character, rest)
             await ctx.send('{} has taken a {} rest, resources recovered'.format(str(character), rest))
         else:
             await ctx.send('User has no character')
+
+    @commands.command()
+    @commands.has_role('DM')
+    async def restall(self, ctx, *, rest: str):
+        '''
+        Have all characters on the server rest
+
+        Parameters:
+        [type] should be short|long
+        '''
+        if rest not in ['short', 'long']:
+            raise commands.BadArgument('rest')
+        characters = ctx.session.query(m.Character)\
+            .filter_by(server=str(ctx.guild.id)).all()
+
+        for character in characters:
+            self.recover_resources(ctx, character, rest)
+            await ctx.send('All characters have taken a {} rest, resources recovered'.format(rest))
 
 
 def setup(bot):
