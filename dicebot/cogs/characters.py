@@ -209,7 +209,8 @@ class CharacterCog (Cog):
 
         for character in characters:
             self.recover_resources(ctx, character, rest)
-            await ctx.send('All characters have taken a {} rest, resources recovered'.format(rest))
+        
+        await ctx.send('All characters have taken a {} rest, resources recovered'.format(rest))
 
 
 def setup(bot):
