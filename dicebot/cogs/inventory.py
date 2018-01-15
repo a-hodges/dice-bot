@@ -162,7 +162,10 @@ class InventoryCog (Cog):
             .filter_by(character_id=character.id, name=name).one_or_none()
         if item is None:
             raise ItemNotFoundError(name)
-        await ctx.send(str(item))
+        text = str(item)
+        if item.description:
+            text += '\n' + item.description
+        await ctx.send(text)
 
     @group.command()
     async def list(self, ctx):

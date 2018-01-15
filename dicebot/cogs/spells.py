@@ -122,7 +122,10 @@ class SpellCog (Cog):
             .filter_by(character_id=character.id, name=name).one_or_none()
         if spell is None:
             raise ItemNotFoundError(name)
-        await ctx.send(str(spell))
+        text = str(spell)
+        if spell.description:
+            text += '\n' + spell.description
+        await ctx.send(text)
 
     @group.command()
     async def list(self, ctx):

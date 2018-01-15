@@ -106,7 +106,10 @@ class InformationCog (Cog):
             .filter_by(character_id=character.id, name=name).one_or_none()
         if info is None:
             raise ItemNotFoundError(name)
-        await ctx.send(str(info))
+        text = str(info)
+        if info.description:
+            text += '\n' + info.description
+        await ctx.send(text)
 
     @group.command()
     async def list(self, ctx):
