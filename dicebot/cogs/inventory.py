@@ -176,10 +176,10 @@ class InventoryCog (Cog):
         text = commands.Paginator(prefix='', suffix='')
         text.add_line("{}'s inventory:".format(character.name))
         for item in character.inventory:
-            line = '***{}***'.format(str(item))
+            text.add_line('***{}***'.format(str(item)))
             if item.description:
-                line += '\n' + item.description
-            text.add_line(line)
+                for line in item.description.splitlines():
+                    text.add_line(line)
         for page in text.pages:
             await ctx.send(page)
 
@@ -220,10 +220,10 @@ class InventoryCog (Cog):
             text = commands.Paginator(prefix='', suffix='')
             text.add_line("{}'s inventory:".format(character.name))
             for item in character.inventory:
-                line = '***{}***'.format(str(item))
+                text.add_line('***{}***'.format(str(item)))
                 if item.description:
-                    line += '\n' + item.description
-                text.add_line(line)
+                    for line in item.description.splitlines():
+                        text.add_line(line)
             for page in text.pages:
                 await ctx.send(page)
 
