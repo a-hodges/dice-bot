@@ -169,7 +169,6 @@ class CharacterCog (Cog):
                 resource.current = resource.max
         ctx.session.commit()
 
-
     @commands.command()
     async def rest(self, ctx, *, rest: str):
         '''
@@ -206,7 +205,7 @@ class CharacterCog (Cog):
 
         for character in characters:
             self.recover_resources(ctx, character, rest)
-        
+
         await ctx.send('All characters have taken a {} rest, resources recovered'.format(rest))
 
 
