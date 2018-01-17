@@ -2,7 +2,7 @@ from discord.ext import commands
 
 import model as m
 from util import Cog, get_character, sql_update, ItemNotFoundError
-from cog_utils import send_pages, item_paginator
+from .cog_utils import send_pages, item_paginator
 
 
 class ResourceCog (Cog):

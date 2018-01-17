@@ -3,7 +3,7 @@ from sqlalchemy.exc import IntegrityError
 
 import model as m
 from util import Cog, get_character, ItemNotFoundError
-from cog_utils import send_pages, desc_paginator
+from .cog_utils import send_pages, desc_paginator
 
 
 class InventoryCog (Cog):
