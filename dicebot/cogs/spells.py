@@ -3,6 +3,7 @@ from sqlalchemy.exc import IntegrityError
 
 import model as m
 from util import Cog, get_character, sql_update, ItemNotFoundError
+from cog_utils import send_pages, desc_paginator
 
 
 class SpellCog (Cog):
@@ -133,15 +134,8 @@ class SpellCog (Cog):
         Lists all of a character's spells
         '''
         character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
-        text = commands.Paginator(prefix='', suffix='')
-        text.add_line("{}'s spells:".format(character.name))
-        for item in character.spells:
-            text.add_line('***{}***'.format(str(item)))
-            if item.description:
-                for line in item.description.splitlines():
-                    text.add_line(line)
-        for page in text.pages:
-            await ctx.send(page)
+        pages = desc_paginator(character.spells, header="{}'s spells:".format(character.name))
+        await send_pages(ctx, pages)
 
     @group.command()
     async def level(self, ctx, level: int):
@@ -192,15 +186,8 @@ class SpellCog (Cog):
         if character is None:
             await ctx.send('No character named {}'.format(name))
         else:
-            text = commands.Paginator(prefix='', suffix='')
-            text.add_line("{}'s spells:".format(character.name))
-            for item in character.spells:
-                text.add_line('***{}***'.format(str(item)))
-                if item.description:
-                    for line in item.description.splitlines():
-                        text.add_line(line)
-            for page in text.pages:
-                await ctx.send(page)
+            pages = desc_paginator(character.spells, header="{}'s spells:".format(character.name))
+            await send_pages(ctx, pages)
 
 
 def setup(bot):

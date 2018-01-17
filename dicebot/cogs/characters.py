@@ -4,6 +4,7 @@ from sqlalchemy.exc import IntegrityError
 
 import model as m
 from util import Cog, get_character
+from cog_utils import send_pages, item_paginator
 
 
 class CharacterCog (Cog):
@@ -126,12 +127,8 @@ class CharacterCog (Cog):
         '''
         characters = ctx.session.query(m.Character)\
             .filter_by(server=str(ctx.guild.id)).all()
-        text = commands.Paginator(prefix='', suffix='')
-        text.add_line('All characters')
-        for character in characters:
-            text.add_line(str(character))
-        for page in text.pages:
-            await ctx.send(page)
+        pages = item_paginator(characters, header='All characters')
+        await send_pages(ctx, pages)
 
     @group.command()
     @commands.has_role('DM')

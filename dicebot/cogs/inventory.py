@@ -3,6 +3,7 @@ from sqlalchemy.exc import IntegrityError
 
 import model as m
 from util import Cog, get_character, ItemNotFoundError
+from cog_utils import send_pages, desc_paginator
 
 
 class InventoryCog (Cog):
@@ -173,15 +174,8 @@ class InventoryCog (Cog):
         Lists character's inventory
         '''
         character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
-        text = commands.Paginator(prefix='', suffix='')
-        text.add_line("{}'s inventory:".format(character.name))
-        for item in character.inventory:
-            text.add_line('***{}***'.format(str(item)))
-            if item.description:
-                for line in item.description.splitlines():
-                    text.add_line(line)
-        for page in text.pages:
-            await ctx.send(page)
+        pages = desc_paginator(character.inventory, header="{}'s inventory:".format(character.name))
+        await send_pages(ctx, pages)
 
     @group.command(aliases=['delete'])
     async def remove(self, ctx, *, name: str):
@@ -217,15 +211,8 @@ class InventoryCog (Cog):
         if character is None:
             await ctx.send('No character named {}'.format(name))
         else:
-            text = commands.Paginator(prefix='', suffix='')
-            text.add_line("{}'s inventory:".format(character.name))
-            for item in character.inventory:
-                text.add_line('***{}***'.format(str(item)))
-                if item.description:
-                    for line in item.description.splitlines():
-                        text.add_line(line)
-            for page in text.pages:
-                await ctx.send(page)
+            pages = desc_paginator(character.inventory, header="{}'s inventory:".format(character.name))
+            await send_pages(ctx, pages)
 
 
 def setup(bot):

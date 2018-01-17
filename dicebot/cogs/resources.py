@@ -2,6 +2,7 @@ from discord.ext import commands
 
 import model as m
 from util import Cog, get_character, sql_update, ItemNotFoundError
+from cog_utils import send_pages, item_paginator
 
 
 class ResourceCog (Cog):
@@ -166,12 +167,8 @@ class ResourceCog (Cog):
         Lists all of a character's resources
         '''
         character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
-        text = commands.Paginator(prefix='', suffix='')
-        text.add_line("{}'s resources:".format(character.name))
-        for item in character.resources:
-            text.add_line(str(item))
-        for page in text.pages:
-            await ctx.send(page)
+        pages = item_paginator(character.resources, header="{}'s resources:".format(character.name))
+        await send_pages(ctx, pages)
 
     @group.command(aliases=['delete'])
     async def remove(self, ctx, *, name: str):
@@ -205,10 +202,8 @@ class ResourceCog (Cog):
         if character is None:
             await ctx.send('No character named {}'.format(name))
         else:
-            text = ["{}'s resources:".format(character.name)]
-            for item in character.resources:
-                text.append(str(item))
-            await ctx.send('\n'.join(text))
+            pages = item_paginator(character.resources, header="{}'s resources:".format(character.name))
+            await send_pages(ctx, pages)
 
 
 def setup(bot):
