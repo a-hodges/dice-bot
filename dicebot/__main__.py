@@ -40,9 +40,6 @@ async def on_ready():
     await bot.change_presence(game=discord.Game(name='Type {}help for command list'.format(bot.command_prefix)))
 
 
-bot.check(commands.guild_only)
-
-
 @bot.before_invoke
 async def before_any_command(ctx):
     '''
