@@ -148,6 +148,7 @@ class Resource (Base):
         doc='The current remaining uses of the resource')
     recover = Column(
         Enum(Rest),
+        nullable=False, default=Rest.other,
         doc='How the character recovers the resource')
 
     __table_args__ = (
@@ -327,7 +328,7 @@ class Spell (Base):
         doc='Spell name')
     level = Column(
         Integer,
-        nullable=False,
+        nullable=False, default=0,
         doc='Spell level')
     description = Column(
         String,
