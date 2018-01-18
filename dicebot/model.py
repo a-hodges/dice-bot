@@ -288,6 +288,7 @@ class Item (Base):
         doc='Item name')
     number = Column(
         Integer,
+        nullable=False, default=1,
         doc='The quantity of the item possessed')
     description = Column(
         String,
