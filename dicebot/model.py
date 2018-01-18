@@ -226,6 +226,7 @@ class Variable (Base):
         doc='Variable name')
     value = Column(
         Integer,
+        nullable=False, default=0,
         doc='The value of the variable')
 
     __table_args__ = (
