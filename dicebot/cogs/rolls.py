@@ -106,6 +106,7 @@ async def do_roll(ctx, session, character, expression):
     operations.append(dice)
 
     unary = equations.unary.copy()
+    unary['!'] = lambda a: a//2-5
 
     if character:
         # replace only 1 roll
@@ -180,6 +181,7 @@ class RollCog (Cog):
         Unary prefixes:
         - : negates a number
         + : does nothing to a number
+        ! : gets the modifier of an ability score using standard D&D modifier rules (score/2-5) i.e. !16 = 3
         '''
         if not expression:
             raise commands.MissingRequiredArgument('expression')
