@@ -105,6 +105,8 @@ async def do_roll(ctx, session, character, expression):
     dice['G'] = dice['g']
     operations.append(dice)
 
+    unary = equations.unary.copy()
+
     if character:
         # replace only 1 roll
         rolls = session.query(m.Roll)\
@@ -124,7 +126,7 @@ async def do_roll(ctx, session, character, expression):
 
     # validate
     for token in re.findall(r'[a-zA-Z]+', expression):
-        if token not in chain(*operations):
+        if token not in chain(*operations) and token not in unary:
             search = r'[a-zA-Z]*({})[a-zA-Z]*'.format(re.escape(token))
             search = re.search(search, original_expression)
             if search:
@@ -133,7 +135,7 @@ async def do_roll(ctx, session, character, expression):
 
     # do roll
     output.append('Rolling: `{}`'.format(expression))
-    roll = equations.solve(expression, operations)
+    roll = equations.solve(expression, operations=operations, unary=unary)
     if roll % 1 == 0:
         roll = int(roll)
 
@@ -174,6 +176,10 @@ class RollCog (Cog):
 
         + : addition
         - : subtraction
+
+        Unary prefixes:
+        - : negates a number
+        + : does nothing to a number
         '''
         if not expression:
             raise commands.MissingRequiredArgument('expression')
