@@ -62,7 +62,12 @@ async def on_command_error(ctx, error):
     if (isinstance(error, commands.CommandInvokeError)):
         error = error.original
 
-    if isinstance(error, commands.CheckFailure):
+    if (isinstance(error, AttributeError) and
+            ctx.guild is None and
+            str(error) == "'NoneType' object has no attribute 'id'"):
+        await ctx.send("This command can only be used in a server")
+
+    elif isinstance(error, commands.CheckFailure):
         await ctx.send('Error: You do not meet the requirements to use this command')
     elif isinstance(error, commands.CommandNotFound):
         if error.args:
