@@ -186,8 +186,11 @@ class RollCog (Cog):
         if not expression:
             raise commands.MissingRequiredArgument('expression')
 
-        character = ctx.session.query(m.Character)\
-            .filter_by(user=str(ctx.author.id), server=str(ctx.guild.id)).one_or_none()
+        if ctx.guild:
+            character = ctx.session.query(m.Character)\
+                .filter_by(user=str(ctx.author.id), server=str(ctx.guild.id)).one_or_none()
+        else:
+            character = None
 
         await do_roll(ctx, ctx.session, character, expression)
 
