@@ -37,7 +37,10 @@ async def on_ready():
     print(bot.user.name)
     print(bot.user.id)
     print('------')
-    await bot.change_presence(game=discord.Game(name='Type {}help for command list'.format(bot.command_prefix)))
+    game = 'Type {}help for command list'.format(bot.command_prefix)
+    if bot.config['url']:
+        game = bot.config['url'] + ' | ' + game
+    await bot.change_presence(game=discord.Game(name=game))
 
 
 @bot.before_invoke
@@ -118,6 +121,7 @@ for extension in [
 def main(args):
     bot.config = OrderedDict([
         ('token', None),
+        ('url', None),
     ])
 
     engine = create_engine(args.database)
