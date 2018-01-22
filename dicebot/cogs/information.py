@@ -39,8 +39,8 @@ class InformationCog (Cog):
         else:
             await ctx.send('{} already has a information block named {}'.format(str(character), name))
 
-    @group.command()
-    async def rename(self, ctx, name: str, *, new_name: str):
+    @group.command(ignore_extra=False)
+    async def rename(self, ctx, name: str, new_name: str):
         '''
         Changes the name of an information block
 
@@ -112,7 +112,7 @@ class InformationCog (Cog):
             text += '\n' + info.description
         await ctx.send(text)
 
-    @group.command()
+    @group.command(ignore_extra=False)
     async def list(self, ctx):
         '''
         Lists character's information

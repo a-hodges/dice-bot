@@ -20,7 +20,7 @@ class InventoryCog (Cog):
             raise commands.CommandNotFound(message)
         await self.plus.callback(self, ctx, number, name=name)
 
-    @group.command()
+    @group.command(ignore_extra=False)
     async def add(self, ctx, name: str, number: int):
         '''
         Adds an item to your inventory
@@ -44,8 +44,8 @@ class InventoryCog (Cog):
         else:
             await ctx.send('{} already has an item named {}'.format(str(character), name))
 
-    @group.command()
-    async def rename(self, ctx, name: str, *, new_name: str):
+    @group.command(ignore_extra=False)
+    async def rename(self, ctx, name: str, new_name: str):
         '''
         Changes the name of an inventory item
 
@@ -168,7 +168,7 @@ class InventoryCog (Cog):
             text += '\n' + item.description
         await ctx.send(text)
 
-    @group.command()
+    @group.command(ignore_extra=False)
     async def list(self, ctx):
         '''
         Lists character's inventory

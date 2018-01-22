@@ -14,7 +14,7 @@ class VariableCog (Cog):
         message = 'Command "{} {}" is not found'.format(ctx.invoked_with, ctx.message.content.split()[1])
         raise commands.CommandNotFound(message)
 
-    @group.command(aliases=['set', 'update'])
+    @group.command(aliases=['set', 'update'], ignore_extra=False)
     async def add(self, ctx, name: str, value: int):
         '''
         Adds/updates a new variable for a character
@@ -49,7 +49,7 @@ class VariableCog (Cog):
             raise ItemNotFoundError(name)
         await ctx.send(str(variable))
 
-    @group.command()
+    @group.command(ignore_extra=False)
     async def list(self, ctx):
         '''
         Lists all of a character's variables

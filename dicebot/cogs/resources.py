@@ -19,7 +19,7 @@ class ResourceCog (Cog):
             raise commands.CommandNotFound(message)
         await self.plus.callback(self, ctx, number, name=name)
 
-    @group.command(aliases=['update'])
+    @group.command(aliases=['update'], ignore_extra=False)
     async def add(self, ctx, name: str, max_uses: int, recover: str):
         '''
         Adds or changes a character resource
@@ -103,7 +103,7 @@ class ResourceCog (Cog):
         else:
             await ctx.send("{} has no {} to use".format(str(character), resource.name))
 
-    @group.command()
+    @group.command(ignore_extra=False)
     async def set(self, ctx, name: str, uses: int):
         '''
         Sets the remaining uses of a resource
@@ -161,7 +161,7 @@ class ResourceCog (Cog):
             raise ItemNotFoundError(name)
         await ctx.send(str(resource))
 
-    @group.command()
+    @group.command(ignore_extra=False)
     async def list(self, ctx):
         '''
         Lists all of a character's resources

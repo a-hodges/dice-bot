@@ -77,7 +77,7 @@ class CharacterCog (Cog):
         '''
         await self.claim.callback(self, ctx, name=name)
 
-    @group.command()
+    @group.command(ignore_extra=False)
     async def none(self, ctx):
         '''
         Removes a character association
@@ -91,8 +91,8 @@ class CharacterCog (Cog):
             await ctx.send('Error: {} does not have a character to remove'.format(ctx.author.mention))
         ctx.session.commit()
 
-    @commands.command()
-    async def whois(self, ctx, *, member: discord.Member):
+    @commands.command(ignore_extra=False)
+    async def whois(self, ctx, member: discord.Member):
         '''
         Retrieves character information for a user
 
@@ -120,7 +120,7 @@ class CharacterCog (Cog):
             ctx.session.rollback()
             await ctx.send('Error: There is already a character with that name')
 
-    @group.command()
+    @group.command(ignore_extra=False)
     async def list(self, ctx):
         '''
         Lists all of the characters for this server
@@ -130,9 +130,9 @@ class CharacterCog (Cog):
         pages = item_paginator(characters, header='All characters')
         await send_pages(ctx, pages)
 
-    @group.command()
+    @group.command(ignore_extra=False)
     @commands.has_role('DM')
-    async def kill(self, ctx, name: str, *, confirmation: str):
+    async def kill(self, ctx, name: str, confirmation: str):
         '''
         Deletes a character
         This is permanent and removes all associated attributes!
@@ -169,8 +169,8 @@ class CharacterCog (Cog):
                 resource.current = resource.max
         ctx.session.commit()
 
-    @commands.command()
-    async def rest(self, ctx, *, rest: str):
+    @commands.command(ignore_extra=False)
+    async def rest(self, ctx, rest: str):
         '''
         Take a rest
         A short rest recovers only short rest resources
@@ -189,9 +189,9 @@ class CharacterCog (Cog):
         else:
             await ctx.send('User has no character')
 
-    @commands.command()
+    @commands.command(ignore_extra=False)
     @commands.has_role('DM')
-    async def restall(self, ctx, *, rest: str):
+    async def restall(self, ctx, rest: str):
         '''
         Have all characters on the server rest
 

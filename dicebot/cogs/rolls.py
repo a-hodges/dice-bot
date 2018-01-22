@@ -194,7 +194,7 @@ class RollCog (Cog):
 
         await do_roll(ctx, ctx.session, character, expression)
 
-    @group.command(aliases=['set', 'update'])
+    @group.command(aliases=['set', 'update'], ignore_extra=False)
     async def add(self, ctx, name: str, expression: str):
         '''
         Adds/updates a new roll for a character
@@ -229,7 +229,7 @@ class RollCog (Cog):
             raise ItemNotFoundError(name)
         await ctx.send(str(roll))
 
-    @group.command()
+    @group.command(ignore_extra=False)
     async def list(self, ctx):
         '''
         Lists all of a character's rolls

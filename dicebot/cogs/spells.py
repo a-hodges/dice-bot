@@ -15,7 +15,7 @@ class SpellCog (Cog):
         message = 'Command "{} {}" is not found'.format(ctx.invoked_with, ctx.message.content.split()[1])
         raise commands.CommandNotFound(message)
 
-    @group.command(aliases=['update'])
+    @group.command(aliases=['update'], ignore_extra=False)
     async def add(self, ctx, name: str, level: int):
         '''
         Adds/updates a new spell for a character
@@ -35,8 +35,8 @@ class SpellCog (Cog):
 
         await ctx.send('{} now has {}'.format(str(character), str(spell)))
 
-    @group.command()
-    async def rename(self, ctx, name: str, *, new_name: str):
+    @group.command(ignore_extra=False)
+    async def rename(self, ctx, name: str, new_name: str):
         '''
         Changes the name of a spell
 
@@ -128,7 +128,7 @@ class SpellCog (Cog):
             text += '\n' + spell.description
         await ctx.send(text)
 
-    @group.command()
+    @group.command(ignore_extra=False)
     async def list(self, ctx):
         '''
         Lists all of a character's spells
@@ -137,7 +137,7 @@ class SpellCog (Cog):
         pages = desc_paginator(character.spells, header="{}'s spells:".format(character.name))
         await send_pages(ctx, pages)
 
-    @group.command()
+    @group.command(ignore_extra=False)
     async def level(self, ctx, level: int):
         '''
         Lists all of a character's spells of a given level
