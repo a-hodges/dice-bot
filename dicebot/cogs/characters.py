@@ -82,7 +82,7 @@ class CharacterCog (Cog):
         await self.claim.callback(self, ctx, name=name)
 
     @group.command(ignore_extra=False)
-    async def none(self, ctx):
+    async def unclaim(self, ctx):
         '''
         Removes a character association
         '''
