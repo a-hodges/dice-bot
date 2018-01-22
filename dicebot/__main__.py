@@ -118,13 +118,13 @@ for extension in [
     bot.load_extension('cogs.' + extension)
 
 
-def main(args):
+def main(database):
     bot.config = OrderedDict([
         ('token', None),
         ('url', None),
     ])
 
-    engine = create_engine(args.database)
+    engine = create_engine(database)
     m.Base.metadata.create_all(engine)
     bot.Session = sessionmaker(bind=engine)
     with closing(bot.Session()) as session:
@@ -148,12 +148,5 @@ def main(args):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Discord D&D bot')
-    parser.add_argument('database',
-                        help='The database url to be accessed')
-    parser.add_argument('-i, --initialize', dest='initialize', action='store_true',
-                        help='Allows for initialization of config values')
-    args = parser.parse_args()
-
     logging.basicConfig(level=logging.INFO)
-    main(args)
+    main(os.environ['DB'])
