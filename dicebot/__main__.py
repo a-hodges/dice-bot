@@ -137,7 +137,7 @@ def main(database):
                 session.add(key)
                 session.commit()
 
-            if args.initialize:
+            if False:
                 arg = input('[{}] (default: {}): '.format(name, repr(key.value)))
                 if arg:
                     key.value = arg
