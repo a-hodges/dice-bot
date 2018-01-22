@@ -8,7 +8,7 @@ Parameters marked with a * may omit the quotes
 Certain commands are only usable by the @DM role
 '''
 
-import argparse
+import os
 import asyncio
 import logging
 from collections import OrderedDict
