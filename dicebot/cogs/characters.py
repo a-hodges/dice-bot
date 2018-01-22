@@ -197,6 +197,7 @@ class CharacterCog (Cog):
         '''
         character = get_character(ctx.session, user.id, ctx.guild.id)
         character.user = None
+        ctx.session.commit()
         await ctx.send('{} is no longer playing as {}'.format(user.mention, str(character)))
 
     @group.command(ignore_extra=False)
