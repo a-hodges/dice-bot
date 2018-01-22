@@ -102,7 +102,6 @@ class Character (Base):
         'resources',
         'rolls',
         'variables',
-        'initiatives',
         'inventory',
         'spells',
         'information',
@@ -240,34 +239,6 @@ class Variable (Base):
 
     def __str__(self):
         return '{0.name}: {0.value}'.format(self)
-
-
-class Initiative (Base):
-    '''
-    Manages character initiative by channel
-    '''
-    __tablename__ = 'initiative'
-
-    character_id = Column(
-        Integer,
-        ForeignKey('characters.id'),
-        primary_key=True,
-        doc='Character foreign key')
-    channel = Column(
-        BigInteger,
-        primary_key=True,
-        doc='Channel id')
-    value = Column(
-        Integer,
-        doc='The initiative roll')
-
-    character = relationship(
-        'Character',
-        foreign_keys=[character_id],
-        back_populates='initiatives')
-
-    def __str__(self):
-        return '{0.character.name}: {0.value}'.format(self)
 
 
 class Item (Base):
