@@ -136,34 +136,6 @@ class CharacterCog (Cog):
         pages = item_paginator(characters, header='All characters')
         await send_pages(ctx, pages)
 
-    @group.command(ignore_extra=False)
-    @commands.has_role('DM')
-    async def kill(self, ctx, name: str, confirmation: str):
-        '''
-        Deletes a character
-        This is permanent and removes all associated attributes!
-        Can only be done by the @DM role
-
-        Parameters:
-        [name] the name of the character to delete
-        [confirmation] enter `100%` to confirm that you want to delete the character permanently
-        '''
-        if confirmation == '100%':
-            character = ctx.session.query(m.Character)\
-                .filter_by(name=name, server=str(ctx.guild.id)).one_or_none()
-            if character is not None:
-                for attribute in character.attributes:
-                    for item in getattr(character, attribute):
-                        ctx.session.delete(item)
-                ctx.session.commit()
-                ctx.session.delete(character)
-                ctx.session.commit()
-                await ctx.send('{} is dead'.format(str(character)))
-            else:
-                await ctx.send('Error: No character named {}'.format(name))
-        else:
-            await ctx.send('Error: please confirm deletion correctly')
-
     def recover_resources(self, ctx, character, rest):
         '''
         Helper function for recovering resources
@@ -213,6 +185,34 @@ class CharacterCog (Cog):
             self.recover_resources(ctx, character, rest)
 
         await ctx.send('All characters have taken a {} rest, resources recovered'.format(rest))
+
+    @group.command(ignore_extra=False)
+    @commands.has_role('DM')
+    async def kill(self, ctx, name: str, confirmation: str):
+        '''
+        Deletes a character
+        This is permanent and removes all associated attributes!
+        Can only be done by the @DM role
+
+        Parameters:
+        [name] the name of the character to delete
+        [confirmation] enter `100%` to confirm that you want to delete the character permanently
+        '''
+        if confirmation == '100%':
+            character = ctx.session.query(m.Character)\
+                .filter_by(name=name, server=str(ctx.guild.id)).one_or_none()
+            if character is not None:
+                for attribute in character.attributes:
+                    for item in getattr(character, attribute):
+                        ctx.session.delete(item)
+                ctx.session.commit()
+                ctx.session.delete(character)
+                ctx.session.commit()
+                await ctx.send('{} is dead'.format(str(character)))
+            else:
+                await ctx.send('Error: No character named {}'.format(name))
+        else:
+            await ctx.send('Error: please confirm deletion correctly')
 
 
 def setup(bot):
