@@ -2,7 +2,7 @@ from discord.ext import commands
 
 import model as m
 from util import Cog, get_character, sql_update, ItemNotFoundError
-from .cog_utils import send_pages, item_paginator
+from .cog_utils import send_pages, item_paginator, strip_quotes
 
 
 class ResourceCog (Cog):
@@ -53,8 +53,10 @@ class ResourceCog (Cog):
 
         Parameters:
         [number] the quantity of the resource to regain
-        [name] the name of the resource
+        [name*] the name of the resource
         '''
+        name = strip_quotes(name)
+
         character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
 
         resource = ctx.session.query(m.Resource)\
@@ -75,8 +77,10 @@ class ResourceCog (Cog):
 
         Parameters:
         [number] the quantity of the resource to use
-        [name] the name of the resource
+        [name*] the name of the resource
         '''
+        name = strip_quotes(name)
+
         await self.plus.callback(self, ctx, -number, name=name)
 
     @group.command()
@@ -85,8 +89,10 @@ class ResourceCog (Cog):
         Consumes 1 use of the resource
 
         Parameters:
-        [name] the name of the resource
+        [name*] the name of the resource
         '''
+        name = strip_quotes(name)
+
         character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
 
         resource = ctx.session.query(m.Resource)\
@@ -131,8 +137,10 @@ class ResourceCog (Cog):
         Returns the remaining uses of a resource to max
 
         Parameters:
-        [name] the name of the resource
+        [name*] the name of the resource
         '''
+        name = strip_quotes(name)
+
         character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
 
         resource = ctx.session.query(m.Resource)\
@@ -152,8 +160,10 @@ class ResourceCog (Cog):
         Checks the status of a resource
 
         Parameters:
-        [name] the name of the resource
+        [name*] the name of the resource
         '''
+        name = strip_quotes(name)
+
         character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
         resource = ctx.session.query(m.Resource)\
             .filter_by(character_id=character.id, name=name).one_or_none()
@@ -176,8 +186,10 @@ class ResourceCog (Cog):
         Deletes a resource from the character
 
         Parameters:
-        [name] the name of the resource
+        [name*] the name of the resource
         '''
+        name = strip_quotes(name)
+
         character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
 
         resource = ctx.session.query(m.Resource)\
@@ -195,8 +207,10 @@ class ResourceCog (Cog):
         Lists the resources for a specified character
 
         Parameters:
-        [name] the name of the character to inspect
+        [name*] the name of the character to inspect
         '''
+        name = strip_quotes(name)
+
         character = ctx.session.query(m.Character)\
             .filter_by(name=name, server=str(ctx.guild.id)).one_or_none()
         if character is None:

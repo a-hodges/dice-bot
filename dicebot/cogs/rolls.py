@@ -8,7 +8,7 @@ import equations
 
 import model as m
 from util import Cog, get_character, sql_update, ItemNotFoundError
-from .cog_utils import send_pages, item_paginator
+from .cog_utils import send_pages, item_paginator, strip_quotes
 
 
 async def do_roll(ctx, session, character, expression):
@@ -158,7 +158,7 @@ class RollCog (Cog):
         Note: If a variable name is included in a roll the name will be replaced with the value of the variable
 
         Parameters:
-        [expression] standard dice notation specifying what to roll the expression may include up to 1 saved roll
+        [expression*] standard dice notation specifying what to roll the expression may include up to 1 saved roll
         [adv] (optional) if present should be adv|disadv to roll any 1d20s with advantage or disadvantage respectively
 
         Mathematic operations from highest precedence to lowest:
@@ -185,6 +185,7 @@ class RollCog (Cog):
         '''
         if not expression:
             raise commands.MissingRequiredArgument('expression')
+        expression = strip_quotes(expression)
 
         if ctx.guild:
             character = ctx.session.query(m.Character)\
@@ -220,8 +221,10 @@ class RollCog (Cog):
         Checks the status of a roll
 
         Parameters:
-        [name] the name of the roll
+        [name*] the name of the roll
         '''
+        name = strip_quotes(name)
+
         character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
         roll = ctx.session.query(m.Roll)\
             .filter_by(character_id=character.id, name=name).one_or_none()
@@ -244,8 +247,10 @@ class RollCog (Cog):
         Deletes a roll from the character
 
         Parameters:
-        [name] the name of the roll
+        [name*] the name of the roll
         '''
+        name = strip_quotes(name)
+
         character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
 
         roll = ctx.session.query(m.Roll)\
@@ -263,8 +268,10 @@ class RollCog (Cog):
         Lists the rolls for a specified character
 
         Parameters:
-        [name] the name of the character to inspect
+        [name*] the name of the character to inspect
         '''
+        name = strip_quotes(name)
+
         character = ctx.session.query(m.Character)\
             .filter_by(name=name, server=str(ctx.guild.id)).one_or_none()
         if character is None:

@@ -3,7 +3,7 @@ from sqlalchemy.exc import IntegrityError
 
 import model as m
 from util import Cog, get_character, sql_update, ItemNotFoundError
-from .cog_utils import send_pages, desc_paginator
+from .cog_utils import send_pages, desc_paginator, strip_quotes
 
 
 class SpellCog (Cog):
@@ -66,8 +66,10 @@ class SpellCog (Cog):
 
         Parameters:
         [level] the new level of the spell
-        [name] the name of the spell
+        [name*] the name of the spell
         '''
+        name = strip_quotes(name)
+
         character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
 
         spell = ctx.session.query(m.Spell)\
@@ -86,9 +88,11 @@ class SpellCog (Cog):
 
         Parameters:
         [name] the name of the spell
-        [description] the new description for the spell
+        [description*] the new description for the spell
             the description does not need quotes
         '''
+        description = strip_quotes(description)
+
         character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
 
         spell = ctx.session.query(m.Spell)\
@@ -106,8 +110,10 @@ class SpellCog (Cog):
         Removes a spell's description
 
         Parameters:
-        [name] the name of the spell to remove the description from
+        [name*] the name of the spell to remove the description from
         '''
+        name = strip_quotes(name)
+
         await self.description.callback(self, ctx, name, description=None)
 
     @group.command()
@@ -116,8 +122,10 @@ class SpellCog (Cog):
         Checks the status of a spell
 
         Parameters:
-        [name] the name of the spell
+        [name*] the name of the spell
         '''
+        name = strip_quotes(name)
+
         character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
         spell = ctx.session.query(m.Spell)\
             .filter_by(character_id=character.id, name=name).one_or_none()
@@ -160,8 +168,10 @@ class SpellCog (Cog):
         Deletes a spell from the character
 
         Parameters:
-        [name] the name of the spell
+        [name*] the name of the spell
         '''
+        name = strip_quotes(name)
+
         character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
 
         spell = ctx.session.query(m.Spell)\
@@ -179,8 +189,10 @@ class SpellCog (Cog):
         Lists the spells for a specified character
 
         Parameters:
-        [name] the name of the character to inspect
+        [name*] the name of the character to inspect
         '''
+        name = strip_quotes(name)
+
         character = ctx.session.query(m.Character)\
             .filter_by(name=name, server=str(ctx.guild.id)).one_or_none()
         if character is None:

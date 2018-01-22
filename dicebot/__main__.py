@@ -3,7 +3,8 @@
 '''D&D manager bot for discord based RPGs
 
 Note:
-Any parameter value that has spaces in it needs to be wrapped in quotes " unless it is the final parameter
+Any parameter value that has spaces in it needs to be wrapped in quotes "
+Parameters marked with a * may omit the quotes
 Certain commands are only usable by the @DM role
 '''
 

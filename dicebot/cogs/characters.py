@@ -4,7 +4,7 @@ from sqlalchemy.exc import IntegrityError
 
 import model as m
 from util import Cog, get_character
-from .cog_utils import send_pages, item_paginator
+from .cog_utils import send_pages, item_paginator, strip_quotes
 
 
 class CharacterCog (Cog):
@@ -22,8 +22,10 @@ class CharacterCog (Cog):
         Creates a character then claims it
 
         Parameters:
-        [name] is the name of the character to associate
+        [name*] is the name of the character to associate
         '''
+        name = strip_quotes(name)
+
         character = ctx.session.query(m.Character)\
             .filter_by(name=name, server=str(ctx.guild.id)).one_or_none()
 
@@ -44,8 +46,10 @@ class CharacterCog (Cog):
         The character must be created first with the create command
 
         Parameters:
-        [name] is the name of the character to associate
+        [name*] is the name of the character to associate
         '''
+        name = strip_quotes(name)
+
         character = ctx.session.query(m.Character)\
             .filter_by(name=name, server=str(ctx.guild.id)).one_or_none()
 
@@ -73,7 +77,7 @@ class CharacterCog (Cog):
         See `character claim` for more information
 
         Parameters:
-        [name] is the name of the character to associate
+        [name*] is the name of the character to associate
         '''
         await self.claim.callback(self, ctx, name=name)
 
@@ -108,8 +112,10 @@ class CharacterCog (Cog):
         Changes the character's name
 
         Parameters:
-        [name] the new name
+        [name*] the new name
         '''
+        name = strip_quotes(name)
+
         try:
             character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
             original_name = character.name

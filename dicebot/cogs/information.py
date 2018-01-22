@@ -3,12 +3,12 @@ from sqlalchemy.exc import IntegrityError
 
 import model as m
 from util import Cog, get_character, ItemNotFoundError
-from .cog_utils import send_pages, desc_paginator
+from .cog_utils import send_pages, desc_paginator, strip_quotes
 
 
 class InformationCog (Cog):
     @commands.group('information', aliases=['info'], invoke_without_command=True)
-    async def group(self, ctx, *, input: str):
+    async def group(self, ctx):
         '''
         Manages character information
         '''
@@ -22,8 +22,10 @@ class InformationCog (Cog):
 
         Parameters:
         [name] the name of the new information block
-        [description] the text of the information block
+        [description*] the text of the information block
         '''
+        description = strip_quotes(description)
+
         character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
 
         info = m.Information(character_id=character.id, name=name, description=description)
@@ -70,9 +72,11 @@ class InformationCog (Cog):
 
         Parameters:
         [name] the name of the block
-        [description] the new description for the block
+        [description*] the new description for the block
             the description does not need quotes
         '''
+        description = strip_quotes(description)
+
         character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
 
         info = ctx.session.query(m.Information)\
@@ -90,8 +94,10 @@ class InformationCog (Cog):
         Clears an information block's description
 
         Parameters:
-        [name] the name of the block to clear the description for
+        [name*] the name of the block to clear the description for
         '''
+        name = strip_quotes(name)
+
         await self.description.callback(self, ctx, name, description='')
 
     @group.command()
@@ -100,8 +106,10 @@ class InformationCog (Cog):
         Shows the information block
 
         Parameters:
-        [name] the name of the block
+        [name*] the name of the block
         '''
+        name = strip_quotes(name)
+
         character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
         info = ctx.session.query(m.Information)\
             .filter_by(character_id=character.id, name=name).one_or_none()
@@ -128,8 +136,10 @@ class InformationCog (Cog):
         This deletes all of the data associated with the block
 
         Parameters:
-        [name] the name of the block
+        [name*] the name of the block
         '''
+        name = strip_quotes(name)
+
         character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
 
         info = ctx.session.query(m.Information)\
@@ -147,8 +157,10 @@ class InformationCog (Cog):
         Lists the information for a specified character
 
         Parameters:
-        [name] the name of the character to inspect
+        [name*] the name of the character to inspect
         '''
+        name = strip_quotes(name)
+
         character = ctx.session.query(m.Character)\
             .filter_by(name=name, server=str(ctx.guild.id)).one_or_none()
         if character is None:

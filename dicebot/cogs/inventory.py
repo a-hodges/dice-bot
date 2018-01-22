@@ -3,7 +3,7 @@ from sqlalchemy.exc import IntegrityError
 
 import model as m
 from util import Cog, get_character, ItemNotFoundError
-from .cog_utils import send_pages, desc_paginator
+from .cog_utils import send_pages, desc_paginator, strip_quotes
 
 
 class InventoryCog (Cog):
@@ -75,9 +75,11 @@ class InventoryCog (Cog):
 
         Parameters:
         [name] the name of the item
-        [description] the new description for the item
+        [description*] the new description for the item
             the description does not need quotes
         '''
+        description = strip_quotes(description)
+
         character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
 
         item = ctx.session.query(m.Item)\
@@ -95,9 +97,11 @@ class InventoryCog (Cog):
         Removes an item's description
 
         Parameters:
-        [name] the name of the item to remove the description from
+        [name*] the name of the item to remove the description from
         '''
-        await self.description.callback(self, ctx, name, description=None)
+        name = strip_quotes(name)
+
+        await self.description.callback(self, ctx, name, description='')
 
     @group.command()
     async def has(self, ctx, number: int, *, name: str):
@@ -106,8 +110,10 @@ class InventoryCog (Cog):
 
         Parameters:
         [number] the new quantity of the item
-        [name] the name of the item
+        [name*] the name of the item
         '''
+        name = strip_quotes(name)
+
         character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
 
         item = ctx.session.query(m.Item)\
@@ -126,8 +132,10 @@ class InventoryCog (Cog):
 
         Parameters:
         [number] the number to increase the item count by
-        [name] the name of the item
+        [name*] the name of the item
         '''
+        name = strip_quotes(name)
+
         character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
 
         item = ctx.session.query(m.Item)\
@@ -146,8 +154,10 @@ class InventoryCog (Cog):
 
         Parameters:
         [number] the number to decrease the item count by
-        [name] the name of the item
+        [name*] the name of the item
         '''
+        name = strip_quotes(name)
+
         await self.plus.callback(self, ctx, -number, name=name)
 
     @group.command()
@@ -156,8 +166,10 @@ class InventoryCog (Cog):
         Checks the status of an item
 
         Parameters:
-        [name] the name of the item
+        [name*] the name of the item
         '''
+        name = strip_quotes(name)
+
         character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
         item = ctx.session.query(m.Item)\
             .filter_by(character_id=character.id, name=name).one_or_none()
@@ -185,8 +197,10 @@ class InventoryCog (Cog):
         use the `has` command if you just want to set the number to 0
 
         Parameters:
-        [name] the name of the item
+        [name*] the name of the item
         '''
+        name = strip_quotes(name)
+
         character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
 
         item = ctx.session.query(m.Item)\
@@ -204,8 +218,10 @@ class InventoryCog (Cog):
         Lists the inventory for a specified character
 
         Parameters:
-        [name] the name of the character to inspect
+        [name*] the name of the character to inspect
         '''
+        name = strip_quotes(name)
+
         character = ctx.session.query(m.Character)\
             .filter_by(name=name, server=str(ctx.guild.id)).one_or_none()
         if character is None:

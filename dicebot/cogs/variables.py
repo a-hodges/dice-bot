@@ -2,7 +2,7 @@ from discord.ext import commands
 
 import model as m
 from util import Cog, get_character, sql_update, ItemNotFoundError
-from .cog_utils import send_pages, item_paginator
+from .cog_utils import send_pages, item_paginator, strip_quotes
 
 
 class VariableCog (Cog):
@@ -40,8 +40,10 @@ class VariableCog (Cog):
         Checks the status of a variable
 
         Parameters:
-        [name] the name of the variable
+        [name*] the name of the variable
         '''
+        name = strip_quotes(name)
+
         character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
         variable = ctx.session.query(m.Variable)\
             .filter_by(character_id=character.id, name=name).one_or_none()
@@ -64,8 +66,10 @@ class VariableCog (Cog):
         Deletes a variable from the character
 
         Parameters:
-        [name] the name of the variable
+        [name*] the name of the variable
         '''
+        name = strip_quotes(name)
+
         character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
 
         variable = ctx.session.query(m.Variable)\
@@ -83,8 +87,10 @@ class VariableCog (Cog):
         Lists the variables for a specified character
 
         Parameters:
-        [name] the name of the character to inspect
+        [name*] the name of the character to inspect
         '''
+        name = strip_quotes(name)
+
         character = ctx.session.query(m.Character)\
             .filter_by(name=name, server=str(ctx.guild.id)).one_or_none()
         if character is None:

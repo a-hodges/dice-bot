@@ -25,3 +25,9 @@ def desc_paginator(items, header=None):
             for line in item.description.splitlines():
                 paginator.add_line(line)
     return paginator
+
+
+def strip_quotes(arg):
+    if len(arg) >= 2 and arg.startswith('"') and arg.endswith('"'):
+        arg = arg[1:-1]
+    return arg
