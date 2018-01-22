@@ -105,7 +105,7 @@ class SpellCog (Cog):
         await ctx.send('{} now has {}'.format(str(character), str(spell)))
 
     @group.command(aliases=['rmdesc'])
-    async def remove_description(self, ctx, *, name: str):
+    async def removedescription(self, ctx, *, name: str):
         '''
         Removes a spell's description
 

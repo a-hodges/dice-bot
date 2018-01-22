@@ -89,7 +89,7 @@ class InformationCog (Cog):
         await ctx.send('{} now has {}'.format(str(character), str(info)))
 
     @group.command(aliases=['rmdesc'])
-    async def remove_description(self, ctx, *, name: str):
+    async def removedescription(self, ctx, *, name: str):
         '''
         Clears an information block's description
 

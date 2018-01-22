@@ -92,7 +92,7 @@ class InventoryCog (Cog):
         await ctx.send('{} now has {}'.format(str(character), str(item)))
 
     @group.command(aliases=['rmdesc'])
-    async def remove_description(self, ctx, *, name: str):
+    async def removedescription(self, ctx, *, name: str):
         '''
         Removes an item's description
 
