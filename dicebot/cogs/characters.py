@@ -188,6 +188,19 @@ class CharacterCog (Cog):
 
     @group.command(ignore_extra=False)
     @commands.has_role('DM')
+    async def forceunclaim(self, ctx, user: discord.Member):
+        '''
+        Forcibly removes a user's association with a character
+
+        Parameters:
+        [user] @mention the user
+        '''
+        character = get_character(ctx.session, user.id, ctx.guild.id)
+        character.user = None
+        await ctx.send('{} is no longer playing as {}'.format(user.mention, str(character)))
+
+    @group.command(ignore_extra=False)
+    @commands.has_role('DM')
     async def kill(self, ctx, name: str, confirmation: str):
         '''
         Deletes a character
