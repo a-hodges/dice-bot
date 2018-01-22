@@ -81,10 +81,6 @@ class Character (Base):
         'Variable',
         order_by='Variable.name',
         back_populates='character')
-    initiatives = relationship(
-        'Initiative',
-        order_by='Initiative.channel',
-        back_populates='character')
     inventory = relationship(
         'Item',
         order_by='Item.name',
