@@ -96,15 +96,15 @@ class CharacterCog (Cog):
         ctx.session.commit()
 
     @commands.command(ignore_extra=False)
-    async def whois(self, ctx, member: discord.Member):
+    async def whois(self, ctx, user: discord.Member):
         '''
         Retrieves character information for a user
 
         Parameters:
-        [user] should be a user on this channel
+        [user] @mention the user
         '''
-        character = get_character(ctx.session, member.id, ctx.guild.id)
-        await ctx.send('{} is {}'.format(member.mention, str(character)))
+        character = get_character(ctx.session, user.id, ctx.guild.id)
+        await ctx.send('{} is {}'.format(user.mention, str(character)))
 
     @group.command()
     async def rename(self, ctx, *, name: str):
