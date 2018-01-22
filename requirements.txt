@@ -1,6 +1,6 @@
 # install with: pip install -r requirements.txt
-# discord.py ~= 1.0.0
-sqlalchemy ~= 1.1.14
+
+# equation solver
 git+git://github.com/b-hodges/equations.git@master#egg=equations
 
 # Special discord version
@@ -8,5 +8,6 @@ git+git://github.com/Rapptz/discord.py.git@rewrite#egg=discord-py
 aiohttp >= 2.0.0, < 2.3.0
 websockets >= 3.1, < 4.0
 
-# Heroku database
-psycopg2 ~= 2.7.3
+# database
+sqlalchemy ~= 1.2
+psycopg2 ~= 2.7
