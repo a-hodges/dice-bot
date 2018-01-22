@@ -106,7 +106,7 @@ async def do_roll(ctx, session, character, expression):
     operations.append(dice)
 
     unary = equations.unary.copy()
-    unary['!'] = lambda a: a//2-5
+    unary['!'] = lambda a: a // 2 - 5
 
     if character:
         # replace only 1 roll
