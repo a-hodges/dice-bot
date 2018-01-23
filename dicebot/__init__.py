@@ -58,6 +58,11 @@ async def after_any_command(ctx):
 
 
 @bot.event
+async def on_message_delete(message):
+    ...
+
+
+@bot.event
 async def on_command_error(ctx, error):
     if (isinstance(error, commands.CommandInvokeError)):
         error = error.original
