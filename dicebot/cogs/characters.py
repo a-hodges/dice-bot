@@ -35,7 +35,7 @@ class CharacterCog (Cog):
             ctx.session.commit()
             await ctx.send('Creating character: {}'.format(name))
 
-        await self.claim.callback(self, ctx, name=name)
+        await ctx.invoke(self.claim, name=name)
 
     @group.command()
     async def claim(self, ctx, *, name: str):
@@ -79,7 +79,7 @@ class CharacterCog (Cog):
         Parameters:
         [name*] is the name of the character to associate
         '''
-        await self.claim.callback(self, ctx, name=name)
+        await ctx.invoke(self.claim, name=name)
 
     @group.command(ignore_extra=False)
     async def unclaim(self, ctx):

@@ -17,7 +17,7 @@ class ResourceCog (Cog):
         except ValueError:
             message = 'Command "{} {}" is not found'.format(ctx.invoked_with, ctx.message.content.split()[1])
             raise commands.CommandNotFound(message)
-        await self.plus.callback(self, ctx, number, name=name)
+        await ctx.invoke(self.plus, number, name=name)
 
     @group.command(aliases=['update'], ignore_extra=False)
     async def add(self, ctx, name: str, max_uses: int, recover: str):
@@ -81,7 +81,7 @@ class ResourceCog (Cog):
         '''
         name = strip_quotes(name)
 
-        await self.plus.callback(self, ctx, -number, name=name)
+        await ctx.invoke(self.plus, -number, name=name)
 
     @group.command()
     async def use(self, ctx, *, name: str):

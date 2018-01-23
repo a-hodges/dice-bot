@@ -18,7 +18,7 @@ class InventoryCog (Cog):
         except ValueError:
             message = 'Command "{} {}" is not found'.format(ctx.invoked_with, ctx.message.content.split()[1])
             raise commands.CommandNotFound(message)
-        await self.plus.callback(self, ctx, number, name=name)
+        await ctx.invoke(self.plus, number, name=name)
 
     @group.command(ignore_extra=False)
     async def add(self, ctx, name: str, number: int):
@@ -101,7 +101,7 @@ class InventoryCog (Cog):
         '''
         name = strip_quotes(name)
 
-        await self.description.callback(self, ctx, name, description='')
+        await ctx.invoke(self.description, name, description='')
 
     @group.command()
     async def has(self, ctx, number: int, *, name: str):
@@ -158,7 +158,7 @@ class InventoryCog (Cog):
         '''
         name = strip_quotes(name)
 
-        await self.plus.callback(self, ctx, -number, name=name)
+        await ctx.invoke(self.plus, -number, name=name)
 
     @group.command()
     async def check(self, ctx, *, name: str):

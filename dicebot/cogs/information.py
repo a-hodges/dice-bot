@@ -98,7 +98,7 @@ class InformationCog (Cog):
         '''
         name = strip_quotes(name)
 
-        await self.description.callback(self, ctx, name, description='')
+        await ctx.invoke(self.description, name, description='')
 
     @group.command()
     async def check(self, ctx, *, name: str):
