@@ -70,41 +70,43 @@ async def on_command_error(ctx, error):
     if (isinstance(error, AttributeError) and
             ctx.guild is None and
             str(error) == "'NoneType' object has no attribute 'id'"):
-        await ctx.send("This command can only be used in a server")
+        message = "This command can only be used in a server"
 
     elif isinstance(error, commands.CheckFailure):
-        await ctx.send('Error: You do not meet the requirements to use this command')
+        message = 'Error: You do not meet the requirements to use this command'
     elif isinstance(error, commands.CommandNotFound):
         if error.args:
-            await ctx.send(error.args[0])
+            message = error.args[0]
         else:
-            await ctx.send('Error: command not found')
+            message = 'Error: command not found'
     elif isinstance(error, commands.BadArgument):
-        await ctx.send('{}\nSee the help text for valid parameters'.format(error))
+        message = '{}\nSee the help text for valid parameters'.format(error)
     elif isinstance(error, commands.MissingRequiredArgument):
-        await ctx.send('Missing parameter: {}\nSee the help text for valid parameters'.format(error.param))
+        message = 'Missing parameter: {}\nSee the help text for valid parameters'.format(error.param)
     elif isinstance(error, commands.TooManyArguments):
-        await ctx.send('Too many parameters\nSee the help text for valid parameters')
+        message = 'Too many parameters\nSee the help text for valid parameters'
     elif isinstance(error, NoCharacterError):
-        await ctx.send('User does not have a character')
+        message = 'User does not have a character'
     elif isinstance(error, ItemNotFoundError):
         if error.value:
-            await ctx.send("Couldn't find requested item: `{}`".format(error.value))
+            message = "Couldn't find requested item: `{}`".format(error.value)
         else:
-            await ctx.send("Couldn't find requested item")
+            message = "Couldn't find requested item"
     elif isinstance(error, EquationError):
         if error.args:
-            await ctx.send('Invalid dice expression: `{}`'.format(error.args[0]))
+            message = 'Invalid dice expression: `{}`'.format(error.args[0])
         else:
-            await ctx.send('Invalid dice expression')
+            message = 'Invalid dice expression'
     elif isinstance(error, ValueError):
         if error.args:
-            await ctx.send('Invalid parameter: {}'.format(error.args[0]))
+            message = 'Invalid parameter: {}'.format(error.args[0])
         else:
-            await ctx.send('Invalid parameter')
+            message = 'Invalid parameter'
     else:
-        await ctx.send('Error: {}'.format(error))
+        message = 'Error: {}'.format(error)
         raise error
+
+    msg = await ctx.send(message)
 
 
 for extension in [
