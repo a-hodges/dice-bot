@@ -3,10 +3,7 @@
 import os
 import logging
 
-try:
-    from . import main
-except SystemError:
-    from __init__ import main
+from dicebot import main
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
