@@ -117,9 +117,7 @@ async def on_command_error(ctx, error: Exception):
     msg = await ctx.send(message)
     await msg.add_reaction(delete_emoji)
 
-prefix = 'cogs.'
-if __name__ != '__main__':
-    prefix = __name__ + '.' + prefix
+prefix = __name__ + '.cogs.'
 for extension in [
     'characters',
     'rolls',
