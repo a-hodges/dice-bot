@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from distutils.core import setup
+from setuptools import setup, find_packages
 
 setup(name='Dice-bot',
       version='1.0.1',
@@ -8,4 +8,4 @@ setup(name='Dice-bot',
       author='BHodges',
       url='https://github.com/b-hodges/dice-bot',
       scripts=['dicebot.py'],
-      packages=['dicebot'])
+      packages=find_packages())
