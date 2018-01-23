@@ -1,9 +1,7 @@
 from discord.ext import commands
 from sqlalchemy.exc import IntegrityError
 
-import model as m
-from util import Cog, get_character, ItemNotFoundError
-from .cog_utils import send_pages, desc_paginator, strip_quotes
+from .util import m, Cog, get_character, ItemNotFoundError, send_pages, desc_paginator, strip_quotes
 
 
 class InformationCog (Cog):

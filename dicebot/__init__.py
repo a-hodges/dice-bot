@@ -16,8 +16,8 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from equations import EquationError
 
-import model as m
-from util import NoCharacterError, ItemNotFoundError
+from . import model as m
+from .cogs import util
 
 bot = commands.Bot(
     command_prefix=';',
@@ -92,9 +92,9 @@ async def on_command_error(ctx, error: Exception):
         message = 'Missing parameter: {}\nSee the help text for valid parameters'.format(error.param)
     elif isinstance(error, commands.TooManyArguments):
         message = 'Too many parameters\nSee the help text for valid parameters'
-    elif isinstance(error, NoCharacterError):
+    elif isinstance(error, util.NoCharacterError):
         message = 'User does not have a character'
-    elif isinstance(error, ItemNotFoundError):
+    elif isinstance(error, util.ItemNotFoundError):
         if error.value:
             message = "Couldn't find requested item: `{}`".format(error.value)
         else:
@@ -117,7 +117,9 @@ async def on_command_error(ctx, error: Exception):
     msg = await ctx.send(message)
     await msg.add_reaction(delete_emoji)
 
-
+prefix = 'cogs.'
+if __name__ != '__main__':
+    prefix = __name__ + '.' + prefix
 for extension in [
     'characters',
     'rolls',
@@ -127,7 +129,7 @@ for extension in [
     'spells',
     'information',
 ]:
-    bot.load_extension('cogs.' + extension)
+    bot.load_extension(prefix + extension)
 
 
 def main(database: str):

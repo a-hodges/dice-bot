@@ -1,8 +1,6 @@
 from discord.ext import commands
 
-import model as m
-from util import Cog, get_character, sql_update, ItemNotFoundError
-from .cog_utils import send_pages, item_paginator, strip_quotes
+from .util import m, Cog, get_character, sql_update, ItemNotFoundError, send_pages, item_paginator, strip_quotes
 
 
 class ResourceCog (Cog):
