@@ -23,6 +23,7 @@ bot = commands.Bot(
     command_prefix=';',
     description=__doc__,
     loop=asyncio.new_event_loop())
+delete_emoji = '❌'
 
 
 @bot.event
@@ -60,6 +61,17 @@ async def after_any_command(ctx):
 @bot.event
 async def on_message_delete(message):
     ...
+
+
+@bot.event
+async def on_raw_reaction_add(emoji, message_id, channel_id, user_id):
+    if user_id != bot.user.id:
+        if str(emoji) == delete_emoji:
+            channel = bot.get_channel(channel_id)
+            message = await channel.get_message(message_id)
+            emoji = [r for r in message.reactions if str(r.emoji) == delete_emoji and r.me and r.count > 1]
+            if emoji:
+                await message.delete()
 
 
 @bot.event
@@ -106,7 +118,9 @@ async def on_command_error(ctx, error):
         message = 'Error: {}'.format(error)
         raise error
 
+    message += '\n(click {} below to delete this message)'.format(delete_emoji)
     msg = await ctx.send(message)
+    await msg.add_reaction(delete_emoji)
 
 
 for extension in [
