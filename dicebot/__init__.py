@@ -64,7 +64,7 @@ async def on_message_delete(message):
 
 
 @bot.event
-async def on_raw_reaction_add(emoji, message_id, channel_id, user_id):
+async def on_raw_reaction_add(emoji: discord.Emoji, message_id: int, channel_id: int, user_id: int):
     if user_id != bot.user.id:
         if str(emoji) == delete_emoji:
             channel = bot.get_channel(channel_id)
@@ -75,7 +75,7 @@ async def on_raw_reaction_add(emoji, message_id, channel_id, user_id):
 
 
 @bot.event
-async def on_command_error(ctx, error):
+async def on_command_error(ctx, error: Exception):
     if (isinstance(error, commands.CommandInvokeError)):
         error = error.original
 
@@ -135,7 +135,7 @@ for extension in [
     bot.load_extension('cogs.' + extension)
 
 
-def main(database):
+def main(database: str):
     bot.config = OrderedDict([
         ('token', None),
         ('url', None),
