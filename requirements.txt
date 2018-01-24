@@ -1,7 +1,7 @@
 # install with: pip install -r requirements.txt
 
 # equation solver
-git+git://github.com/b-hodges/equations.git@master#egg=equations
+equations ~= 1.0
 
 # Special discord version
 git+git://github.com/Rapptz/discord.py.git@rewrite#egg=discord-py
