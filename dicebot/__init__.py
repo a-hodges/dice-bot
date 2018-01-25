@@ -59,7 +59,7 @@ async def after_any_command(ctx):
 
 
 @bot.event
-async def on_raw_reaction_add(emoji: discord.Emoji, message_id: int, channel_id: int, user_id: int):
+async def on_raw_reaction_add(emoji: discord.PartialEmoji, message_id: int, channel_id: int, user_id: int):
     if user_id != bot.user.id:
         if str(emoji) == delete_emoji:
             channel = bot.get_channel(channel_id)
