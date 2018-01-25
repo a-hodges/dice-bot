@@ -4,6 +4,7 @@ from sqlalchemy.exc import IntegrityError
 
 from .util import m, Cog, get_character, send_pages, item_paginator, strip_quotes
 
+
 class CharacterCog (Cog):
     @commands.group('character', aliases=['char'], invoke_without_command=True)
     async def group(self, ctx):
