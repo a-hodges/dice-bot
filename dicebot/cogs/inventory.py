@@ -1,10 +1,11 @@
 from discord.ext import commands
 from sqlalchemy.exc import IntegrityError
 
-from .util import m, Cog, get_character, ItemNotFoundError, send_pages, desc_paginator, strip_quotes
+from . import util
+from .util import m
 
 
-class InventoryCog (Cog):
+class InventoryCog (util.Cog):
     @commands.group('inventory', aliases=['inv'], invoke_without_command=True)
     async def group(self, ctx, *, input: str):
         '''
@@ -27,7 +28,7 @@ class InventoryCog (Cog):
         [name] the name of the new item
         [number] the number of the item you currently possess
         '''
-        character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
+        character = util.get_character(ctx.session, ctx.author.id, ctx.guild.id)
 
         item = m.Item(character_id=character.id, name=name, number=number)
         try:
@@ -51,12 +52,12 @@ class InventoryCog (Cog):
         [name] the name of the item to change
         [new_name] the new name of the item
         '''
-        character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
+        character = util.get_character(ctx.session, ctx.author.id, ctx.guild.id)
 
         item = ctx.session.query(m.Item)\
             .filter_by(character_id=character.id, name=name).one_or_none()
         if item is None:
-            raise ItemNotFoundError(name)
+            raise util.ItemNotFoundError(name)
 
         try:
             item.name = new_name
@@ -76,14 +77,14 @@ class InventoryCog (Cog):
         [description*] the new description for the item
             the description does not need quotes
         '''
-        description = strip_quotes(description)
+        description = util.strip_quotes(description)
 
-        character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
+        character = util.get_character(ctx.session, ctx.author.id, ctx.guild.id)
 
         item = ctx.session.query(m.Item)\
             .filter_by(character_id=character.id, name=name).one_or_none()
         if item is None:
-            raise ItemNotFoundError(name)
+            raise util.ItemNotFoundError(name)
 
         item.description = description
         ctx.session.commit()
@@ -97,7 +98,7 @@ class InventoryCog (Cog):
         Parameters:
         [name*] the name of the item to remove the description from
         '''
-        name = strip_quotes(name)
+        name = util.strip_quotes(name)
 
         await ctx.invoke(self.description, name, description='')
 
@@ -110,14 +111,14 @@ class InventoryCog (Cog):
         [number] the new quantity of the item
         [name*] the name of the item
         '''
-        name = strip_quotes(name)
+        name = util.strip_quotes(name)
 
-        character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
+        character = util.get_character(ctx.session, ctx.author.id, ctx.guild.id)
 
         item = ctx.session.query(m.Item)\
             .filter_by(character_id=character.id, name=name).one_or_none()
         if item is None:
-            raise ItemNotFoundError(name)
+            raise util.ItemNotFoundError(name)
 
         item.number = number
         ctx.session.commit()
@@ -132,14 +133,14 @@ class InventoryCog (Cog):
         [number] the number to increase the item count by
         [name*] the name of the item
         '''
-        name = strip_quotes(name)
+        name = util.strip_quotes(name)
 
-        character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
+        character = util.get_character(ctx.session, ctx.author.id, ctx.guild.id)
 
         item = ctx.session.query(m.Item)\
             .filter_by(character_id=character.id, name=name).one_or_none()
         if item is None:
-            raise ItemNotFoundError(name)
+            raise util.ItemNotFoundError(name)
 
         item.number += number
         ctx.session.commit()
@@ -154,7 +155,7 @@ class InventoryCog (Cog):
         [number] the number to decrease the item count by
         [name*] the name of the item
         '''
-        name = strip_quotes(name)
+        name = util.strip_quotes(name)
 
         await ctx.invoke(self.plus, -number, name=name)
 
@@ -166,13 +167,13 @@ class InventoryCog (Cog):
         Parameters:
         [name*] the name of the item
         '''
-        name = strip_quotes(name)
+        name = util.strip_quotes(name)
 
-        character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
+        character = util.get_character(ctx.session, ctx.author.id, ctx.guild.id)
         item = ctx.session.query(m.Item)\
             .filter_by(character_id=character.id, name=name).one_or_none()
         if item is None:
-            raise ItemNotFoundError(name)
+            raise util.ItemNotFoundError(name)
         text = str(item)
         if item.description:
             text += '\n' + item.description
@@ -183,9 +184,9 @@ class InventoryCog (Cog):
         '''
         Lists character's inventory
         '''
-        character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
-        pages = desc_paginator(character.inventory, header="{}'s inventory:".format(character.name))
-        await send_pages(ctx, pages)
+        character = util.get_character(ctx.session, ctx.author.id, ctx.guild.id)
+        pages = util.desc_paginator(character.inventory, header="{}'s inventory:".format(character.name))
+        await util.send_pages(ctx, pages)
 
     @group.command(aliases=['delete'])
     async def remove(self, ctx, *, name: str):
@@ -197,14 +198,14 @@ class InventoryCog (Cog):
         Parameters:
         [name*] the name of the item
         '''
-        name = strip_quotes(name)
+        name = util.strip_quotes(name)
 
-        character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
+        character = util.get_character(ctx.session, ctx.author.id, ctx.guild.id)
 
         item = ctx.session.query(m.Item)\
             .filter_by(character_id=character.id, name=name).one_or_none()
         if item is None:
-            raise ItemNotFoundError(name)
+            raise util.ItemNotFoundError(name)
 
         ctx.session.delete(item)
         ctx.session.commit()
@@ -218,15 +219,15 @@ class InventoryCog (Cog):
         Parameters:
         [name*] the name of the character to inspect
         '''
-        name = strip_quotes(name)
+        name = util.strip_quotes(name)
 
         character = ctx.session.query(m.Character)\
             .filter_by(name=name, server=str(ctx.guild.id)).one_or_none()
         if character is None:
             await ctx.send('No character named {}'.format(name))
         else:
-            pages = desc_paginator(character.inventory, header="{}'s inventory:".format(character.name))
-            await send_pages(ctx, pages)
+            pages = util.desc_paginator(character.inventory, header="{}'s inventory:".format(character.name))
+            await util.send_pages(ctx, pages)
 
 
 def setup(bot):

@@ -1,10 +1,11 @@
 from discord.ext import commands
 from sqlalchemy.exc import IntegrityError
 
-from .util import m, Cog, get_character, sql_update, ItemNotFoundError, send_pages, desc_paginator, strip_quotes
+from . import util
+from .util import m
 
 
-class SpellCog (Cog):
+class SpellCog (util.Cog):
     @commands.group('spell', invoke_without_command=True)
     async def group(self, ctx):
         '''
@@ -22,9 +23,9 @@ class SpellCog (Cog):
         [name] name of spell to store
         [level] the level of the spell
         '''
-        character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
+        character = util.get_character(ctx.session, ctx.author.id, ctx.guild.id)
 
-        spell = sql_update(ctx.session, m.Spell, {
+        spell = util.sql_update(ctx.session, m.Spell, {
             'character': character,
             'name': name,
         }, {
@@ -42,12 +43,12 @@ class SpellCog (Cog):
         [name] the name of the spell to change
         [new_name] the new name of the spell
         '''
-        character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
+        character = util.get_character(ctx.session, ctx.author.id, ctx.guild.id)
 
         spell = ctx.session.query(m.Spell)\
             .filter_by(character_id=character.id, name=name).one_or_none()
         if spell is None:
-            raise ItemNotFoundError(name)
+            raise util.ItemNotFoundError(name)
 
         try:
             spell.name = new_name
@@ -66,14 +67,14 @@ class SpellCog (Cog):
         [level] the new level of the spell
         [name*] the name of the spell
         '''
-        name = strip_quotes(name)
+        name = util.strip_quotes(name)
 
-        character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
+        character = util.get_character(ctx.session, ctx.author.id, ctx.guild.id)
 
         spell = ctx.session.query(m.Spell)\
             .filter_by(character_id=character.id, name=name).one_or_none()
         if spell is None:
-            raise ItemNotFoundError(name)
+            raise util.ItemNotFoundError(name)
 
         spell.level = level
         ctx.session.commit()
@@ -89,14 +90,14 @@ class SpellCog (Cog):
         [description*] the new description for the spell
             the description does not need quotes
         '''
-        description = strip_quotes(description)
+        description = util.strip_quotes(description)
 
-        character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
+        character = util.get_character(ctx.session, ctx.author.id, ctx.guild.id)
 
         spell = ctx.session.query(m.Spell)\
             .filter_by(character_id=character.id, name=name).one_or_none()
         if spell is None:
-            raise ItemNotFoundError(name)
+            raise util.ItemNotFoundError(name)
 
         spell.description = description
         ctx.session.commit()
@@ -110,7 +111,7 @@ class SpellCog (Cog):
         Parameters:
         [name*] the name of the spell to remove the description from
         '''
-        name = strip_quotes(name)
+        name = util.strip_quotes(name)
 
         await ctx.invoke(self.description, name, description=None)
 
@@ -122,13 +123,13 @@ class SpellCog (Cog):
         Parameters:
         [name*] the name of the spell
         '''
-        name = strip_quotes(name)
+        name = util.strip_quotes(name)
 
-        character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
+        character = util.get_character(ctx.session, ctx.author.id, ctx.guild.id)
         spell = ctx.session.query(m.Spell)\
             .filter_by(character_id=character.id, name=name).one_or_none()
         if spell is None:
-            raise ItemNotFoundError(name)
+            raise util.ItemNotFoundError(name)
         text = str(spell)
         if spell.description:
             text += '\n' + spell.description
@@ -139,9 +140,9 @@ class SpellCog (Cog):
         '''
         Lists all of a character's spells
         '''
-        character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
-        pages = desc_paginator(character.spells, header="{}'s spells:".format(character.name))
-        await send_pages(ctx, pages)
+        character = util.get_character(ctx.session, ctx.author.id, ctx.guild.id)
+        pages = util.desc_paginator(character.spells, header="{}'s spells:".format(character.name))
+        await util.send_pages(ctx, pages)
 
     @group.command(ignore_extra=False)
     async def level(self, ctx, level: int):
@@ -151,7 +152,7 @@ class SpellCog (Cog):
         Parameters:
         [level] the level of spells to show
         '''
-        character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
+        character = util.get_character(ctx.session, ctx.author.id, ctx.guild.id)
         spells = ctx.session.query(m.Spell)\
             .filter_by(character_id=character.id, level=level)\
             .order_by(m.Spell.name).all()
@@ -168,14 +169,14 @@ class SpellCog (Cog):
         Parameters:
         [name*] the name of the spell
         '''
-        name = strip_quotes(name)
+        name = util.strip_quotes(name)
 
-        character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
+        character = util.get_character(ctx.session, ctx.author.id, ctx.guild.id)
 
         spell = ctx.session.query(m.Spell)\
             .filter_by(character_id=character.id, name=name).one_or_none()
         if spell is None:
-            raise ItemNotFoundError(name)
+            raise util.ItemNotFoundError(name)
 
         ctx.session.delete(spell)
         ctx.session.commit()
@@ -189,15 +190,15 @@ class SpellCog (Cog):
         Parameters:
         [name*] the name of the character to inspect
         '''
-        name = strip_quotes(name)
+        name = util.strip_quotes(name)
 
         character = ctx.session.query(m.Character)\
             .filter_by(name=name, server=str(ctx.guild.id)).one_or_none()
         if character is None:
             await ctx.send('No character named {}'.format(name))
         else:
-            pages = desc_paginator(character.spells, header="{}'s spells:".format(character.name))
-            await send_pages(ctx, pages)
+            pages = util.desc_paginator(character.spells, header="{}'s spells:".format(character.name))
+            await util.send_pages(ctx, pages)
 
 
 def setup(bot):

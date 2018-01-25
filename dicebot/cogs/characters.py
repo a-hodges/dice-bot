@@ -2,10 +2,11 @@ import discord
 from discord.ext import commands
 from sqlalchemy.exc import IntegrityError
 
-from .util import m, Cog, get_character, send_pages, item_paginator, strip_quotes
+from . import util
+from .util import m
 
 
-class CharacterCog (Cog):
+class CharacterCog (util.Cog):
     @commands.group('character', aliases=['char'], invoke_without_command=True)
     async def group(self, ctx):
         '''
@@ -22,7 +23,7 @@ class CharacterCog (Cog):
         Parameters:
         [name*] is the name of the character to associate
         '''
-        name = strip_quotes(name)
+        name = util.strip_quotes(name)
 
         character = ctx.session.query(m.Character)\
             .filter_by(name=name, server=str(ctx.guild.id)).one_or_none()
@@ -46,7 +47,7 @@ class CharacterCog (Cog):
         Parameters:
         [name*] is the name of the character to associate
         '''
-        name = strip_quotes(name)
+        name = util.strip_quotes(name)
 
         character = ctx.session.query(m.Character)\
             .filter_by(name=name, server=str(ctx.guild.id)).one_or_none()
@@ -101,7 +102,7 @@ class CharacterCog (Cog):
         Parameters:
         [user] @mention the user
         '''
-        character = get_character(ctx.session, user.id, ctx.guild.id)
+        character = util.get_character(ctx.session, user.id, ctx.guild.id)
         await ctx.send('{} is {}'.format(user.mention, str(character)))
 
     @group.command()
@@ -112,10 +113,10 @@ class CharacterCog (Cog):
         Parameters:
         [name*] the new name
         '''
-        name = strip_quotes(name)
+        name = util.strip_quotes(name)
 
         try:
-            character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
+            character = util.get_character(ctx.session, ctx.author.id, ctx.guild.id)
             original_name = character.name
             character.name = name
             ctx.session.commit()
@@ -131,8 +132,8 @@ class CharacterCog (Cog):
         '''
         characters = ctx.session.query(m.Character)\
             .filter_by(server=str(ctx.guild.id)).all()
-        pages = item_paginator(characters, header='All characters')
-        await send_pages(ctx, pages)
+        pages = util.item_paginator(characters, header='All characters')
+        await util.send_pages(ctx, pages)
 
     def recover_resources(self, ctx, character, rest):
         '''
@@ -157,7 +158,7 @@ class CharacterCog (Cog):
         '''
         if rest not in ['short', 'long']:
             raise commands.BadArgument('Bad argument: rest')
-        character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
+        character = util.get_character(ctx.session, ctx.author.id, ctx.guild.id)
 
         if character:
             self.recover_resources(ctx, character, rest)
@@ -193,7 +194,7 @@ class CharacterCog (Cog):
         Parameters:
         [user] @mention the user
         '''
-        character = get_character(ctx.session, user.id, ctx.guild.id)
+        character = util.get_character(ctx.session, user.id, ctx.guild.id)
         character.user = None
         ctx.session.commit()
         await ctx.send('{} is no longer playing as {}'.format(user.mention, str(character)))

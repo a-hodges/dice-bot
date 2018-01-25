@@ -1,9 +1,10 @@
 from discord.ext import commands
 
-from .util import m, Cog, get_character, sql_update, ItemNotFoundError, send_pages, item_paginator, strip_quotes
+from . import util
+from .util import m
 
 
-class ResourceCog (Cog):
+class ResourceCog (util.Cog):
     @commands.group('resource', aliases=['res'], invoke_without_command=True)
     async def group(self, ctx, *, input: str):
         '''
@@ -31,9 +32,9 @@ class ResourceCog (Cog):
         if recover not in ['short', 'long', 'other']:
             raise commands.BadArgument('Bad argument: recover')
 
-        character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
+        character = util.get_character(ctx.session, ctx.author.id, ctx.guild.id)
 
-        resource = sql_update(ctx.session, m.Resource, {
+        resource = util.sql_update(ctx.session, m.Resource, {
             'character': character,
             'name': name,
         }, {
@@ -53,14 +54,14 @@ class ResourceCog (Cog):
         [number] the quantity of the resource to regain
         [name*] the name of the resource
         '''
-        name = strip_quotes(name)
+        name = util.strip_quotes(name)
 
-        character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
+        character = util.get_character(ctx.session, ctx.author.id, ctx.guild.id)
 
         resource = ctx.session.query(m.Resource)\
             .filter_by(character_id=character.id, name=name).one_or_none()
         if resource is None:
-            raise ItemNotFoundError(name)
+            raise util.ItemNotFoundError(name)
 
         prev = resource.current
         resource.current = resource.current + number
@@ -77,7 +78,7 @@ class ResourceCog (Cog):
         [number] the quantity of the resource to use
         [name*] the name of the resource
         '''
-        name = strip_quotes(name)
+        name = util.strip_quotes(name)
 
         await ctx.invoke(self.plus, -number, name=name)
 
@@ -89,14 +90,14 @@ class ResourceCog (Cog):
         Parameters:
         [name*] the name of the resource
         '''
-        name = strip_quotes(name)
+        name = util.strip_quotes(name)
 
-        character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
+        character = util.get_character(ctx.session, ctx.author.id, ctx.guild.id)
 
         resource = ctx.session.query(m.Resource)\
             .filter_by(character_id=character.id, name=name).one_or_none()
         if resource is None:
-            raise ItemNotFoundError(name)
+            raise util.ItemNotFoundError(name)
 
         if resource.current >= 1:
             prev = resource.current
@@ -116,12 +117,12 @@ class ResourceCog (Cog):
         [name] the name of the resource
         [uses] the new number of remaining uses
         '''
-        character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
+        character = util.get_character(ctx.session, ctx.author.id, ctx.guild.id)
 
         resource = ctx.session.query(m.Resource)\
             .filter_by(character_id=character.id, name=name).one_or_none()
         if resource is None:
-            raise ItemNotFoundError(name)
+            raise util.ItemNotFoundError(name)
 
         resource.current = uses
         ctx.session.commit()
@@ -137,14 +138,14 @@ class ResourceCog (Cog):
         Parameters:
         [name*] the name of the resource
         '''
-        name = strip_quotes(name)
+        name = util.strip_quotes(name)
 
-        character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
+        character = util.get_character(ctx.session, ctx.author.id, ctx.guild.id)
 
         resource = ctx.session.query(m.Resource)\
             .filter_by(character_id=character.id, name=name).one_or_none()
         if resource is None:
-            raise ItemNotFoundError(name)
+            raise util.ItemNotFoundError(name)
 
         resource.current = resource.max
         ctx.session.commit()
@@ -160,13 +161,13 @@ class ResourceCog (Cog):
         Parameters:
         [name*] the name of the resource
         '''
-        name = strip_quotes(name)
+        name = util.strip_quotes(name)
 
-        character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
+        character = util.get_character(ctx.session, ctx.author.id, ctx.guild.id)
         resource = ctx.session.query(m.Resource)\
             .filter_by(character_id=character.id, name=name).one_or_none()
         if resource is None:
-            raise ItemNotFoundError(name)
+            raise util.ItemNotFoundError(name)
         await ctx.send(str(resource))
 
     @group.command(ignore_extra=False)
@@ -174,9 +175,9 @@ class ResourceCog (Cog):
         '''
         Lists all of a character's resources
         '''
-        character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
-        pages = item_paginator(character.resources, header="{}'s resources:".format(character.name))
-        await send_pages(ctx, pages)
+        character = util.get_character(ctx.session, ctx.author.id, ctx.guild.id)
+        pages = util.item_paginator(character.resources, header="{}'s resources:".format(character.name))
+        await util.send_pages(ctx, pages)
 
     @group.command(aliases=['delete'])
     async def remove(self, ctx, *, name: str):
@@ -186,14 +187,14 @@ class ResourceCog (Cog):
         Parameters:
         [name*] the name of the resource
         '''
-        name = strip_quotes(name)
+        name = util.strip_quotes(name)
 
-        character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
+        character = util.get_character(ctx.session, ctx.author.id, ctx.guild.id)
 
         resource = ctx.session.query(m.Resource)\
             .filter_by(character_id=character.id, name=name).one_or_none()
         if resource is None:
-            raise ItemNotFoundError(name)
+            raise util.ItemNotFoundError(name)
 
         ctx.session.delete(resource)
         ctx.session.commit()
@@ -207,15 +208,15 @@ class ResourceCog (Cog):
         Parameters:
         [name*] the name of the character to inspect
         '''
-        name = strip_quotes(name)
+        name = util.strip_quotes(name)
 
         character = ctx.session.query(m.Character)\
             .filter_by(name=name, server=str(ctx.guild.id)).one_or_none()
         if character is None:
             await ctx.send('No character named {}'.format(name))
         else:
-            pages = item_paginator(character.resources, header="{}'s resources:".format(character.name))
-            await send_pages(ctx, pages)
+            pages = util.item_paginator(character.resources, header="{}'s resources:".format(character.name))
+            await util.send_pages(ctx, pages)
 
 
 def setup(bot):

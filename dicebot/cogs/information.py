@@ -1,10 +1,11 @@
 from discord.ext import commands
 from sqlalchemy.exc import IntegrityError
 
-from .util import m, Cog, get_character, ItemNotFoundError, send_pages, desc_paginator, strip_quotes
+from . import util
+from .util import m
 
 
-class InformationCog (Cog):
+class InformationCog (m.Cog):
     @commands.group('information', aliases=['info'], invoke_without_command=True)
     async def group(self, ctx):
         '''
@@ -22,9 +23,9 @@ class InformationCog (Cog):
         [name] the name of the new information block
         [description*] the text of the information block
         '''
-        description = strip_quotes(description)
+        description = util.strip_quotes(description)
 
-        character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
+        character = util.get_character(ctx.session, ctx.author.id, ctx.guild.id)
 
         info = m.Information(character_id=character.id, name=name, description=description)
         try:
@@ -48,12 +49,12 @@ class InformationCog (Cog):
         [name] the name of the block to change
         [new_name] the new name of the block
         '''
-        character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
+        character = util.get_character(ctx.session, ctx.author.id, ctx.guild.id)
 
         info = ctx.session.query(m.Information)\
             .filter_by(character_id=character.id, name=name).one_or_none()
         if info is None:
-            raise ItemNotFoundError(name)
+            raise util.ItemNotFoundError(name)
 
         try:
             info.name = new_name
@@ -73,14 +74,14 @@ class InformationCog (Cog):
         [description*] the new description for the block
             the description does not need quotes
         '''
-        description = strip_quotes(description)
+        description = util.strip_quotes(description)
 
-        character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
+        character = util.get_character(ctx.session, ctx.author.id, ctx.guild.id)
 
         info = ctx.session.query(m.Information)\
             .filter_by(character_id=character.id, name=name).one_or_none()
         if info is None:
-            raise ItemNotFoundError(name)
+            raise util.ItemNotFoundError(name)
 
         info.description = description
         ctx.session.commit()
@@ -94,7 +95,7 @@ class InformationCog (Cog):
         Parameters:
         [name*] the name of the block to clear the description for
         '''
-        name = strip_quotes(name)
+        name = util.strip_quotes(name)
 
         await ctx.invoke(self.description, name, description='')
 
@@ -106,13 +107,13 @@ class InformationCog (Cog):
         Parameters:
         [name*] the name of the block
         '''
-        name = strip_quotes(name)
+        name = util.strip_quotes(name)
 
-        character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
+        character = util.get_character(ctx.session, ctx.author.id, ctx.guild.id)
         info = ctx.session.query(m.Information)\
             .filter_by(character_id=character.id, name=name).one_or_none()
         if info is None:
-            raise ItemNotFoundError(name)
+            raise util.ItemNotFoundError(name)
         text = str(info)
         if info.description:
             text += '\n' + info.description
@@ -123,9 +124,9 @@ class InformationCog (Cog):
         '''
         Lists character's information
         '''
-        character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
-        pages = desc_paginator(character.information, header="{}'s information:".format(character.name))
-        await send_pages(ctx, pages)
+        character = util.get_character(ctx.session, ctx.author.id, ctx.guild.id)
+        pages = util.desc_paginator(character.information, header="{}'s information:".format(character.name))
+        await util.send_pages(ctx, pages)
 
     @group.command(aliases=['delete'])
     async def remove(self, ctx, *, name: str):
@@ -136,14 +137,14 @@ class InformationCog (Cog):
         Parameters:
         [name*] the name of the block
         '''
-        name = strip_quotes(name)
+        name = util.strip_quotes(name)
 
-        character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
+        character = util.get_character(ctx.session, ctx.author.id, ctx.guild.id)
 
         info = ctx.session.query(m.Information)\
             .filter_by(character_id=character.id, name=name).one_or_none()
         if info is None:
-            raise ItemNotFoundError(name)
+            raise util.ItemNotFoundError(name)
 
         ctx.session.delete(info)
         ctx.session.commit()
@@ -157,15 +158,15 @@ class InformationCog (Cog):
         Parameters:
         [name*] the name of the character to inspect
         '''
-        name = strip_quotes(name)
+        name = util.strip_quotes(name)
 
         character = ctx.session.query(m.Character)\
             .filter_by(name=name, server=str(ctx.guild.id)).one_or_none()
         if character is None:
             await ctx.send('No character named {}'.format(name))
         else:
-            pages = desc_paginator(character.information, header="{}'s information:".format(character.name))
-            await send_pages(ctx, pages)
+            pages = util.desc_paginator(character.information, header="{}'s information:".format(character.name))
+            await util.send_pages(ctx, pages)
 
 
 def setup(bot):

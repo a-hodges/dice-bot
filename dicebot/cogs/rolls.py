@@ -6,7 +6,8 @@ from discord.ext import commands
 from sqlalchemy import func
 import equations
 
-from .util import m, Cog, get_character, sql_update, ItemNotFoundError, send_pages, item_paginator, strip_quotes
+from . import util
+from .util import m
 
 
 async def do_roll(ctx, session, character, expression):
@@ -148,7 +149,7 @@ async def do_roll(ctx, session, character, expression):
     return roll
 
 
-class RollCog (Cog):
+class RollCog (util.Cog):
     @commands.group('roll', aliases=['r'], invoke_without_command=True)
     async def group(self, ctx, *, expression: str):
         '''
@@ -183,7 +184,7 @@ class RollCog (Cog):
         '''
         if not expression:
             raise commands.MissingRequiredArgument('expression')
-        expression = strip_quotes(expression)
+        expression = util.strip_quotes(expression)
 
         if ctx.guild:
             character = ctx.session.query(m.Character)\
@@ -202,9 +203,9 @@ class RollCog (Cog):
         [name] name of roll to store
         [expression] dice equation
         '''
-        character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
+        character = util.get_character(ctx.session, ctx.author.id, ctx.guild.id)
 
-        roll = sql_update(ctx.session, m.Roll, {
+        roll = util.sql_update(ctx.session, m.Roll, {
             'character': character,
             'name': name,
         }, {
@@ -221,13 +222,13 @@ class RollCog (Cog):
         Parameters:
         [name*] the name of the roll
         '''
-        name = strip_quotes(name)
+        name = util.strip_quotes(name)
 
-        character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
+        character = util.get_character(ctx.session, ctx.author.id, ctx.guild.id)
         roll = ctx.session.query(m.Roll)\
             .filter_by(character_id=character.id, name=name).one_or_none()
         if roll is None:
-            raise ItemNotFoundError(name)
+            raise util.ItemNotFoundError(name)
         await ctx.send(str(roll))
 
     @group.command(ignore_extra=False)
@@ -235,9 +236,9 @@ class RollCog (Cog):
         '''
         Lists all of a character's rolls
         '''
-        character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
-        pages = item_paginator(character.rolls, header="{}'s rolls:".format(character.name))
-        await send_pages(ctx, pages)
+        character = util.get_character(ctx.session, ctx.author.id, ctx.guild.id)
+        pages = util.item_paginator(character.rolls, header="{}'s rolls:".format(character.name))
+        await util.send_pages(ctx, pages)
 
     @group.command(aliases=['delete'])
     async def remove(self, ctx, *, name: str):
@@ -247,14 +248,14 @@ class RollCog (Cog):
         Parameters:
         [name*] the name of the roll
         '''
-        name = strip_quotes(name)
+        name = util.strip_quotes(name)
 
-        character = get_character(ctx.session, ctx.author.id, ctx.guild.id)
+        character = util.get_character(ctx.session, ctx.author.id, ctx.guild.id)
 
         roll = ctx.session.query(m.Roll)\
             .filter_by(character_id=character.id, name=name).one_or_none()
         if roll is None:
-            raise ItemNotFoundError(name)
+            raise util.ItemNotFoundError(name)
 
         ctx.session.delete(roll)
         ctx.session.commit()
@@ -268,15 +269,15 @@ class RollCog (Cog):
         Parameters:
         [name*] the name of the character to inspect
         '''
-        name = strip_quotes(name)
+        name = util.strip_quotes(name)
 
         character = ctx.session.query(m.Character)\
             .filter_by(name=name, server=str(ctx.guild.id)).one_or_none()
         if character is None:
             await ctx.send('No character named {}'.format(name))
         else:
-            pages = item_paginator(character.rolls, header="{}'s rolls:".format(character.name))
-            await send_pages(ctx, pages)
+            pages = util.item_paginator(character.rolls, header="{}'s rolls:".format(character.name))
+            await util.send_pages(ctx, pages)
 
 
 def setup(bot):
