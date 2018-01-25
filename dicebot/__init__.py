@@ -58,15 +58,16 @@ async def after_any_command(ctx):
     ctx.session = None
 
 
+def is_my_delete_emoji(reaction):
+    return reaction.me and reaction.count > 1 and str(reaction.emoji) == delete_emoji
+
+
 @bot.event
 async def on_raw_reaction_add(emoji: discord.PartialEmoji, message_id: int, channel_id: int, user_id: int):
-    if user_id != bot.user.id:
-        if str(emoji) == delete_emoji:
-            channel = bot.get_channel(channel_id)
-            message = await channel.get_message(message_id)
-            emoji = [r for r in message.reactions if str(r.emoji) == delete_emoji and r.me and r.count > 1]
-            if emoji:
-                await message.delete()
+    if user_id != bot.user.id and str(emoji) == delete_emoji:
+        message = await bot.get_channel(channel_id).get_message(message_id)
+        if discord.utils.find(is_my_delete_emoji, message.reactions):
+            await message.delete()
 
 
 @bot.event
