@@ -5,7 +5,7 @@ from . import util
 from .util import m
 
 
-class InformationCog (m.Cog):
+class InformationCog (util.Cog):
     @commands.group('information', aliases=['info'], invoke_without_command=True)
     async def group(self, ctx):
         '''
