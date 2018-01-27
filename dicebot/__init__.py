@@ -119,6 +119,10 @@ async def on_command_error(ctx, error: Exception):
     msg = await ctx.send(message)
     await msg.add_reaction(delete_emoji)
 
+
+# ----#-   Commands
+
+
 prefix = __name__ + '.cogs.'
 for extension in [
     'characters',
@@ -130,6 +134,9 @@ for extension in [
     'information',
 ]:
     bot.load_extension(prefix + extension)
+
+
+# ----#-
 
 
 def main(database: str):
