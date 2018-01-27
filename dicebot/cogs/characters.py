@@ -167,7 +167,7 @@ class CharacterCog (util.Cog):
             await ctx.send('User has no character')
 
     @commands.command(ignore_extra=False)
-    @commands.has_role('DM')
+    @commands.has_permissions(administrator=True)
     async def restall(self, ctx, rest: str):
         '''
         Have all characters on the server rest
@@ -186,7 +186,7 @@ class CharacterCog (util.Cog):
         await ctx.send('All characters have taken a {} rest, resources recovered'.format(rest))
 
     @group.command(ignore_extra=False)
-    @commands.has_role('DM')
+    @commands.has_permissions(administrator=True)
     async def forceunclaim(self, ctx, user: discord.Member):
         '''
         Forcibly removes a user's association with a character
@@ -200,7 +200,7 @@ class CharacterCog (util.Cog):
         await ctx.send('{} is no longer playing as {}'.format(user.mention, str(character)))
 
     @group.command(ignore_extra=False)
-    @commands.has_role('DM')
+    @commands.has_permissions(administrator=True)
     async def kill(self, ctx, name: str, confirmation: str):
         '''
         Deletes a character

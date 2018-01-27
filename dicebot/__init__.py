@@ -3,7 +3,8 @@
 Note:
 Any parameter value that has spaces in it needs to be wrapped in quotes "
 Parameters marked with a * may omit the quotes
-Certain commands are only usable by the @DM role
+
+Certain commands are only usable by administrators
 '''
 
 import asyncio
