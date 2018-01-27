@@ -7,6 +7,7 @@ Parameters marked with a * may omit the quotes
 Certain commands are only usable by administrators
 '''
 
+import re
 import asyncio
 from collections import OrderedDict
 from contextlib import closing
@@ -26,10 +27,13 @@ default_prefix = ';'
 
 
 async def get_prefix(bot: commands.Bot, message: discord.Message):
-    guild_id = str(message.guild.id)
+    match = re.match(r'^({}\s+)'.format(re.escape(bot.user.mention)), message.content)
+    if match:
+        return match.group(1)
     with closing(bot.Session()) as session:
-        item = session.query(m.Prefix).get(guild_id)
-        return default_prefix if item is None else item.prefix
+        item = session.query(m.Prefix).get(str(message.guild.id))
+        prefix = default_prefix if item is None else item.prefix
+    return prefix
 
 
 bot = commands.Bot(
@@ -48,7 +52,7 @@ async def on_ready():
     print(bot.user.name)
     print(bot.user.id)
     print('------')
-    game = 'Type {}help for command list'.format(default_prefix)
+    game = 'Type `@{} help` for command list'.format(bot.user.name)
     if bot.config['url']:
         game = bot.config['url'] + ' | ' + game
     await bot.change_presence(game=discord.Game(name=game))
