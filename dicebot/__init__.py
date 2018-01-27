@@ -22,11 +22,14 @@ from . import model as m
 from .cogs import util
 
 
+default_prefix = ';'
+
+
 async def get_prefix(bot: commands.Bot, message: discord.Message):
     guild_id = str(message.guild.id)
     with closing(bot.Session()) as session:
         item = session.query(m.Prefix).get(guild_id)
-        return ';' if item is None else item.prefix
+        return default_prefix if item is None else item.prefix
 
 
 bot = commands.Bot(
@@ -45,7 +48,7 @@ async def on_ready():
     print(bot.user.name)
     print(bot.user.id)
     print('------')
-    game = 'Type {}help for command list'.format(bot.command_prefix)
+    game = 'Type {}help for command list'.format(default_prefix)
     if bot.config['url']:
         game = bot.config['url'] + ' | ' + game
     await bot.change_presence(game=discord.Game(name=game))
@@ -134,7 +137,7 @@ async def on_command_error(ctx, error: Exception):
 
 @bot.command()
 @commands.has_permissions(administrator=True)
-async def setprefix(ctx, prefix: str = ';'):
+async def setprefix(ctx, prefix: str = default_prefix):
     '''
     Sets the prefix for the server
 
@@ -144,7 +147,7 @@ async def setprefix(ctx, prefix: str = ';'):
     '''
     guild_id = str(ctx.guild.id)
     item = ctx.session.query(m.Prefix).get(guild_id)
-    if prefix == ';':
+    if prefix == default_prefix:
         if item is not None:
             ctx.session.delete(item)
     else:
