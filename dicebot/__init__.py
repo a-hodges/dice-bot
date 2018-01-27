@@ -143,7 +143,7 @@ async def setprefix(ctx, prefix: str = default_prefix):
 
     Parameters:
     [prefix] the new prefix for the server
-        leave blank to reset to `;`
+        leave blank to reset
     '''
     guild_id = str(ctx.guild.id)
     item = ctx.session.query(m.Prefix).get(guild_id)
