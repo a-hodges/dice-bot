@@ -135,7 +135,7 @@ async def on_command_error(ctx, error: Exception):
 # ----#-   Commands
 
 
-@bot.command()
+@bot.command(ignore_extra=False)
 @commands.has_permissions(administrator=True)
 async def setprefix(ctx, prefix: str = default_prefix):
     '''
