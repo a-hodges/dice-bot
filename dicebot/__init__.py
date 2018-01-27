@@ -89,6 +89,7 @@ async def on_raw_reaction_add(emoji: discord.PartialEmoji, message_id: int, chan
 
 @bot.event
 async def on_command_error(ctx, error: Exception):
+    unknown = False
     if (isinstance(error, commands.CommandInvokeError)):
         error = error.original
 
@@ -127,13 +128,18 @@ async def on_command_error(ctx, error: Exception):
             message = 'Invalid parameter: {}'.format(error.args[0])
         else:
             message = 'Invalid parameter'
+    elif isinstance(error, Exception):
+        message = 'Error: {}'.format(error)
     else:
         message = 'Error: {}'.format(error)
-        raise error
+        unknown = True
 
     message += '\n(click {} below to delete this message)'.format(delete_emoji)
     msg = await ctx.send(message)
     await msg.add_reaction(delete_emoji)
+
+    if unknown:
+        raise error
 
 
 # ----#-   Commands
