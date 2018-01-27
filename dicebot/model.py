@@ -41,6 +41,21 @@ class Config (Base):
         doc="The setting's value")
 
 
+class Prefix (Base):
+    '''
+    Stores the prefixes for servers
+    '''
+    __tablename__ = 'prefixes'
+
+    server = Column(
+        String(64),
+        primary_key=True,
+        doc='The server id for the prefix')
+    prefix = Column(
+        String(64),
+        doc='The prefix for the server')
+
+
 class Character (Base):
     '''
     Character data

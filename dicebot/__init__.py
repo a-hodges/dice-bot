@@ -15,13 +15,22 @@ import discord
 from discord.ext import commands
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.exc import IntegrityError
 from equations import EquationError
 
 from . import model as m
 from .cogs import util
 
+
+async def get_prefix(bot: commands.Bot, message: discord.Message):
+    guild_id = str(message.guild.id)
+    with closing(bot.Session()) as session:
+        item = session.query(m.Prefix).get(guild_id)
+        return ';' if item is None else item.prefix
+
+
 bot = commands.Bot(
-    command_prefix=';',
+    command_prefix=get_prefix,
     description=__doc__,
     loop=asyncio.new_event_loop())
 delete_emoji = '❌'
@@ -121,6 +130,35 @@ async def on_command_error(ctx, error: Exception):
 
 
 # ----#-   Commands
+
+
+@bot.command()
+@commands.has_permissions(administrator=True)
+async def setprefix(ctx, prefix: str = ';'):
+    '''
+    Sets the prefix for the server
+
+    Parameters:
+    [prefix] the new prefix for the server
+        leave blank to reset to `;`
+    '''
+    guild_id = str(ctx.guild.id)
+    item = ctx.session.query(m.Prefix).get(guild_id)
+    if prefix == ';':
+        if item is not None:
+            ctx.session.delete(item)
+    else:
+        if item is None:
+            item = m.Prefix(server=guild_id)
+            ctx.session.add(item)
+        item.prefix = prefix
+    try:
+        ctx.session.commit()
+    except IntegrityError:
+        ctx.session.rollback()
+        raise Exception('Could not change prefix, an unknown error occured')
+    else:
+        await ctx.send('Prefix changed to {}'.format(prefix))
 
 
 prefix = __name__ + '.cogs.'
