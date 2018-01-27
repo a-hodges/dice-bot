@@ -274,7 +274,7 @@ class RollCog (util.Cog):
         character = ctx.session.query(m.Character)\
             .filter_by(name=name, server=str(ctx.guild.id)).one_or_none()
         if character is None:
-            await ctx.send('No character named {}'.format(name))
+            raise Exception('No character named {}'.format(name))
         else:
             pages = util.item_paginator(character.rolls, header="{}'s rolls:".format(character.name))
             await util.send_pages(ctx, pages)

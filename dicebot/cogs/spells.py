@@ -56,7 +56,7 @@ class SpellCog (util.Cog):
             await ctx.send('{} now has {}'.format(str(character), str(spell)))
         except IntegrityError:
             ctx.session.rollback()
-            await ctx.send('{} already has a spell named {}'.format(str(character), new_name))
+            raise Exception('{} already has a spell named {}'.format(str(character), new_name))
 
     @group.command()
     async def setlevel(self, ctx, level: int, *, name: str):
@@ -195,7 +195,7 @@ class SpellCog (util.Cog):
         character = ctx.session.query(m.Character)\
             .filter_by(name=name, server=str(ctx.guild.id)).one_or_none()
         if character is None:
-            await ctx.send('No character named {}'.format(name))
+            raise Exception('No character named {}'.format(name))
         else:
             pages = util.desc_paginator(character.spells, header="{}'s spells:".format(character.name))
             await util.send_pages(ctx, pages)

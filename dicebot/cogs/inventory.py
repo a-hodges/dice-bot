@@ -41,7 +41,7 @@ class InventoryCog (util.Cog):
         if item is not None:
             await ctx.send('{} now has {}'.format(str(character), str(item)))
         else:
-            await ctx.send('{} already has an item named {}'.format(str(character), name))
+            raise Exception('{} already has an item named {}'.format(str(character), name))
 
     @group.command(ignore_extra=False)
     async def rename(self, ctx, name: str, new_name: str):
@@ -65,7 +65,7 @@ class InventoryCog (util.Cog):
             await ctx.send('{} now has {}'.format(str(character), str(item)))
         except IntegrityError:
             ctx.session.rollback()
-            await ctx.send('{} already has an item named {}'.format(str(character), new_name))
+            raise Exception('{} already has an item named {}'.format(str(character), new_name))
 
     @group.command(aliases=['desc'])
     async def description(self, ctx, name: str, *, description: str):
@@ -224,7 +224,7 @@ class InventoryCog (util.Cog):
         character = ctx.session.query(m.Character)\
             .filter_by(name=name, server=str(ctx.guild.id)).one_or_none()
         if character is None:
-            await ctx.send('No character named {}'.format(name))
+            raise Exception('No character named {}'.format(name))
         else:
             pages = util.desc_paginator(character.inventory, header="{}'s inventory:".format(character.name))
             await util.send_pages(ctx, pages)

@@ -65,9 +65,9 @@ class CharacterCog (util.Cog):
                 ctx.session.commit()
                 await ctx.send('{} is {}'.format(ctx.author.mention, str(character)))
             else:
-                await ctx.send('Error: Someone else is using {}'.format(str(character)))
+                raise Exception('Someone else is using {}'.format(str(character)))
         else:
-            await ctx.send('There is no character named {}'.format(name))
+            raise Exception('There is no character named {}'.format(name))
 
     @commands.command()
     async def iam(self, ctx, *, name: str):
@@ -89,10 +89,10 @@ class CharacterCog (util.Cog):
             .filter_by(user=str(ctx.author.id), server=str(ctx.guild.id)).one_or_none()
         if character is not None:
             character.user = None
+            ctx.session.commit()
             await ctx.send('{} is no longer playing as {}'.format(ctx.author.mention, str(character)))
         else:
-            await ctx.send('Error: {} does not have a character to remove'.format(ctx.author.mention))
-        ctx.session.commit()
+            raise util.NoCharacterError
 
     @commands.command(ignore_extra=False)
     async def whois(self, ctx, user: discord.Member):
@@ -123,7 +123,7 @@ class CharacterCog (util.Cog):
             await ctx.send("{} has changed {}'s name to {}".format(ctx.author.mention, original_name, name))
         except IntegrityError:
             ctx.session.rollback()
-            await ctx.send('Error: There is already a character with that name')
+            raise Exception('There is already a character with that name')
 
     @group.command(ignore_extra=False)
     async def list(self, ctx):
@@ -164,7 +164,7 @@ class CharacterCog (util.Cog):
             self.recover_resources(ctx, character, rest)
             await ctx.send('{} has taken a {} rest, resources recovered'.format(str(character), rest))
         else:
-            await ctx.send('User has no character')
+            raise util.NoCharacterError
 
     @commands.command(ignore_extra=False)
     @commands.has_permissions(administrator=True)
@@ -223,9 +223,9 @@ class CharacterCog (util.Cog):
                 ctx.session.commit()
                 await ctx.send('{} is dead'.format(str(character)))
             else:
-                await ctx.send('Error: No character named {}'.format(name))
+                raise Exception('No character named {}'.format(name))
         else:
-            await ctx.send('Error: please confirm deletion correctly')
+            raise Exception('Please confirm deletion correctly')
 
 
 def setup(bot):

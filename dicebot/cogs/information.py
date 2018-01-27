@@ -38,7 +38,7 @@ class InformationCog (util.Cog):
         if info is not None:
             await ctx.send('{} now has {}'.format(str(character), str(info)))
         else:
-            await ctx.send('{} already has a information block named {}'.format(str(character), name))
+            raise Exception('{} already has a information block named {}'.format(str(character), name))
 
     @group.command(ignore_extra=False)
     async def rename(self, ctx, name: str, new_name: str):
@@ -62,7 +62,7 @@ class InformationCog (util.Cog):
             await ctx.send('{} now has {}'.format(str(character), str(info)))
         except IntegrityError:
             ctx.session.rollback()
-            await ctx.send('{} already has an information block named {}'.format(str(character), new_name))
+            raise Exception('{} already has an information block named {}'.format(str(character), new_name))
 
     @group.command(aliases=['desc'])
     async def description(self, ctx, name: str, *, description: str):
@@ -163,7 +163,7 @@ class InformationCog (util.Cog):
         character = ctx.session.query(m.Character)\
             .filter_by(name=name, server=str(ctx.guild.id)).one_or_none()
         if character is None:
-            await ctx.send('No character named {}'.format(name))
+            raise Exception('No character named {}'.format(name))
         else:
             pages = util.desc_paginator(character.information, header="{}'s information:".format(character.name))
             await util.send_pages(ctx, pages)
