@@ -57,6 +57,11 @@ async def send_pages(ctx, paginator):
         await ctx.send(page)
 
 
+def invalid_subcommand(ctx):
+    message = 'Command "{} {}" is not found'.format(ctx.invoked_with, ctx.message.content.split()[1])
+    return commands.CommandNotFound(message)
+
+
 def item_paginator(items, header=None):
     paginator = commands.Paginator(prefix='', suffix='')
     if header:

@@ -10,8 +10,7 @@ class VariableCog (util.Cog):
         '''
         Manage character values
         '''
-        message = 'Command "{} {}" is not found'.format(ctx.invoked_with, ctx.message.content.split()[1])
-        raise commands.CommandNotFound(message)
+        raise util.invalid_subcommand(ctx)
 
     @group.command(aliases=['set', 'update'], ignore_extra=False)
     async def add(self, ctx, name: str, value: int):

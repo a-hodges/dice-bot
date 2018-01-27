@@ -11,8 +11,7 @@ class SpellCog (util.Cog):
         '''
         Manage character spell list
         '''
-        message = 'Command "{} {}" is not found'.format(ctx.invoked_with, ctx.message.content.split()[1])
-        raise commands.CommandNotFound(message)
+        raise util.invalid_subcommand(ctx)
 
     @group.command(aliases=['update'], ignore_extra=False)
     async def add(self, ctx, name: str, level: int):

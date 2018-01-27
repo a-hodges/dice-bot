@@ -15,8 +15,7 @@ class InventoryCog (util.Cog):
             number, name = input.split(maxsplit=1)
             number = int(number)
         except ValueError:
-            message = 'Command "{} {}" is not found'.format(ctx.invoked_with, ctx.message.content.split()[1])
-            raise commands.CommandNotFound(message)
+            raise util.invalid_subcommand(ctx)
         await ctx.invoke(self.plus, number, name=name)
 
     @group.command(ignore_extra=False)

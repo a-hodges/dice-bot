@@ -11,8 +11,7 @@ class InformationCog (util.Cog):
         '''
         Manages character information
         '''
-        message = 'Command "{} {}" is not found'.format(ctx.invoked_with, ctx.message.content.split()[1])
-        raise commands.CommandNotFound(message)
+        raise util.invalid_subcommand(ctx)
 
     @group.command()
     async def add(self, ctx, name: str, *, description: str):

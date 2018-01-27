@@ -12,8 +12,7 @@ class CharacterCog (util.Cog):
         '''
         Manage character data
         '''
-        message = 'Command "{} {}" is not found'.format(ctx.invoked_with, ctx.message.content.split()[1])
-        raise commands.CommandNotFound(message)
+        raise util.invalid_subcommand(ctx)
 
     @group.command()
     async def create(self, ctx, *, name: str):
