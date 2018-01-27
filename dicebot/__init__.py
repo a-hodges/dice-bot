@@ -168,6 +168,15 @@ async def setprefix(ctx, prefix: str = default_prefix):
         await ctx.send('Prefix changed to `{}`'.format(prefix))
 
 
+@bot.command(ignore_extra=False)
+async def checkprefix(ctx):
+    '''
+    Checks the server's prefix
+    '''
+    item = ctx.session.query(m.Prefix).get(str(ctx.guild.id))
+    return default_prefix if item is None else item.prefix
+
+
 prefix = __name__ + '.cogs.'
 for extension in [
     'characters',
