@@ -170,6 +170,7 @@ class CharacterCog (util.Cog):
     async def restall(self, ctx, rest: str):
         '''
         Have all characters on the server rest
+        Can only be done by an administrator
 
         Parameters:
         [rest] should be short|long
@@ -189,6 +190,7 @@ class CharacterCog (util.Cog):
     async def forceunclaim(self, ctx, user: discord.Member):
         '''
         Forcibly removes a user's association with a character
+        Can only be done by an administrator
 
         Parameters:
         [user] @mention the user
@@ -204,7 +206,7 @@ class CharacterCog (util.Cog):
         '''
         Deletes a character
         This is permanent and removes all associated attributes!
-        Can only be done by the @DM role
+        Can only be done by an administrator
 
         Parameters:
         [name] the name of the character to delete

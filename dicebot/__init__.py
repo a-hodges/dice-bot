@@ -150,6 +150,7 @@ async def on_command_error(ctx, error: Exception):
 async def setprefix(ctx, prefix: str = default_prefix):
     '''
     Sets the prefix for the server
+    Can only be done by an administrator
 
     Parameters:
     [prefix] the new prefix for the server
