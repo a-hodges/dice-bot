@@ -10,7 +10,7 @@ requires = [
 ]
 
 dependency_links = [
-    "https://github.com/Rapptz/discord.py/tarball/rewrite#egg=discord-py",
+    "https://github.com/Rapptz/discord.py/tarball/rewrite#egg=discord.py-1.0.0",
 ]
 
 setup(name='Dice-bot',
