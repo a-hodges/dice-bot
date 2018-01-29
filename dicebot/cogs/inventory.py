@@ -5,7 +5,7 @@ from . import util
 from .util import m
 
 
-class InventoryCog (util.Cog):
+class InventoryCategory (util.Cog):
     @commands.group('inventory', aliases=['inv'], invoke_without_command=True)
     async def group(self, ctx, *, input: str):
         '''
@@ -230,4 +230,4 @@ class InventoryCog (util.Cog):
 
 
 def setup(bot):
-    bot.add_cog(InventoryCog(bot))
+    bot.add_cog(InventoryCategory(bot))

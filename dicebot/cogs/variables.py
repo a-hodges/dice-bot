@@ -4,7 +4,7 @@ from . import util
 from .util import m
 
 
-class VariableCog (util.Cog):
+class VariableCategory (util.Cog):
     @commands.group('variable', aliases=['var'], invoke_without_command=True)
     async def group(self, ctx):
         '''
@@ -99,4 +99,4 @@ class VariableCog (util.Cog):
 
 
 def setup(bot):
-    bot.add_cog(VariableCog(bot))
+    bot.add_cog(VariableCategory(bot))

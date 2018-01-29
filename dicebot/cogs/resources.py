@@ -4,7 +4,7 @@ from . import util
 from .util import m
 
 
-class ResourceCog (util.Cog):
+class ResourceCategory (util.Cog):
     @commands.group('resource', aliases=['res'], invoke_without_command=True)
     async def group(self, ctx, *, input: str):
         '''
@@ -219,4 +219,4 @@ class ResourceCog (util.Cog):
 
 
 def setup(bot):
-    bot.add_cog(ResourceCog(bot))
+    bot.add_cog(ResourceCategory(bot))

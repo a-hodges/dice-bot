@@ -5,7 +5,7 @@ from . import util
 from .util import m
 
 
-class SpellCog (util.Cog):
+class SpellCategory (util.Cog):
     @commands.group('spell', invoke_without_command=True)
     async def group(self, ctx):
         '''
@@ -201,4 +201,4 @@ class SpellCog (util.Cog):
 
 
 def setup(bot):
-    bot.add_cog(SpellCog(bot))
+    bot.add_cog(SpellCategory(bot))

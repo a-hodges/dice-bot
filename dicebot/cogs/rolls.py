@@ -149,7 +149,7 @@ async def do_roll(ctx, session, character, expression):
     return roll
 
 
-class RollCog (util.Cog):
+class RollCategory (util.Cog):
     @commands.group('roll', aliases=['r'], invoke_without_command=True)
     async def group(self, ctx, *, expression: str):
         '''
@@ -281,4 +281,4 @@ class RollCog (util.Cog):
 
 
 def setup(bot):
-    bot.add_cog(RollCog(bot))
+    bot.add_cog(RollCategory(bot))

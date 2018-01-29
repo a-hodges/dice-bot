@@ -5,7 +5,7 @@ from . import util
 from .util import m
 
 
-class InformationCog (util.Cog):
+class InformationCategory (util.Cog):
     @commands.group('information', aliases=['info'], invoke_without_command=True)
     async def group(self, ctx):
         '''
@@ -169,4 +169,4 @@ class InformationCog (util.Cog):
 
 
 def setup(bot):
-    bot.add_cog(InformationCog(bot))
+    bot.add_cog(InformationCategory(bot))

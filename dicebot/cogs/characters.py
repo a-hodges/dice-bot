@@ -6,7 +6,7 @@ from . import util
 from .util import m
 
 
-class CharacterCog (util.Cog):
+class CharacterCategory (util.Cog):
     @commands.group('character', aliases=['char'], invoke_without_command=True)
     async def group(self, ctx):
         '''
@@ -230,4 +230,4 @@ class CharacterCog (util.Cog):
 
 
 def setup(bot):
-    bot.add_cog(CharacterCog(bot))
+    bot.add_cog(CharacterCategory(bot))
