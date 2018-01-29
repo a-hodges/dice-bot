@@ -15,5 +15,4 @@ setup(name='Dice-bot',
       author='BHodges',
       url='https://github.com/b-hodges/dice-bot',
       install_requires=requires,
-      scripts=['dicebot.py'],
       packages=find_packages())
