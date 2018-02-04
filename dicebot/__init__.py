@@ -30,9 +30,12 @@ async def get_prefix(bot: commands.Bot, message: discord.Message):
     match = re.match(r'^({}\s+)'.format(re.escape(bot.user.mention)), message.content)
     if match:
         return match.group(1)
-    with closing(bot.Session()) as session:
-        item = session.query(m.Prefix).get(str(message.guild.id))
-        prefix = default_prefix if item is None else item.prefix
+    elif message.guild:
+        with closing(bot.Session()) as session:
+            item = session.query(m.Prefix).get(str(message.guild.id))
+            prefix = default_prefix if item is None else item.prefix
+    else:
+        prefix = default_prefix
     return prefix
 
 
