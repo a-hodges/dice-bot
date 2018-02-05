@@ -187,8 +187,10 @@ class RollCategory (util.Cog):
         expression = util.strip_quotes(expression)
 
         if ctx.guild:
-            character = ctx.session.query(m.Character)\
-                .filter_by(user=str(ctx.author.id), server=str(ctx.guild.id)).one_or_none()
+            try:
+                character = util.get_character(ctx.session, ctx.author.id, ctx.guild.id)
+            except util.NoCharacterError:
+                character = None
         else:
             character = None
 
