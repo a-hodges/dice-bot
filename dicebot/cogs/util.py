@@ -53,6 +53,9 @@ def sql_update(session, type, keys, values):
 
 
 async def send_pages(ctx, paginator):
+    '''
+    Displays a set of pages
+    '''
     for page in paginator.pages:
         await ctx.send(page)
 
@@ -63,6 +66,9 @@ def invalid_subcommand(ctx):
 
 
 def item_paginator(items, header=None):
+    '''
+    Returns a pages instance for items without descriptions
+    '''
     paginator = commands.Paginator(prefix='', suffix='')
     if header:
         paginator.add_line(header)
@@ -72,6 +78,9 @@ def item_paginator(items, header=None):
 
 
 def desc_paginator(items, header=None):
+    '''
+    Returns a pages instance for items with descriptions
+    '''
     paginator = commands.Paginator(prefix='', suffix='')
     if header:
         paginator.add_line(header)
@@ -84,6 +93,9 @@ def desc_paginator(items, header=None):
 
 
 def strip_quotes(arg):
+    '''
+    Strips quotes from arguments
+    '''
     if len(arg) >= 2 and arg.startswith('"') and arg.endswith('"'):
         arg = arg[1:-1]
     return arg
