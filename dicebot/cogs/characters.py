@@ -63,6 +63,8 @@ class CharacterCategory (util.Cog):
                 character.user = str(ctx.author.id)
                 ctx.session.commit()
                 await ctx.send('{} is {}'.format(ctx.author.mention, str(character)))
+            elif character.user == 'DM':
+                raise Exception('Cannot claim DM character {}'.format(str(character)))
             else:
                 raise Exception('Someone else is using {}'.format(str(character)))
         else:
@@ -128,8 +130,10 @@ class CharacterCategory (util.Cog):
     async def list(self, ctx):
         '''
         Lists all of the characters for this server
+        Does not list DM characters
         '''
         characters = ctx.session.query(m.Character)\
+            .filter(~m.Character.dm_character)\
             .filter_by(server=str(ctx.guild.id)).all()
         pages = util.item_paginator(characters, header='All characters:')
         await util.send_pages(ctx, pages)

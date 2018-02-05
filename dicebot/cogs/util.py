@@ -26,6 +26,7 @@ def get_character(session, userid, server):
     Gets a character based on their user
     '''
     character = session.query(m.Character)\
+        .filter(~m.Character.dm_character)\
         .filter_by(user=str(userid), server=str(server)).one_or_none()
     if character is None:
         raise NoCharacterError()
@@ -111,6 +112,7 @@ async def inspector(ctx, name: str, attr: str, paginator):
     Returns a Pages instance
     '''
     character = ctx.session.query(m.Character)\
+        .filter(~m.Character.dm_character)\
         .filter_by(name=name, server=str(ctx.guild.id)).one_or_none()
     if character is None:
         raise Exception('No character named {}'.format(name))

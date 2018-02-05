@@ -11,6 +11,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import relationship
 from sqlalchemy.schema import Index, UniqueConstraint
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.ext.declarative import declarative_base
 
 
@@ -77,6 +78,10 @@ class Character (Base):
     user = Column(
         String(64),
         doc='The id of the user of the character')
+
+    @hybrid_property
+    def dm_character(self):
+        return (self.user != None) & (self.user == 'DM')
 
     __table_args__ = (
         UniqueConstraint(name, server),
