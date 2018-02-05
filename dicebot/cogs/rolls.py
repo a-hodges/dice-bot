@@ -271,13 +271,7 @@ class RollCategory (util.Cog):
         '''
         name = util.strip_quotes(name)
 
-        character = ctx.session.query(m.Character)\
-            .filter_by(name=name, server=str(ctx.guild.id)).one_or_none()
-        if character is None:
-            raise Exception('No character named {}'.format(name))
-        else:
-            pages = util.item_paginator(character.rolls, header="{}'s rolls:".format(character.name))
-            await util.send_pages(ctx, pages)
+        await util.inspector(ctx, name, 'rolls', util.item_paginator)
 
 
 def setup(bot):
