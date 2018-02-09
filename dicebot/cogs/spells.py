@@ -129,7 +129,7 @@ class SpellCategory (util.Cog):
             .filter_by(character_id=character.id, name=name).one_or_none()
         if spell is None:
             raise util.ItemNotFoundError(name)
-        text = str(spell)
+        text = '**{}**'.format(str(spell))
         if spell.description:
             text += '\n' + spell.description
         await ctx.send(text)

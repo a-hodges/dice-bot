@@ -113,7 +113,7 @@ class InformationCategory (util.Cog):
             .filter_by(character_id=character.id, name=name).one_or_none()
         if info is None:
             raise util.ItemNotFoundError(name)
-        text = str(info)
+        text = '**{}**'.format(str(info))
         if info.description:
             text += '\n' + info.description
         await ctx.send(text)

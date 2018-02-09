@@ -173,7 +173,7 @@ class InventoryCategory (util.Cog):
             .filter_by(character_id=character.id, name=name).one_or_none()
         if item is None:
             raise util.ItemNotFoundError(name)
-        text = str(item)
+        text = '**{}**'.format(str(item))
         if item.description:
             text += '\n' + item.description
         await ctx.send(text)
