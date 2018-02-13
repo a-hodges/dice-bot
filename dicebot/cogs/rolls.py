@@ -134,7 +134,7 @@ async def do_roll(ctx, session, character, expression):
             raise equations.EquationError('Could not find: {}'.format(token))
 
     # do roll
-    output.append('Rolling: `{}`'.format(expression))
+    output.append('`{}`'.format(expression))
     roll = equations.solve(expression, operations=operations, unary=unary)
     if roll % 1 == 0:
         roll = int(roll)
@@ -144,7 +144,7 @@ async def do_roll(ctx, session, character, expression):
     else:
         output.append('You rolled {}'.format(roll))
 
-    await ctx.send('\n'.join(output))
+    await ctx.send(' **|** '.join(output))
 
     return roll
 
