@@ -30,7 +30,7 @@ default_prefix = ';'
 
 async def get_prefix(bot: commands.Bot, message: discord.Message):
     mention = message.guild.get_member(bot.user.id).mention if message.guild else bot.user.mention
-    match = re.match(r'^(.*{}\s*)'.format(re.escape(mention)), message.content)
+    match = re.match(r'^(.*{}\s*)'.format(re.escape(mention)), message.content, flags=re.S)
     if match:
         return match.group(1)
     elif message.guild:
