@@ -5,6 +5,8 @@ Any parameter value that has spaces in it needs to be wrapped in quotes "
 Parameters marked with a * may omit the quotes
 
 Certain commands are only usable by administrators
+
+If the bot is mentioned in a message, everything after the last mention is considered a command
 '''
 
 import re
@@ -28,7 +30,7 @@ default_prefix = ';'
 
 async def get_prefix(bot: commands.Bot, message: discord.Message):
     mention = message.guild.get_member(bot.user.id).mention if message.guild else bot.user.mention
-    match = re.match(r'^(\s*{}\s*)'.format(re.escape(mention)), message.content)
+    match = re.match(r'^(.*{}\s*)'.format(re.escape(mention)), message.content)
     if match:
         return match.group(1)
     elif message.guild:
