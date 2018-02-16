@@ -10,7 +10,7 @@ from . import util
 from .util import m
 
 
-async def do_roll(ctx, session, character, expression):
+async def do_roll(expression, session, character=None, output=[]):
     '''
     Does the variable replacement and dice rolling
     '''
@@ -26,7 +26,6 @@ async def do_roll(ctx, session, character, expression):
         adv = 0
 
     original_expression = expression
-    output = []
 
     # Set up operations
     def roll_dice(a, b, *, silent=False):
@@ -144,8 +143,6 @@ async def do_roll(ctx, session, character, expression):
     else:
         output.append('You rolled {}'.format(roll))
 
-    await ctx.send(' **|** '.join(output))
-
     return roll
 
 
@@ -194,7 +191,10 @@ class RollCategory (util.Cog):
         else:
             character = None
 
-        await do_roll(ctx, ctx.session, character, expression)
+        output = []
+        await do_roll(expression, ctx.session, character, output=output)
+        output = ' **|** '.join(output)
+        await ctx.send(output)
 
     @group.command(aliases=['set', 'update'], ignore_extra=False)
     async def add(self, ctx, name: str, expression: str):
