@@ -86,13 +86,17 @@ async def inspector(ctx, character, attr, desc=False):
     Returns a Pages instance
     '''
     if isinstance(character, str):
+        name = character
         character = ctx.session.query(m.Character)\
             .filter(~m.Character.dm_character)\
             .filter_by(name=name, server=str(ctx.guild.id)).one_or_none()
         if character is None:
             raise Exception('No character named {}'.format(name))
+    else:
+        name = character.name
+
     paginator = commands.Paginator(prefix='', suffix='')
-    paginator.add_line("{}'s {}:".format(character.name, attr))
+    paginator.add_line("{}'s {}:".format(name, attr))
     for item in getattr(character, attr):
         head = str(item)
         if desc:
@@ -101,6 +105,7 @@ async def inspector(ctx, character, attr, desc=False):
         if desc and item.description:
             for line in item.description.splitlines():
                 paginator.add_line(line)
+
     await send_pages(ctx, paginator)
 
 
