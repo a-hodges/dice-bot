@@ -140,7 +140,7 @@ class SpellCategory (util.Cog):
         Lists all of a character's spells
         '''
         character = util.get_character(ctx.session, ctx.author.id, ctx.guild.id)
-        await util.inspector(ctx, character, 'spells', util.desc_paginator)
+        await util.inspector(ctx, character, 'spells', desc=True)
 
     @group.command(ignore_extra=False)
     async def level(self, ctx, level: int):
@@ -190,7 +190,7 @@ class SpellCategory (util.Cog):
         '''
         name = util.strip_quotes(name)
 
-        await util.inspector(ctx, name, 'spells', util.desc_paginator)
+        await util.inspector(ctx, name, 'spells', desc=True)
 
 
 def setup(bot):

@@ -67,33 +67,6 @@ def invalid_subcommand(ctx):
     return commands.CommandNotFound(message)
 
 
-def item_paginator(items, header=None):
-    '''
-    Returns a pages instance for items without descriptions
-    '''
-    paginator = commands.Paginator(prefix='', suffix='')
-    if header:
-        paginator.add_line(header)
-    for item in items:
-        paginator.add_line(str(item))
-    return paginator
-
-
-def desc_paginator(items, header=None):
-    '''
-    Returns a pages instance for items with descriptions
-    '''
-    paginator = commands.Paginator(prefix='', suffix='')
-    if header:
-        paginator.add_line(header)
-    for item in items:
-        paginator.add_line('***{}***'.format(str(item)))
-        if item.description:
-            for line in item.description.splitlines():
-                paginator.add_line(line)
-    return paginator
-
-
 def strip_quotes(arg):
     '''
     Strips quotes from arguments
@@ -103,7 +76,7 @@ def strip_quotes(arg):
     return arg
 
 
-async def inspector(ctx, character, attr: str, paginator):
+async def inspector(ctx, character, attr, desc=False):
     '''
     Inspects an attribute of a character
     [ctx] the command context
@@ -118,8 +91,17 @@ async def inspector(ctx, character, attr: str, paginator):
             .filter_by(name=name, server=str(ctx.guild.id)).one_or_none()
         if character is None:
             raise Exception('No character named {}'.format(name))
-    pages = paginator(getattr(character, attr), header="{}'s {}:".format(character.name, attr))
-    await send_pages(ctx, pages)
+    paginator = commands.Paginator(prefix='', suffix='')
+    paginator.add_line("{}'s {}:".format(character.name, attr))
+    for item in getattr(character, attr):
+        head = str(item)
+        if desc:
+            head = '***{}***'.format(head)
+        paginator.add_line(head)
+        if desc and item.description:
+            for line in item.description.splitlines():
+                paginator.add_line(line)
+    await send_pages(ctx, paginator)
 
 
 async def send_embed(ctx, *, content=None, author=None, color=None, description=None, fields=[]):

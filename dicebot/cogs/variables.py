@@ -55,7 +55,7 @@ class VariableCategory (util.Cog):
         Lists all of a character's variables
         '''
         character = util.get_character(ctx.session, ctx.author.id, ctx.guild.id)
-        await util.inspector(ctx, character, 'variables', util.item_paginator)
+        await util.inspector(ctx, character, 'variables')
 
     @group.command(aliases=['delete'])
     async def remove(self, ctx, *, name: str):
@@ -88,7 +88,7 @@ class VariableCategory (util.Cog):
         '''
         name = util.strip_quotes(name)
 
-        await util.inspector(ctx, name, 'variables', util.item_paginator)
+        await util.inspector(ctx, name, 'variables')
 
 
 def setup(bot):

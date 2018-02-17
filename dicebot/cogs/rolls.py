@@ -238,7 +238,7 @@ class RollCategory (util.Cog):
         Lists all of a character's rolls
         '''
         character = util.get_character(ctx.session, ctx.author.id, ctx.guild.id)
-        await util.inspector(ctx, character, 'rolls', util.item_paginator)
+        await util.inspector(ctx, character, 'rolls')
 
     @group.command(aliases=['delete'])
     async def remove(self, ctx, *, name: str):
@@ -271,7 +271,7 @@ class RollCategory (util.Cog):
         '''
         name = util.strip_quotes(name)
 
-        await util.inspector(ctx, name, 'rolls', util.item_paginator)
+        await util.inspector(ctx, name, 'rolls')
 
 
 def setup(bot):

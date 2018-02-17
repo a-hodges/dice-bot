@@ -124,7 +124,7 @@ class InformationCategory (util.Cog):
         Lists character's information
         '''
         character = util.get_character(ctx.session, ctx.author.id, ctx.guild.id)
-        await util.inspector(ctx, character, 'information', util.desc_paginator)
+        await util.inspector(ctx, character, 'information', desc=True)
 
     @group.command(aliases=['delete'])
     async def remove(self, ctx, *, name: str):
@@ -158,7 +158,7 @@ class InformationCategory (util.Cog):
         '''
         name = util.strip_quotes(name)
 
-        await util.inspector(ctx, name, 'information', util.desc_paginator)
+        await util.inspector(ctx, name, 'information', desc=True)
 
 
 def setup(bot):

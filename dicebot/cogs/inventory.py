@@ -184,7 +184,7 @@ class InventoryCategory (util.Cog):
         Lists character's inventory
         '''
         character = util.get_character(ctx.session, ctx.author.id, ctx.guild.id)
-        await util.inspector(ctx, character, 'inventory', util.desc_paginator)
+        await util.inspector(ctx, character, 'inventory', desc=True)
 
     @group.command(aliases=['delete'])
     async def remove(self, ctx, *, name: str):
@@ -219,7 +219,7 @@ class InventoryCategory (util.Cog):
         '''
         name = util.strip_quotes(name)
 
-        await util.inspector(ctx, name, 'inventory', util.desc_paginator)
+        await util.inspector(ctx, name, 'inventory', desc=True)
 
 
 def setup(bot):
