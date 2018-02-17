@@ -196,7 +196,8 @@ class RollCategory (util.Cog):
         await do_roll(expression, ctx.session, character, output=output)
         output = ' **|** '.join(output)
         embed = discord.Embed(description=output, color=ctx.author.color)
-        embed.set_author(name=ctx.author.nick, icon_url=ctx.author.avatar_url)
+        icon_url = ctx.author.avatar_url_as(static_format='png')
+        embed.set_author(name=ctx.author.nick, icon_url=icon_url)
         await ctx.send(embed=embed)
 
     @group.command(aliases=['set', 'update'], ignore_extra=False)
