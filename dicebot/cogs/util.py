@@ -59,7 +59,7 @@ async def send_pages(ctx, paginator):
     Displays a set of pages
     '''
     for page in paginator.pages:
-        await util.send_embed(ctx, author=ctx.author, page)
+        await send_embed(ctx, author=ctx.author, page)
 
 
 def invalid_subcommand(ctx):
