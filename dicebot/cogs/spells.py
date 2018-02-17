@@ -31,7 +31,7 @@ class SpellCategory (util.Cog):
             'level': level,
         })
 
-        await util.send_embed(ctx, author=ctx.author, description='{} now has {}'.format(str(character), str(spell)))
+        await util.send_embed(ctx, description='{} now has {}'.format(str(character), str(spell)))
 
     @group.command(ignore_extra=False)
     async def rename(self, ctx, name: str, new_name: str):
@@ -52,9 +52,7 @@ class SpellCategory (util.Cog):
         try:
             spell.name = new_name
             ctx.session.commit()
-            await util.send_embed(
-                ctx, author=ctx.author,
-                description='{} now has {}'.format(str(character), str(spell)))
+            await util.send_embed(ctx, description='{} now has {}'.format(str(character), str(spell)))
         except IntegrityError:
             ctx.session.rollback()
             raise Exception('{} already has a spell named {}'.format(str(character), new_name))
@@ -79,7 +77,7 @@ class SpellCategory (util.Cog):
 
         spell.level = level
         ctx.session.commit()
-        await util.send_embed(ctx, author=ctx.author, description='{} now has {}'.format(str(character), str(spell)))
+        await util.send_embed(ctx, description='{} now has {}'.format(str(character), str(spell)))
 
     @group.command(aliases=['desc'])
     async def description(self, ctx, name: str, *, description: str):
@@ -102,7 +100,7 @@ class SpellCategory (util.Cog):
 
         spell.description = description
         ctx.session.commit()
-        await util.send_embed(ctx, author=ctx.author, description='{} now has {}'.format(str(character), str(spell)))
+        await util.send_embed(ctx, description='{} now has {}'.format(str(character), str(spell)))
 
     @group.command(aliases=['rmdesc'])
     async def removedescription(self, ctx, *, name: str):
@@ -134,7 +132,7 @@ class SpellCategory (util.Cog):
         text = '**{}**'.format(str(spell))
         if spell.description:
             text += '\n' + spell.description
-        await util.send_embed(ctx, author=ctx.author, description=text)
+        await util.send_embed(ctx, description=text)
 
     @group.command(ignore_extra=False)
     async def list(self, ctx):
@@ -159,7 +157,7 @@ class SpellCategory (util.Cog):
         text = ["{}'s spells:".format(character.name)]
         for spell in spells:
             text.append(str(spell))
-        await util.send_embed(ctx, author=ctx.author, description='\n'.join(text))
+        await util.send_embed(ctx, description='\n'.join(text))
 
     @group.command(aliases=['delete'])
     async def remove(self, ctx, *, name: str):
@@ -180,9 +178,7 @@ class SpellCategory (util.Cog):
 
         ctx.session.delete(spell)
         ctx.session.commit()
-        await util.send_embed(
-            ctx, author=ctx.author,
-            description='{} no longer has {}'.format(str(character), str(spell)))
+        await util.send_embed(ctx, description='{} no longer has {}'.format(str(character), str(spell)))
 
     @group.command()
     async def inspect(self, ctx, *, name: str):

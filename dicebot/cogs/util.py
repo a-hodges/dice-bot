@@ -59,7 +59,7 @@ async def send_pages(ctx, paginator):
     Displays a set of pages
     '''
     for page in paginator.pages:
-        await send_embed(ctx, author=ctx.author, page)
+        await send_embed(ctx, page)
 
 
 def invalid_subcommand(ctx):
@@ -109,19 +109,21 @@ async def inspector(ctx, character, attr, desc=False):
     await send_pages(ctx, paginator)
 
 
-async def send_embed(ctx, *, content=None, author=None, color=None, description=None, fields=[]):
+async def send_embed(ctx, *, content=None, author=True, description=None, fields=[]):
     '''
     Creates and sends an embed
     '''
     embed = discord.Embed()
     if description is not None:
         embed.description = description
-    if author is not None:
+    if author:
+        if author == True:
+            author = ctx.author
         embed.color = author.color
         icon_url = author.avatar_url_as(static_format='png')
         embed.set_author(name=author.nick, icon_url=icon_url)
-    if color:
-        embed.color = color
+    else:
+        embed.color = ctx.author.color
     if fields:
         for field in fields:
             embed.add_field(name=field[0], value=field[1], inline=field[2] if len(field) > 2 else False)

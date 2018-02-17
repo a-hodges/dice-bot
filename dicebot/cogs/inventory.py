@@ -38,7 +38,7 @@ class InventoryCategory (util.Cog):
             item = None
 
         if item is not None:
-            await util.send_embed(ctx, author=ctx.author, description='{} now has {}'.format(str(character), str(item)))
+            await util.send_embed(ctx, description='{} now has {}'.format(str(character), str(item)))
         else:
             raise Exception('{} already has an item named {}'.format(str(character), name))
 
@@ -61,7 +61,7 @@ class InventoryCategory (util.Cog):
         try:
             item.name = new_name
             ctx.session.commit()
-            await util.send_embed(ctx, author=ctx.author, description='{} now has {}'.format(str(character), str(item)))
+            await util.send_embed(ctx, description='{} now has {}'.format(str(character), str(item)))
         except IntegrityError:
             ctx.session.rollback()
             raise Exception('{} already has an item named {}'.format(str(character), new_name))
@@ -87,7 +87,7 @@ class InventoryCategory (util.Cog):
 
         item.description = description
         ctx.session.commit()
-        await util.send_embed(ctx, author=ctx.author, description='{} now has {}'.format(str(character), str(item)))
+        await util.send_embed(ctx, description='{} now has {}'.format(str(character), str(item)))
 
     @group.command(aliases=['rmdesc'])
     async def removedescription(self, ctx, *, name: str):
@@ -121,7 +121,7 @@ class InventoryCategory (util.Cog):
 
         item.number = number
         ctx.session.commit()
-        await util.send_embed(ctx, author=ctx.author, description='{} now has {}'.format(str(character), str(item)))
+        await util.send_embed(ctx, description='{} now has {}'.format(str(character), str(item)))
 
     @group.command('+')
     async def plus(self, ctx, number: int, *, name: str):
@@ -143,7 +143,7 @@ class InventoryCategory (util.Cog):
 
         item.number += number
         ctx.session.commit()
-        await util.send_embed(ctx, author=ctx.author, description='{} now has {}'.format(str(character), str(item)))
+        await util.send_embed(ctx, description='{} now has {}'.format(str(character), str(item)))
 
     @group.command('-')
     async def minus(self, ctx, number: int, *, name: str):
@@ -176,7 +176,7 @@ class InventoryCategory (util.Cog):
         text = '**{}**'.format(str(item))
         if item.description:
             text += '\n' + item.description
-        await util.send_embed(ctx, author=ctx.author, description=text)
+        await util.send_embed(ctx, description=text)
 
     @group.command(ignore_extra=False)
     async def list(self, ctx):
@@ -207,7 +207,7 @@ class InventoryCategory (util.Cog):
 
         ctx.session.delete(item)
         ctx.session.commit()
-        await util.send_embed(ctx, author=ctx.author, description='{} removed'.format(str(item)))
+        await util.send_embed(ctx, description='{} removed'.format(str(item)))
 
     @group.command()
     async def inspect(self, ctx, *, name: str):

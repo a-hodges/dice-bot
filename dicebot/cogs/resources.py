@@ -42,7 +42,7 @@ class ResourceCategory (util.Cog):
             'recover': recover,
         })
 
-        await util.send_embed(ctx, author=ctx.author, description='{} now has {}'.format(str(character), str(resource)))
+        await util.send_embed(ctx, description='{} now has {}'.format(str(character), str(resource)))
 
     @group.command('+')
     async def plus(self, ctx, number: int, *, name: str):
@@ -67,7 +67,7 @@ class ResourceCategory (util.Cog):
         ctx.session.commit()
         description = "{0}'s {1} went from {2}/{4} to {3}/{4}".format(
             str(character), resource.name, prev, resource.current, resource.max)
-        await util.send_embed(ctx, author=ctx.author, description=description)
+        await util.send_embed(ctx, description=description)
 
     @group.command('-')
     async def minus(self, ctx, number: int, *, name: str):
@@ -108,7 +108,7 @@ class ResourceCategory (util.Cog):
         else:
             description = "{} has no {} to use".format(str(character), resource.name)
 
-        await util.send_embed(ctx, author=ctx.author, description=description)
+        await util.send_embed(ctx, description=description)
 
     @group.command(ignore_extra=False)
     async def set(self, ctx, name: str, uses: int):
@@ -131,7 +131,7 @@ class ResourceCategory (util.Cog):
 
         description = '{} now has {}/{} uses of {}'.format(
             str(character), resource.current, resource.max, resource.name)
-        await util.send_embed(ctx, author=ctx.author, description=description)
+        await util.send_embed(ctx, description=description)
 
     @group.command()
     async def regain(self, ctx, *, name: str):
@@ -155,7 +155,7 @@ class ResourceCategory (util.Cog):
 
         description = '{} now has {}/{} uses of {}'.format(
             str(character), resource.current, resource.max, resource.name)
-        await util.send_embed(ctx, author=ctx.author, description=description)
+        await util.send_embed(ctx, description=description)
 
     @group.command()
     async def check(self, ctx, *, name: str):
@@ -172,7 +172,7 @@ class ResourceCategory (util.Cog):
             .filter_by(character_id=character.id, name=name).one_or_none()
         if resource is None:
             raise util.ItemNotFoundError(name)
-        await util.send_embed(ctx, author=ctx.author, description=str(resource))
+        await util.send_embed(ctx, description=str(resource))
 
     @group.command(ignore_extra=False)
     async def list(self, ctx):
@@ -201,7 +201,7 @@ class ResourceCategory (util.Cog):
 
         ctx.session.delete(resource)
         ctx.session.commit()
-        await util.send_embed(ctx, author=ctx.author, description='{} removed'.format(str(resource)))
+        await util.send_embed(ctx, description='{} removed'.format(str(resource)))
 
     @group.command()
     async def inspect(self, ctx, *, name: str):

@@ -31,7 +31,7 @@ class CharacterCategory (util.Cog):
             character = m.Character(name=name, server=str(ctx.guild.id))
             ctx.session.add(character)
             ctx.session.commit()
-            await util.send_embed(ctx, color=ctx.author.color, description='Creating character: {}'.format(name))
+            await util.send_embed(ctx, author=False, description='Creating character: {}'.format(name))
 
         await ctx.invoke(self.claim, name=name)
 
@@ -59,14 +59,11 @@ class CharacterCategory (util.Cog):
                     user.user = None
                     ctx.session.commit()
                     await util.send_embed(
-                        ctx, author=ctx.author,
-                        description='{} is no longer playing as {}'.format(ctx.author.mention, str(user)))
+                        ctx, description='{} is no longer playing as {}'.format(ctx.author.mention, str(user)))
 
                 character.user = str(ctx.author.id)
                 ctx.session.commit()
-                await util.send_embed(
-                    ctx, author=ctx.author,
-                    description='{} is {}'.format(ctx.author.mention, str(character)))
+                await util.send_embed(ctx, description='{} is {}'.format(ctx.author.mention, str(character)))
             elif character.user == 'DM':
                 raise Exception('Cannot claim DM character {}'.format(str(character)))
             else:
@@ -96,8 +93,7 @@ class CharacterCategory (util.Cog):
             character.user = None
             ctx.session.commit()
             await util.send_embed(
-                ctx, author=ctx.author,
-                description='{} is no longer playing as {}'.format(ctx.author.mention, str(character)))
+                ctx, description='{} is no longer playing as {}'.format(ctx.author.mention, str(character)))
         else:
             raise util.NoCharacterError
 
@@ -128,8 +124,7 @@ class CharacterCategory (util.Cog):
             character.name = name
             ctx.session.commit()
             await util.send_embed(
-                ctx, author=ctx.author,
-                description="{} has changed {}'s name to {}".format(ctx.author.mention, original_name, name))
+                ctx, description="{} has changed {}'s name to {}".format(ctx.author.mention, original_name, name))
         except IntegrityError:
             ctx.session.rollback()
             raise Exception('There is already a character with that name')
@@ -174,8 +169,7 @@ class CharacterCategory (util.Cog):
         if character:
             self.recover_resources(ctx, character, rest)
             await util.send_embed(
-                ctx, author=ctx.author,
-                description='{} has taken a {} rest, resources recovered'.format(str(character), rest))
+                ctx, description='{} has taken a {} rest, resources recovered'.format(str(character), rest))
         else:
             raise util.NoCharacterError
 
@@ -198,8 +192,7 @@ class CharacterCategory (util.Cog):
             self.recover_resources(ctx, character, rest)
 
         await util.send_embed(
-            ctx, color=ctx.author.color,
-            description='All characters have taken a {} rest, resources recovered'.format(rest))
+            ctx, author=False, description='All characters have taken a {} rest, resources recovered'.format(rest))
 
     @group.command(ignore_extra=False)
     @commands.has_permissions(administrator=True)
@@ -240,7 +233,7 @@ class CharacterCategory (util.Cog):
                 ctx.session.commit()
                 ctx.session.delete(character)
                 ctx.session.commit()
-                await util.send_embed(ctx, color=ctx.author.color, description='{} is dead'.format(str(character)))
+                await util.send_embed(ctx, author=False, description='{} is dead'.format(str(character)))
             else:
                 raise Exception('No character named {}'.format(name))
         else:
