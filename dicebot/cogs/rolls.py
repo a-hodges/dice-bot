@@ -2,7 +2,6 @@ import re
 import random
 from itertools import chain
 
-import discord
 from discord.ext import commands
 from sqlalchemy import func
 import equations
@@ -194,11 +193,7 @@ class RollCategory (util.Cog):
 
         output = []
         await do_roll(expression, ctx.session, character, output=output)
-        output = ' **|** '.join(output)
-        embed = discord.Embed(description=output, color=ctx.author.color)
-        icon_url = ctx.author.avatar_url_as(static_format='png')
-        embed.set_author(name=ctx.author.nick, icon_url=icon_url)
-        await ctx.send(embed=embed)
+        await util.send_embed(ctx, author=ctx.author, description=' **|** '.join(output))
 
     @group.command(aliases=['set', 'update'], ignore_extra=False)
     async def add(self, ctx, name: str, expression: str):

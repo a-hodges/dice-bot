@@ -1,3 +1,4 @@
+import discord
 from discord.ext import commands
 
 from .. import model as m
@@ -119,3 +120,20 @@ async def inspector(ctx, name: str, attr: str, paginator):
     else:
         pages = paginator(getattr(character, attr), header="{}'s {}:".format(character.name, attr))
         await send_pages(ctx, pages)
+
+
+async def send_embed(ctx, *, content=None, author=None, description=None, fields=[]):
+    '''
+    Creates and sends an embed
+    '''
+    embed = discord.Embed()
+    if description is not None:
+        embed.description = description
+    if author is not None:
+        embed.color = author.color
+        icon_url = author.avatar_url_as(static_format='png')
+        embed.set_author(name=author.nick, icon_url=icon_url)
+    if fields:
+        for field in fields:
+            embed.add_field(name=field[0], value=field[1], inline=field[2] if len(field) > 2 else False)
+    await ctx.send(content=content, embed=embed)
