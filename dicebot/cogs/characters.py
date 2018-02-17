@@ -165,7 +165,9 @@ class CharacterCategory (util.Cog):
 
         if character:
             self.recover_resources(ctx, character, rest)
-            await ctx.send('{} has taken a {} rest, resources recovered'.format(str(character), rest))
+            await util.send_embed(
+                ctx, author=ctx.author,
+                description='{} has taken a {} rest, resources recovered'.format(str(character), rest))
         else:
             raise util.NoCharacterError
 
@@ -187,7 +189,9 @@ class CharacterCategory (util.Cog):
         for character in characters:
             self.recover_resources(ctx, character, rest)
 
-        await ctx.send('All characters have taken a {} rest, resources recovered'.format(rest))
+        await util.send_embed(
+            ctx, color=ctx.author.color,
+            description='All characters have taken a {} rest, resources recovered'.format(rest))
 
     @group.command(ignore_extra=False)
     @commands.has_permissions(administrator=True)
