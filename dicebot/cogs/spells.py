@@ -140,8 +140,7 @@ class SpellCategory (util.Cog):
         Lists all of a character's spells
         '''
         character = util.get_character(ctx.session, ctx.author.id, ctx.guild.id)
-        pages = util.desc_paginator(character.spells, header="{}'s spells:".format(character.name))
-        await util.send_pages(ctx, pages)
+        await util.inspector(ctx, character, 'spells', util.desc_paginator)
 
     @group.command(ignore_extra=False)
     async def level(self, ctx, level: int):

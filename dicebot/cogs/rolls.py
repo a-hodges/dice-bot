@@ -238,8 +238,7 @@ class RollCategory (util.Cog):
         Lists all of a character's rolls
         '''
         character = util.get_character(ctx.session, ctx.author.id, ctx.guild.id)
-        pages = util.item_paginator(character.rolls, header="{}'s rolls:".format(character.name))
-        await util.send_pages(ctx, pages)
+        await util.inspector(ctx, character, 'rolls', util.item_paginator)
 
     @group.command(aliases=['delete'])
     async def remove(self, ctx, *, name: str):

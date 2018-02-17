@@ -184,8 +184,7 @@ class InventoryCategory (util.Cog):
         Lists character's inventory
         '''
         character = util.get_character(ctx.session, ctx.author.id, ctx.guild.id)
-        pages = util.desc_paginator(character.inventory, header="{}'s inventory:".format(character.name))
-        await util.send_pages(ctx, pages)
+        await util.inspector(ctx, character, 'inventory', util.desc_paginator)
 
     @group.command(aliases=['delete'])
     async def remove(self, ctx, *, name: str):

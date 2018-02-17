@@ -124,8 +124,7 @@ class InformationCategory (util.Cog):
         Lists character's information
         '''
         character = util.get_character(ctx.session, ctx.author.id, ctx.guild.id)
-        pages = util.desc_paginator(character.information, header="{}'s information:".format(character.name))
-        await util.send_pages(ctx, pages)
+        await util.inspector(ctx, character, 'information', util.desc_paginator)
 
     @group.command(aliases=['delete'])
     async def remove(self, ctx, *, name: str):
