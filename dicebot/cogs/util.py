@@ -127,4 +127,4 @@ async def send_embed(ctx, *, content=None, author=True, description=None, fields
     if fields:
         for field in fields:
             embed.add_field(name=field[0], value=field[1], inline=field[2] if len(field) > 2 else False)
-    await ctx.send(content=content, embed=embed)
+    return await ctx.send(content=content, embed=embed)
