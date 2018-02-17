@@ -178,7 +178,7 @@ async def setprefix(ctx, prefix: str = default_prefix):
         ctx.session.rollback()
         raise Exception('Could not change prefix, an unknown error occured')
     else:
-        await ctx.send('Prefix changed to `{}`'.format(prefix))
+        await util.send_embed(ctx, author=False, description='Prefix changed to `{}`'.format(prefix))
 
 
 prefix = __name__ + '.cogs.'
