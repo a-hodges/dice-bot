@@ -141,7 +141,8 @@ async def on_command_error(ctx, error: Exception):
         unknown = True
 
     message += '\n(click {} below to delete this message)'.format(delete_emoji)
-    msg = await ctx.send(message)
+    embed = discord.Embed(description=message, color=discord.Color.red())
+    msg = await ctx.send(embed=embed)
     await msg.add_reaction(delete_emoji)
 
     if unknown:
