@@ -81,7 +81,7 @@ class Character (Base):
 
     @hybrid_property
     def dm_character(self):
-        return (self.user != None) & (self.user == 'DM')
+        return (self.user != None) & (self.user == 'DM')  # noqa: E711
 
     __table_args__ = (
         UniqueConstraint(name, server),
