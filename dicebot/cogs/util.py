@@ -103,23 +103,23 @@ def strip_quotes(arg):
     return arg
 
 
-async def inspector(ctx, name: str, attr: str, paginator):
+async def inspector(ctx, character, attr: str, paginator):
     '''
     Inspects an attribute of a character
     [ctx] the command context
-    [name] the name of the character to inspect
+    [character] the name of the character to inspect or the character itself
     [attr] the attribute of the character to inspect
     [paginator] either desc_paginator or item_paginator
     Returns a Pages instance
     '''
-    character = ctx.session.query(m.Character)\
-        .filter(~m.Character.dm_character)\
-        .filter_by(name=name, server=str(ctx.guild.id)).one_or_none()
-    if character is None:
-        raise Exception('No character named {}'.format(name))
-    else:
-        pages = paginator(getattr(character, attr), header="{}'s {}:".format(character.name, attr))
-        await send_pages(ctx, pages)
+    if isinstance(character, str):
+        character = ctx.session.query(m.Character)\
+            .filter(~m.Character.dm_character)\
+            .filter_by(name=name, server=str(ctx.guild.id)).one_or_none()
+        if character is None:
+            raise Exception('No character named {}'.format(name))
+    pages = paginator(getattr(character, attr), header="{}'s {}:".format(character.name, attr))
+    await send_pages(ctx, pages)
 
 
 async def send_embed(ctx, *, content=None, author=None, color=None, description=None, fields=[]):
