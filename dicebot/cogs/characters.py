@@ -66,7 +66,7 @@ class CharacterCategory (util.Cog):
                 ctx.session.commit()
                 await util.send_embed(
                     ctx, author=ctx.author,
-                    '{} is {}'.format(ctx.author.mention, str(character)))
+                    description='{} is {}'.format(ctx.author.mention, str(character)))
             elif character.user == 'DM':
                 raise Exception('Cannot claim DM character {}'.format(str(character)))
             else:
@@ -95,7 +95,7 @@ class CharacterCategory (util.Cog):
         if character is not None:
             character.user = None
             ctx.session.commit()
-            await send_embed(
+            await util.send_embed(
                 ctx, author=ctx.author,
                 description='{} is no longer playing as {}'.format(ctx.author.mention, str(character)))
         else:
@@ -110,7 +110,7 @@ class CharacterCategory (util.Cog):
         [user] @mention the user
         '''
         character = util.get_character(ctx.session, user.id, ctx.guild.id)
-        await util.send_embed(ctx, author=user, '{} is {}'.format(user.mention, str(character)))
+        await util.send_embed(ctx, author=user, description='{} is {}'.format(user.mention, str(character)))
 
     @group.command()
     async def rename(self, ctx, *, name: str):
@@ -214,7 +214,9 @@ class CharacterCategory (util.Cog):
         character = util.get_character(ctx.session, user.id, ctx.guild.id)
         character.user = None
         ctx.session.commit()
-        await util.send_embed(ctx, author=user, '{} is no longer playing as {}'.format(user.mention, str(character)))
+        await util.send_embed(
+            ctx, author=user,
+            description='{} is no longer playing as {}'.format(user.mention, str(character)))
 
     @group.command(ignore_extra=False)
     @commands.has_permissions(administrator=True)

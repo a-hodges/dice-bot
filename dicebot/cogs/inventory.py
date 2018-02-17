@@ -207,7 +207,7 @@ class InventoryCategory (util.Cog):
 
         ctx.session.delete(item)
         ctx.session.commit()
-        await util.send_embed(ctx, author=ctx.author, '{} removed'.format(str(item)))
+        await util.send_embed(ctx, author=ctx.author, description='{} removed'.format(str(item)))
 
     @group.command()
     async def inspect(self, ctx, *, name: str):
