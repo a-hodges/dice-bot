@@ -213,7 +213,7 @@ class RollCategory (util.Cog):
             'expression': expression,
         })
 
-        await ctx.send('{} now has {}'.format(str(character), str(roll)))
+        await util.send_embed(ctx, author=ctx.author, description='{} now has {}'.format(str(character), str(roll)))
 
     @group.command()
     async def check(self, ctx, *, name: str):
@@ -230,7 +230,7 @@ class RollCategory (util.Cog):
             .filter_by(character_id=character.id, name=name).one_or_none()
         if roll is None:
             raise util.ItemNotFoundError(name)
-        await ctx.send(str(roll))
+        await util.send_embed(ctx, author=ctx.author, description=str(roll))
 
     @group.command(ignore_extra=False)
     async def list(self, ctx):
@@ -259,7 +259,7 @@ class RollCategory (util.Cog):
 
         ctx.session.delete(roll)
         ctx.session.commit()
-        await ctx.send('{} removed'.format(str(roll)))
+        await util.send_embed(ctx, author=ctx.author, description='{} removed'.format(str(roll)))
 
     @group.command()
     async def inspect(self, ctx, *, name: str):

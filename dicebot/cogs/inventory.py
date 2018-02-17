@@ -38,7 +38,7 @@ class InventoryCategory (util.Cog):
             item = None
 
         if item is not None:
-            await ctx.send('{} now has {}'.format(str(character), str(item)))
+            await util.send_embed(ctx, author=ctx.author, description='{} now has {}'.format(str(character), str(item)))
         else:
             raise Exception('{} already has an item named {}'.format(str(character), name))
 
@@ -61,7 +61,7 @@ class InventoryCategory (util.Cog):
         try:
             item.name = new_name
             ctx.session.commit()
-            await ctx.send('{} now has {}'.format(str(character), str(item)))
+            await util.send_embed(ctx, author=ctx.author, description='{} now has {}'.format(str(character), str(item)))
         except IntegrityError:
             ctx.session.rollback()
             raise Exception('{} already has an item named {}'.format(str(character), new_name))
@@ -87,7 +87,7 @@ class InventoryCategory (util.Cog):
 
         item.description = description
         ctx.session.commit()
-        await ctx.send('{} now has {}'.format(str(character), str(item)))
+        await util.send_embed(ctx, author=ctx.author, description='{} now has {}'.format(str(character), str(item)))
 
     @group.command(aliases=['rmdesc'])
     async def removedescription(self, ctx, *, name: str):
@@ -176,7 +176,7 @@ class InventoryCategory (util.Cog):
         text = '**{}**'.format(str(item))
         if item.description:
             text += '\n' + item.description
-        await ctx.send(text)
+        await util.send_embed(ctx, author=ctx.author, description=text)
 
     @group.command(ignore_extra=False)
     async def list(self, ctx):
@@ -207,7 +207,7 @@ class InventoryCategory (util.Cog):
 
         ctx.session.delete(item)
         ctx.session.commit()
-        await ctx.send('{} removed'.format(str(item)))
+        await util.send_embed(ctx, author=ctx.author, '{} removed'.format(str(item)))
 
     @group.command()
     async def inspect(self, ctx, *, name: str):

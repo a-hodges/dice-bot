@@ -35,7 +35,7 @@ class InformationCategory (util.Cog):
             info = None
 
         if info is not None:
-            await ctx.send('{} now has {}'.format(str(character), str(info)))
+            await util.send_embed(ctx, author=ctx.author, description='{} now has {}'.format(str(character), str(info)))
         else:
             raise Exception('{} already has a information block named {}'.format(str(character), name))
 
@@ -58,7 +58,7 @@ class InformationCategory (util.Cog):
         try:
             info.name = new_name
             ctx.session.commit()
-            await ctx.send('{} now has {}'.format(str(character), str(info)))
+            await util.send_embed(ctx, author=ctx.author, description='{} now has {}'.format(str(character), str(info)))
         except IntegrityError:
             ctx.session.rollback()
             raise Exception('{} already has an information block named {}'.format(str(character), new_name))
@@ -84,7 +84,7 @@ class InformationCategory (util.Cog):
 
         info.description = description
         ctx.session.commit()
-        await ctx.send('{} now has {}'.format(str(character), str(info)))
+        await util.send_embed(ctx, author=ctx.author, description='{} now has {}'.format(str(character), str(info)))
 
     @group.command(aliases=['rmdesc'])
     async def removedescription(self, ctx, *, name: str):
@@ -116,7 +116,7 @@ class InformationCategory (util.Cog):
         text = '**{}**'.format(str(info))
         if info.description:
             text += '\n' + info.description
-        await ctx.send(text)
+        await util.send_embed(ctx, author=ctx.author, description=text)
 
     @group.command(ignore_extra=False)
     async def list(self, ctx):
@@ -146,7 +146,7 @@ class InformationCategory (util.Cog):
 
         ctx.session.delete(info)
         ctx.session.commit()
-        await ctx.send('{} removed'.format(str(info)))
+        await util.send_embed(ctx, author=ctx.author, description='{} removed'.format(str(info)))
 
     @group.command()
     async def inspect(self, ctx, *, name: str):

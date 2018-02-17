@@ -42,7 +42,7 @@ class ResourceCategory (util.Cog):
             'recover': recover,
         })
 
-        await ctx.send('{} now has {}'.format(str(character), str(resource)))
+        await util.send_embed(ctx, author=ctx.author, description='{} now has {}'.format(str(character), str(resource)))
 
     @group.command('+')
     async def plus(self, ctx, number: int, *, name: str):
@@ -172,7 +172,7 @@ class ResourceCategory (util.Cog):
             .filter_by(character_id=character.id, name=name).one_or_none()
         if resource is None:
             raise util.ItemNotFoundError(name)
-        await ctx.send(str(resource))
+        await util.send_embed(ctx, author=ctx.author, description=str(resource))
 
     @group.command(ignore_extra=False)
     async def list(self, ctx):
@@ -201,7 +201,7 @@ class ResourceCategory (util.Cog):
 
         ctx.session.delete(resource)
         ctx.session.commit()
-        await ctx.send('{} removed'.format(str(resource)))
+        await util.send_embed(ctx, author=ctx.author, description='{} removed'.format(str(resource)))
 
     @group.command()
     async def inspect(self, ctx, *, name: str):

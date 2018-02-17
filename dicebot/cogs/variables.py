@@ -30,7 +30,7 @@ class VariableCategory (util.Cog):
             'value': value,
         })
 
-        await ctx.send('{} now has {}'.format(str(character), str(variable)))
+        await util.send_embed(ctx, author=ctx.author, description='{} now has {}'.format(str(character), str(variable)))
 
     @group.command()
     async def check(self, ctx, *, name: str):
@@ -47,7 +47,7 @@ class VariableCategory (util.Cog):
             .filter_by(character_id=character.id, name=name).one_or_none()
         if variable is None:
             raise util.ItemNotFoundError(name)
-        await ctx.send(str(variable))
+        await util.send_embed(ctx, author=ctx.author, description=str(variable))
 
     @group.command(ignore_extra=False)
     async def list(self, ctx):
@@ -76,7 +76,9 @@ class VariableCategory (util.Cog):
 
         ctx.session.delete(variable)
         ctx.session.commit()
-        await ctx.send('{} no longer has {}'.format(str(character), str(variable)))
+        await util.send_embed(
+            ctx, author=ctx.author,
+            description='{} no longer has {}'.format(str(character), str(variable)))
 
     @group.command()
     async def inspect(self, ctx, *, name: str):
