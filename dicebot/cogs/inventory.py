@@ -121,7 +121,7 @@ class InventoryCategory (util.Cog):
 
         item.number = number
         ctx.session.commit()
-        await ctx.send('{} now has {}'.format(str(character), str(item)))
+        await util.send_embed(ctx, author=ctx.author, description='{} now has {}'.format(str(character), str(item)))
 
     @group.command('+')
     async def plus(self, ctx, number: int, *, name: str):
@@ -143,7 +143,7 @@ class InventoryCategory (util.Cog):
 
         item.number += number
         ctx.session.commit()
-        await ctx.send('{} now has {}'.format(str(character), str(item)))
+        await util.send_embed(ctx, author=ctx.author, description='{} now has {}'.format(str(character), str(item)))
 
     @group.command('-')
     async def minus(self, ctx, number: int, *, name: str):

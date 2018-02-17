@@ -65,8 +65,9 @@ class ResourceCategory (util.Cog):
         prev = resource.current
         resource.current = resource.current + number
         ctx.session.commit()
-        await ctx.send("{0}'s {1} went from {2}/{4} to {3}/{4}".format(
-            str(character), resource.name, prev, resource.current, resource.max))
+        description = "{0}'s {1} went from {2}/{4} to {3}/{4}".format(
+            str(character), resource.name, prev, resource.current, resource.max)
+        await util.send_embed(ctx, author=ctx.author, description=description)
 
     @group.command('-')
     async def minus(self, ctx, number: int, *, name: str):
@@ -102,10 +103,12 @@ class ResourceCategory (util.Cog):
             prev = resource.current
             resource.current = resource.current - 1
             ctx.session.commit()
-            await ctx.send("{0}'s {1} went from {2}/{4} to {3}/{4}".format(
-                str(character), resource.name, prev, resource.current, resource.max))
+            description = "{0}'s {1} went from {2}/{4} to {3}/{4}".format(
+                str(character), resource.name, prev, resource.current, resource.max)
         else:
-            await ctx.send("{} has no {} to use".format(str(character), resource.name))
+            description = "{} has no {} to use".format(str(character), resource.name)
+
+        await util.send_embed(ctx, author=ctx.author, description=description)
 
     @group.command(ignore_extra=False)
     async def set(self, ctx, name: str, uses: int):
@@ -126,8 +129,9 @@ class ResourceCategory (util.Cog):
         resource.current = uses
         ctx.session.commit()
 
-        await ctx.send('{} now has {}/{} uses of {}'.format(
-            str(character), resource.current, resource.max, resource.name))
+        description = '{} now has {}/{} uses of {}'.format(
+            str(character), resource.current, resource.max, resource.name)
+        await util.send_embed(ctx, author=ctx.author, description=description)
 
     @group.command()
     async def regain(self, ctx, *, name: str):
@@ -149,8 +153,9 @@ class ResourceCategory (util.Cog):
         resource.current = resource.max
         ctx.session.commit()
 
-        await ctx.send('{} now has {}/{} uses of {}'.format(
-            str(character), resource.current, resource.max, resource.name))
+        description = '{} now has {}/{} uses of {}'.format(
+            str(character), resource.current, resource.max, resource.name)
+        await util.send_embed(ctx, author=ctx.author, description=description)
 
     @group.command()
     async def check(self, ctx, *, name: str):
