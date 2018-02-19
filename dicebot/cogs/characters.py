@@ -66,6 +66,8 @@ class CharacterCategory (util.Cog):
                 await util.send_embed(ctx, description='{} is {}'.format(ctx.author.mention, str(character)))
             elif character.user == 'DM':
                 raise Exception('Cannot claim DM character {}'.format(str(character)))
+            elif character.user == str(ctx.author.id):
+                raise Exception('{} is already playing as {}'.format(ctx.author.mention, str(character)))
             else:
                 raise Exception('Someone else is using {}'.format(str(character)))
         else:
