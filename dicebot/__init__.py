@@ -191,6 +191,7 @@ for extension in [
     'inventory',
     'spells',
     'information',
+    'tables',
 ]:
     bot.load_extension(prefix + extension)
 
