@@ -238,6 +238,36 @@ class ResourceCategory (util.Cog):
 
         await util.inspector(ctx, name, 'resources')
 
+    @commands.command(aliases=['res4'], invoke_without_command=True)
+    async def resourcefor(self, ctx, character: str, number: int, *, name: str):
+        '''
+        Regains a number of uses of the resource for the specified character
+        Can accept negative numbers
+
+        Parameters:
+        [character] the name of the character to manage
+        [number] the quantity of the resource to regain
+        [name*] the name of the resource
+        '''
+        name = util.strip_quotes(name)
+
+        character = ctx.session.query(m.Character)\
+            .filter_by(name=character, server=str(ctx.guild.id)).one_or_none()
+        if character is None:
+            raise Exception('Character does not exist')
+
+        resource = ctx.session.query(m.Resource)\
+            .filter_by(character_id=character.id, name=name).one_or_none()
+        if resource is None:
+            raise util.ItemNotFoundError(name)
+
+        prev = resource.current
+        resource.current = resource.current + number
+        ctx.session.commit()
+        description = "{0}'s {1} went from {2}/{4} to {3}/{4}".format(
+            str(character), resource.name, prev, resource.current, resource.max)
+        await util.send_embed(ctx, description=description)
+
 
 def setup(bot):
     bot.add_cog(ResourceCategory(bot))
