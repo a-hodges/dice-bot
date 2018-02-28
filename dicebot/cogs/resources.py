@@ -2,6 +2,7 @@ from discord.ext import commands
 
 from . import util
 from .util import m
+from .rolls import do_roll
 
 
 class ResourceCategory (util.Cog):
@@ -156,6 +157,28 @@ class ResourceCategory (util.Cog):
         description = '{} now has {}/{} uses of {}'.format(
             str(character), resource.current, resource.max, resource.name)
         await util.send_embed(ctx, description=description)
+
+    @group.command()
+    async def roll(self, ctx, name: str, *, expression: str):
+        '''
+        Adds the rolled value to the specified resource using the `roll` command
+
+        Parameters:
+        [name] the name of the resource to roll for
+        [expression*] standard dice notation specifying what to roll the expression may include up to 1 saved roll
+        [adv] (optional) roll with advantage or disadvantage respectively as specified in the `roll` command
+        '''
+        if not expression:
+            raise commands.MissingRequiredArgument('expression')
+        expression = util.strip_quotes(expression)
+
+        character = util.get_character(ctx.session, ctx.author.id, ctx.guild.id)
+
+        output = []
+        number = await do_roll(expression, ctx.session, character, output=output)
+        await util.send_embed(ctx, description=' **|** '.join(output))
+
+        await ctx.invoke(self.plus, number, name=name)
 
     @group.command()
     async def check(self, ctx, *, name: str):
