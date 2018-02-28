@@ -239,6 +239,7 @@ class ResourceCategory (util.Cog):
         await util.inspector(ctx, name, 'resources')
 
     @commands.command(aliases=['res4'], invoke_without_command=True)
+    @commands.has_permissions(administrator=True)
     async def resourcefor(self, ctx, character: str, number: int, *, name: str):
         '''
         Regains a number of uses of the resource for the specified character
