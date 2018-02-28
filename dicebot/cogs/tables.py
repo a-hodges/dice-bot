@@ -4,7 +4,6 @@ import random
 from discord.ext import commands
 
 from . import util
-from .util import m
 
 table_expression = re.compile(r'^\s*(?:(\d+)\s*\|\s*)?(.*)\s*$')
 
