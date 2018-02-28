@@ -107,7 +107,7 @@ class ResourceCategory (util.Cog):
             description = "{0}'s {1} went from {2}/{4} to {3}/{4}".format(
                 str(character), resource.name, prev, resource.current, resource.max)
         else:
-            description = "{} has no {} to use".format(str(character), resource.name)
+            raise Exception("{} has no {} to use".format(str(character), resource.name))
 
         await util.send_embed(ctx, description=description)
 
