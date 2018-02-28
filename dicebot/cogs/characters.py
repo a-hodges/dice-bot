@@ -140,7 +140,10 @@ class CharacterCategory (util.Cog):
         characters = ctx.session.query(m.Character)\
             .filter(~m.Character.dm_character)\
             .filter_by(server=str(ctx.guild.id)).all()
-        pages = util.item_paginator(characters, header='All characters:')
+        pages = commands.Paginator(prefix='', suffix='')
+        pages.add_line('All characters:')
+        for character in characters:
+            pages.add_line(str(character))
         await util.send_pages(ctx, pages)
 
     def recover_resources(self, ctx, character, rest):
