@@ -277,6 +277,31 @@ class RollCategory (util.Cog):
 
         await util.inspector(ctx, name, 'rolls')
 
+    @commands.command(aliases=['r4'])
+    @commands.has_permissions(administrator=True)
+    async def rollfor(self, ctx, name, *, expression: str):
+        '''
+        Make a roll for the specified character
+        Uses the same rules as the `roll` command
+
+        Parameters:
+        [name] the name of the character to roll for
+        [expression*] standard dice notation specifying what to roll the expression may include up to 1 saved roll
+        [adv] (optional) roll with advantage or disadvantage respectively as specified in the `roll` command
+        '''
+        if not expression:
+            raise commands.MissingRequiredArgument('expression')
+        expression = util.strip_quotes(expression)
+
+        character = ctx.session.query(m.Character)\
+            .filter_by(name=name, server=str(ctx.guild.id)).one_or_none()
+        if character is None:
+            raise Exception('Character does not exist')
+
+        output = []
+        await do_roll(expression, ctx.session, character, output=output)
+        await util.send_embed(ctx, description=' **|** '.join(output))
+
 
 def setup(bot):
     bot.add_cog(RollCategory(bot))
