@@ -6,9 +6,11 @@ Parameters marked with a * may omit the quotes
 
 Certain commands are only usable by administrators
 
-If the bot is mentioned in a message, everything after the last mention is considered a command
+If the bot is mentioned in a message, the content of the line after the mention runs a command
+Multiple commands can be invoked in one message in this way
 '''
 
+import copy
 import re
 import asyncio
 from collections import OrderedDict
@@ -29,11 +31,7 @@ default_prefix = ';'
 
 
 async def get_prefix(bot: commands.Bot, message: discord.Message):
-    mention = message.guild.get_member(bot.user.id).mention if message.guild else bot.user.mention
-    match = re.match(r'^(.*{}\s*)'.format(re.escape(mention)), message.content, flags=re.S)
-    if match:
-        return match.group(1)
-    elif message.guild:
+    if message.guild:
         with closing(bot.Session()) as session:
             item = session.query(m.Prefix).get(str(message.guild.id))
             prefix = default_prefix if item is None else item.prefix
@@ -79,6 +77,21 @@ async def after_any_command(ctx):
     '''
     ctx.session.close()
     ctx.session = None
+
+
+@bot.event
+async def on_message(message):
+    ctx = await bot.get_context(message)
+    if ctx.valid:
+        await bot.invoke(ctx)
+    else:
+        mention = message.guild.get_member(bot.user.id).mention if message.guild else bot.user.mention
+        expr = re.compile(r'{}\s*(.*)(?=\n|$)'.format(re.escape(mention)))
+        prefix = await get_prefix(bot, message)
+        for command in expr.findall(message.content):
+            m2 = copy.copy(message)
+            m2.content = prefix + command
+            await bot.process_commands(m2)
 
 
 def is_my_delete_emoji(reaction):
