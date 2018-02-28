@@ -133,7 +133,7 @@ class ResourceCategory (util.Cog):
             str(character), resource.current, resource.max, resource.name)
         await util.send_embed(ctx, description=description)
 
-    @group.command()
+    @group.command(aliases=['recover'])
     async def regain(self, ctx, *, name: str):
         '''
         Returns the remaining uses of a resource to max
