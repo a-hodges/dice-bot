@@ -15,13 +15,15 @@ async def do_roll(expression, session, character=None, output=[]):
     Does the variable replacement and dice rolling
     '''
     expression = expression.strip()
-    match = re.match(r'^(.*)\s+((?:dis)?adv)$', expression)
+    match = re.match(r'^(.*)\s+((?:dis)?adv|dis|(?:dis)?advantage)$', expression)
     if match:
         expression = match.group(1)
-        if match.group(2) == 'adv':
+        if match.group(2) in ['adv', 'advantage']:
             adv = 1
-        else:
+        elif match.group(2) in ['dis', 'disadv', 'disadvantage']:
             adv = -1
+        else:
+            raise Exception('Invalid adv/disadv operator')
     else:
         adv = 0
 
@@ -155,7 +157,9 @@ class RollCategory (util.Cog):
 
         Parameters:
         [expression*] standard dice notation specifying what to roll the expression may include up to 1 saved roll
-        [adv] (optional) if present should be adv|disadv to roll any 1d20s with advantage or disadvantage respectively
+        [adv] (optional) roll any 1d20s with advantage or disadvantage for the following options:
+            Advantage: `adv` | `advantage`
+            Disadvantage: `dis` | `disadv` | `disadvantage`
 
         Mathematic operations from highest precedence to lowest:
 
