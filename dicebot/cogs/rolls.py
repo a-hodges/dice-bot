@@ -279,7 +279,7 @@ class RollCategory (util.Cog):
 
     @commands.command(aliases=['r4'])
     @commands.has_permissions(administrator=True)
-    async def rollfor(self, ctx, name, *, expression: str):
+    async def rollfor(self, ctx, name: str, *, expression: str):
         '''
         Make a roll for the specified character
         Uses the same rules as the `roll` command
