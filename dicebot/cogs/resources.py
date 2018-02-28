@@ -244,6 +244,7 @@ class ResourceCategory (util.Cog):
         '''
         Regains a number of uses of the resource for the specified character
         Can accept negative numbers
+        Can only be done by an administrator
 
         Parameters:
         [character] the name of the character to manage

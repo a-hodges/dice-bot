@@ -283,6 +283,7 @@ class RollCategory (util.Cog):
         '''
         Make a roll for the specified character
         Uses the same rules as the `roll` command
+        Can only be done by an administrator
 
         Parameters:
         [character] the name of the character to roll for
