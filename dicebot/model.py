@@ -158,11 +158,11 @@ class Resource (Base):
         doc='Resource name')
     max = Column(
         Integer,
-        nullable=False, default=0,
+        nullable=False, default=1,
         doc='The maximum number of uses of the resource')
     current = Column(
         Integer,
-        nullable=False, default=0,
+        nullable=False, default=1,
         doc='The current remaining uses of the resource')
     recover = Column(
         Enum(Rest),
