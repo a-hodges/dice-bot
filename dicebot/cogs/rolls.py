@@ -109,14 +109,14 @@ async def do_roll(expression, session, character=None, output=[]):
     unary['!'] = lambda a: a // 2 - 5
 
     if character:
-        # replace only 1 roll
+        # replace rolls
         rolls = session.query(m.Roll)\
             .filter_by(character=character)\
             .order_by(func.char_length(m.Roll.name).desc())
-        for roll in rolls:
-            if roll.name in expression:
-                expression = expression.replace(roll.name, '({})'.format(roll.expression), 1)
-                break
+        rep = {roll.name: '({})'.format(roll.expression) for roll in rolls}
+        expr = re.compile('|'.join(map(re.escape, rep)))
+        for _ in range(3):
+            expression = expr.sub(lambda m: rep[m.group(0)], expression)
 
         # replace variables
         variables = session.query(m.Variable)\
@@ -156,7 +156,9 @@ class RollCategory (util.Cog):
         Note: If a variable name is included in a roll the name will be replaced with the value of the variable
 
         Parameters:
-        [expression*] standard dice notation specifying what to roll the expression may include up to 1 saved roll
+        [expression*] standard dice notation specifying what to roll
+            The expression may include saved rolls, replacing the name with the roll itself
+            Rolls may contain other rolls up to 3 levels deep
         [adv] (optional) roll any 1d20s with advantage or disadvantage for the following options:
             Advantage: `adv` | `advantage`
             Disadvantage: `dis` | `disadv` | `disadvantage`
