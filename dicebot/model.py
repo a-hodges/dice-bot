@@ -14,6 +14,8 @@ from sqlalchemy.schema import Index, UniqueConstraint
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.ext.declarative import declarative_base
 
+dmkey = 'DM'
+
 
 class Base:
     def dict(self):
@@ -81,11 +83,11 @@ class Character (Base):
 
     @hybrid_property
     def dm_character(self):
-        return (self.user != None) & (self.user == 'DM')  # noqa: E711
+        return (self.user != None) & (self.user == dmkey)  # noqa: E711
 
     __table_args__ = (
         UniqueConstraint(name, server),
-        Index('_character_index', server, user, unique=True),
+        Index('_character_index', server, user, unique=True, postgresql_where=(user != dmkey)),
     )
 
     resources = relationship(
