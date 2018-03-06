@@ -122,8 +122,9 @@ async def do_roll(expression, session, character=None, output=[]):
         variables = session.query(m.Variable)\
             .filter_by(character=character)\
             .order_by(func.char_length(m.Variable.name).desc())
-        for variable in variables:
-            expression = expression.replace(variable.name, '({})'.format(variable.value))
+        rep = {var.name: '({})'.format(var.value) for var in variables}
+        expr = re.compile('|'.join(map(re.escape, rep)))
+        expression = expr.sub(lambda m: rep[m.group(0)], expression)
 
     # validate
     for token in re.findall(r'[a-zA-Z]+', expression):
