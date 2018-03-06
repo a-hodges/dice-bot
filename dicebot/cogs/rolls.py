@@ -108,6 +108,8 @@ async def do_roll(expression, session, character=None, output=[]):
     unary = equations.unary.copy()
     unary['!'] = lambda a: a // 2 - 5
 
+    output.append('`{}`'.format(expression))
+
     if character:
         # replace rolls
         rolls = session.query(m.Roll)\
@@ -117,6 +119,11 @@ async def do_roll(expression, session, character=None, output=[]):
         expr = re.compile('|'.join(map(re.escape, rep)))
         for _ in range(3):
             expression = expr.sub(lambda m: rep[m.group(0)], expression)
+            temp = '`{}`'.format(expression)
+            if temp != output[-1]:
+                output.append(temp)
+            else:
+                break
 
         # replace variables
         variables = session.query(m.Variable)\
@@ -125,6 +132,9 @@ async def do_roll(expression, session, character=None, output=[]):
         rep = {var.name: '({})'.format(var.value) for var in variables}
         expr = re.compile('|'.join(map(re.escape, rep)))
         expression = expr.sub(lambda m: rep[m.group(0)], expression)
+        temp = '`{}`'.format(expression)
+        if temp != output[-1]:
+            output.append(temp)
 
     # validate
     for token in re.findall(r'[a-zA-Z]+', expression):
@@ -136,7 +146,6 @@ async def do_roll(expression, session, character=None, output=[]):
             raise equations.EquationError('Could not find: {}'.format(token))
 
     # do roll
-    output.append('`{}`'.format(expression))
     roll = equations.solve(expression, operations=operations, unary=unary)
     if roll % 1 == 0:
         roll = int(roll)
