@@ -209,7 +209,7 @@ class RollCategory (util.Cog):
 
         output = []
         await do_roll(expression, ctx.session, character, output=output)
-        await util.send_embed(ctx, description=' **|** '.join(output))
+        await util.send_embed(ctx, description='\n'.join(output))
 
     @group.command(aliases=['set', 'update'], ignore_extra=False)
     async def add(self, ctx, name: str, expression: str):
@@ -313,7 +313,7 @@ class RollCategory (util.Cog):
 
         output = []
         await do_roll(expression, ctx.session, character, output=output)
-        await util.send_embed(ctx, description=' **|** '.join(output))
+        await util.send_embed(ctx, description='\n'.join(output))
 
 
 def setup(bot):
