@@ -117,7 +117,7 @@ async def do_roll(expression, session, character=None, output=[]):
             .filter_by(character=character)\
             .order_by(func.char_length(m.Roll.name).desc())
         rep = {roll.name: '({})'.format(roll.expression) for roll in rolls}
-        expr = re.compile('|'.join(map(re.escape, rep)))
+        expr = re.compile('|'.join(map(re.escape, sorted(rep.keys(), key=len, reverse=True))))
         for _ in range(3):
             expression = expr.sub(lambda m: rep[m.group(0)], expression)
             temp = '`{}`'.format(expression)
@@ -131,7 +131,7 @@ async def do_roll(expression, session, character=None, output=[]):
             .filter_by(character=character)\
             .order_by(func.char_length(m.Variable.name).desc())
         rep = {var.name: '({})'.format(var.value) for var in variables}
-        expr = re.compile('|'.join(map(re.escape, rep)))
+        expr = re.compile('|'.join(map(re.escape, sorted(rep.keys(), key=len, reverse=True))))
         expression = expr.sub(lambda m: rep[m.group(0)], expression)
         temp = '`{}`'.format(expression)
         if temp != output[-1]:
