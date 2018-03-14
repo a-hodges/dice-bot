@@ -139,7 +139,7 @@ async def on_command_error(ctx, error: Exception):
             message = "Couldn't find requested item"
     elif isinstance(error, EquationError):
         if error.args:
-            message = 'Invalid dice expression: `{}`'.format(error.args[0])
+            message = 'Invalid dice expression: {}'.format(error.args[0])
         else:
             message = 'Invalid dice expression'
     elif isinstance(error, ValueError):

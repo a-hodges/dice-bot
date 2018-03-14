@@ -144,7 +144,7 @@ async def do_roll(expression, session, character=None, output=[]):
             search = re.search(search, original_expression)
             if search:
                 token = search.group(1)
-            raise equations.EquationError('Could not find: {}'.format(token))
+            raise equations.EquationError('\n{}\nCould not find: `{}`'.format('\n'.join(output), token))
 
     # do roll
     roll = equations.solve(expression, operations=operations, unary=unary)
