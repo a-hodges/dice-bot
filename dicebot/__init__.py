@@ -195,6 +195,24 @@ async def setprefix(ctx, prefix: str = default_prefix):
         await util.send_embed(ctx, author=False, description='Prefix changed to `{}`'.format(prefix))
 
 
+@bot.command(ignore_extra=False)
+async def checkprefix(ctx):
+    '''
+    Echoes the prefix the bot is currently set to respond to in this server
+    '''
+    if message.guild:
+        with closing(bot.Session()) as session:
+            item = session.query(m.Prefix).get(str(message.guild.id))
+            prefix = default_prefix if item is None else item.prefix
+    else:
+        prefix = default_prefix
+
+    message = 'Current prefix = `{}`'.format(prefix)
+    message += '\n(click {} below to delete this message)'.format(delete_emoji)
+    msg = await util.send_embed(ctx, author=False, description=message)
+    await msg.add_reaction(delete_emoji)
+
+
 prefix = __name__ + '.cogs.'
 for extension in [
     'characters',
