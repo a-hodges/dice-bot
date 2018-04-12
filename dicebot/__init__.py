@@ -200,9 +200,9 @@ async def checkprefix(ctx):
     '''
     Echoes the prefix the bot is currently set to respond to in this server
     '''
-    if message.guild:
+    if ctx.guild:
         with closing(bot.Session()) as session:
-            item = session.query(m.Prefix).get(str(message.guild.id))
+            item = session.query(m.Prefix).get(str(ctx.guild.id))
             prefix = default_prefix if item is None else item.prefix
     else:
         prefix = default_prefix
