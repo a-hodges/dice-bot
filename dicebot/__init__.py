@@ -209,7 +209,8 @@ async def checkprefix(ctx):
 
     message = 'Current prefix = `{}`'.format(prefix)
     message += '\n(click {} below to delete this message)'.format(delete_emoji)
-    msg = await util.send_embed(ctx, author=False, description=message)
+    embed = discord.Embed(description=message, color=ctx.guild.get_member(ctx.bot.user.id).color)
+    msg = await ctx.send(embed=embed)
     await msg.add_reaction(delete_emoji)
 
 
