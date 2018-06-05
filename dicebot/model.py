@@ -114,6 +114,10 @@ class Character (Base):
         'Information',
         order_by='Information.name',
         back_populates='character')
+    timers = relationship(
+        'Timer',
+        order_by='Timer.name',
+        back_populates='character')
 
     attributes = [
         'resources',
@@ -376,6 +380,47 @@ class Information (Base):
     def __str__(self):
         ret = '{0.name}'.format(self)
         return ret
+
+
+class Timer (Base):
+    '''
+    Character timers, values that change over time
+    '''
+    __tablename__ = 'resources'
+
+    id = Column(
+        Integer,
+        primary_key=True,
+        doc='An autonumber id')
+    character_id = Column(
+        Integer,
+        ForeignKey('characters.id'),
+        nullable=False,
+        doc='Character foreign key')
+    name = Column(
+        String(64),
+        nullable=False,
+        doc='Resource name')
+    delta = Column(
+        Integer,
+        nullable=False, default=-1,
+        doc='The amount this value changes by every tick')
+    initial = Column(
+        Integer,
+        nullable=False, default=10,
+        doc='The value for the timer when it starts')
+    value = Column(
+        Integer,
+        doc='The current value of the timer, null for not running')
+
+    __table_args__ = (
+        Index('_timer_index', character_id, name, unique=True),
+    )
+
+    character = relationship(
+        'Character',
+        foreign_keys=[character_id],
+        back_populates='timers')
 
 
 if __name__ == '__main__':
