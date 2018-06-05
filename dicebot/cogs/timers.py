@@ -10,7 +10,7 @@ class TimerCategory (util.Cog):
         '''
         Manages character timers
 
-        Timers help track resources that change over time
+        Timers help track values that change over time such as countdowns
         The timer changes by delta when `t tick` or `endturn` are used
         '''
         try:
