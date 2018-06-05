@@ -386,7 +386,7 @@ class Timer (Base):
     '''
     Character timers, values that change over time
     '''
-    __tablename__ = 'resources'
+    __tablename__ = 'timers'
 
     id = Column(
         Integer,
