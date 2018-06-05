@@ -422,6 +422,11 @@ class Timer (Base):
         foreign_keys=[character_id],
         back_populates='timers')
 
+    def __str__(self):
+        ret = '{0.name} ({0.initial}, {0.delta:+}): {1}'.format(
+            self, self.value if self.value is not None else 'stopped')
+        return ret
+
 
 if __name__ == '__main__':
     from operator import attrgetter
