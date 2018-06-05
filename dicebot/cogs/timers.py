@@ -64,7 +64,7 @@ class TimerCategory (util.Cog):
         prev = timer.value
         timer.value = prev + number
         ctx.session.commit()
-        description = "{}'s {}: {} ➡️ {}".format(
+        description = "{}'s {}: `{} => {}`".format(
             str(character), timer.name, prev, timer.value)
         await util.send_embed(ctx, description=description)
 
@@ -103,7 +103,7 @@ class TimerCategory (util.Cog):
         timer.value = value
         ctx.session.commit()
 
-        description = "{}'s {}: {} ➡️ {}".format(
+        description = "{}'s {}: `{} => {}`".format(
             str(character), timer.name, prev, timer.value)
         await util.send_embed(ctx, description=description)
 
@@ -171,7 +171,7 @@ class TimerCategory (util.Cog):
             if timer.value is not None:
                 prev = timer.value
                 timer.value += timer.delta
-                description += "{}'s {} ({:+}): {} ➡️ {}\n".format(
+                description += "{}'s {} ({:+}): `{} => {}`\n".format(
                     str(character), timer.name, timer.delta, prev, timer.value)
         ctx.session.commit()
 
