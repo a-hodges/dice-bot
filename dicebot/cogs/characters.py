@@ -110,6 +110,13 @@ class CharacterCategory (util.Cog):
         character = util.get_character(ctx.session, user.id, ctx.guild.id)
         await util.send_embed(ctx, author=user, description='{} is {}'.format(user.mention, str(character)))
 
+    @commands.command(ignore_extra=False)
+    async def whoami(self, ctx):
+        '''
+        Retrieves character information for yourself
+        '''
+        await ctx.invoke(self.whois, user=ctx.author)
+
     @group.command()
     async def rename(self, ctx, *, name: str):
         '''
