@@ -208,20 +208,30 @@ class CharacterCategory (util.Cog):
 
     @group.command(ignore_extra=False)
     @commands.has_permissions(administrator=True)
-    async def forceunclaim(self, ctx, user: discord.Member):
+    async def forceunclaim(self, ctx, *, character: str):
         '''
         Forcibly removes a user's association with a character
         Can only be done by an administrator
 
         Parameters:
-        [user] @mention the user
+        [character] the name of the character to remove user from
         '''
-        character = util.get_character(ctx.session, user.id, ctx.guild.id)
-        character.user = None
-        ctx.session.commit()
-        await util.send_embed(
-            ctx, author=user,
-            description='{} is no longer playing as {}'.format(user.mention, str(character)))
+        character = ctx.session.query(m.Character)\
+            .filter_by(name=character, server=str(ctx.guild.id)).one_or_none()
+        if character is None:
+            raise Exception('Could not find character with that name')
+        if character.user is not None:
+            user = ctx.bot.get_user(int(character.user))
+            user = user.mention if user else 'Missing User'
+            character.user = None
+            ctx.session.commit()
+            await util.send_embed(
+                ctx,
+                description='{} is no longer playing as {}'.format(user, str(character)))
+        else:
+            await util.send_embed(
+                ctx,
+                description='{} has no user to remove'.format(str(character)))
 
     @group.command(ignore_extra=False)
     @commands.has_permissions(administrator=True)
