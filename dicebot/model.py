@@ -6,6 +6,7 @@ from sqlalchemy import (
     Column,
     String,
     Integer,
+    BigInteger,
     Enum,
     ForeignKey,
 )
@@ -66,7 +67,7 @@ class Character (Base):
     __tablename__ = 'characters'
 
     id = Column(
-        Integer,
+        BigInteger,
         primary_key=True,
         doc='An autonumber id')
     name = Column(
@@ -148,11 +149,11 @@ class Resource (Base):
     __tablename__ = 'resources'
 
     id = Column(
-        Integer,
+        BigInteger,
         primary_key=True,
         doc='An autonumber id')
     character_id = Column(
-        Integer,
+        BigInteger,
         ForeignKey('characters.id'),
         nullable=False,
         doc='Character foreign key')
@@ -196,11 +197,11 @@ class Roll (Base):
     __tablename__ = 'rolls'
 
     id = Column(
-        Integer,
+        BigInteger,
         primary_key=True,
         doc='An autonumber id')
     character_id = Column(
-        Integer,
+        BigInteger,
         ForeignKey('characters.id'),
         nullable=False,
         doc='Character foreign key')
@@ -232,11 +233,11 @@ class Variable (Base):
     __tablename__ = 'variables'
 
     id = Column(
-        Integer,
+        BigInteger,
         primary_key=True,
         doc='An autonumber id')
     character_id = Column(
-        Integer,
+        BigInteger,
         ForeignKey('characters.id'),
         nullable=False,
         doc='Character foreign key')
@@ -269,11 +270,11 @@ class Item (Base):
     __tablename__ = 'items'
 
     id = Column(
-        Integer,
+        BigInteger,
         primary_key=True,
         doc='An autonumber id')
     character_id = Column(
-        Integer,
+        BigInteger,
         ForeignKey('characters.id'),
         nullable=False,
         doc='Character foreign key')
@@ -310,11 +311,11 @@ class Spell (Base):
     __tablename__ = 'spells'
 
     id = Column(
-        Integer,
+        BigInteger,
         primary_key=True,
         doc='An autonumber id')
     character_id = Column(
-        Integer,
+        BigInteger,
         ForeignKey('characters.id'),
         nullable=False,
         doc='Character foreign key')
@@ -351,11 +352,11 @@ class Information (Base):
     __tablename__ = 'information'
 
     id = Column(
-        Integer,
+        BigInteger,
         primary_key=True,
         doc='An autonumber id')
     character_id = Column(
-        Integer,
+        BigInteger,
         ForeignKey('characters.id'),
         nullable=False,
         doc='Character foreign key')
@@ -389,11 +390,11 @@ class Timer (Base):
     __tablename__ = 'timers'
 
     id = Column(
-        Integer,
+        BigInteger,
         primary_key=True,
         doc='An autonumber id')
     character_id = Column(
-        Integer,
+        BigInteger,
         ForeignKey('characters.id'),
         nullable=False,
         doc='Character foreign key')
