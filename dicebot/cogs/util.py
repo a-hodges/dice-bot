@@ -121,7 +121,7 @@ async def send_embed(ctx, *, content=None, author=True, description=None, fields
             author = ctx.author
         embed.color = author.color
         icon_url = author.avatar_url_as(static_format='png')
-        embed.set_author(name=author.nick, icon_url=icon_url)
+        embed.set_author(name=author.display_name, icon_url=icon_url)
     else:
         embed.color = ctx.author.color
     if fields:
