@@ -429,6 +429,18 @@ class Timer (Base):
         return ret
 
 
+class Blacklist (Base):
+    '''
+    A list of user ids that are not allowed to use the dice bot
+    '''
+    __tablename__ = 'blacklist'
+
+    id = Column(
+        BigInteger,
+        primary_key=True,
+        doc='The id of the blacklisted user')
+
+
 if __name__ == '__main__':
     from operator import attrgetter
 

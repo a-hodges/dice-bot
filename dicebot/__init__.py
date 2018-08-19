@@ -82,7 +82,11 @@ async def after_any_command(ctx):
 @bot.event
 async def on_message(message):
     ctx = await bot.get_context(message)
-    if ctx.valid:
+    with closing(bot.Session()) as session:
+        blacklisted = session.query(m.Blacklist).get(ctx.author.id)
+    if blacklisted:
+        await on_command_error(ctx, Exception('User does not have permission for this command'))
+    elif ctx.valid:
         await bot.invoke(ctx)
     else:
         mention = message.guild.get_member(bot.user.id).mention if message.guild else bot.user.mention
