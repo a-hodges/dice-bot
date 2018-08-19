@@ -8,4 +8,4 @@ git+git://github.com/Rapptz/discord.py.git@rewrite#egg=discord-py
 
 # database
 sqlalchemy ~= 1.2
-psycopg2 ~= 2.7
+psycopg2-binary ~= 2.7
