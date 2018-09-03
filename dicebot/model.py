@@ -7,6 +7,7 @@ from sqlalchemy import (
     String,
     Integer,
     BigInteger,
+    Boolean,
     Enum,
     ForeignKey,
 )
@@ -330,6 +331,10 @@ class Spell (Base):
     description = Column(
         String,
         doc='A short description of the spell')
+    prepared = Column(
+        Boolean,
+        nullable=False, default=True,
+        doc='Whether the character has the spell prepared')
 
     __table_args__ = (
         Index('_spell_index', character_id, name, unique=True),
