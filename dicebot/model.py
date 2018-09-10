@@ -213,6 +213,9 @@ class Roll (Base):
     expression = Column(
         String,
         doc='The dice expression to roll')
+    group = Column(
+        String,
+        doc='Group to display the roll with on website')
 
     __table_args__ = (
         Index('_roll_index', character_id, name, unique=True),
@@ -373,6 +376,9 @@ class Information (Base):
         String,
         nullable=False, default='',
         doc='The actual info block')
+    group = Column(
+        String,
+        doc='Group to display the roll with on website')
 
     __table_args__ = (
         Index('_information_index', character_id, name, unique=True),
