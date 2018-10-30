@@ -59,7 +59,7 @@ async def on_ready():
     game = 'Type `@{} help` for command list'.format(bot.user.name)
     if bot.config['url']:
         game = bot.config['url'] + ' | ' + game
-    await bot.change_presence(game=discord.Game(name=game))
+    await bot.change_presence(activity=discord.Game(name=game))
 
 
 @bot.before_invoke
